@@ -1,205 +1,410 @@
-[gd_scene load_steps=48 format=3 uid="uid://cldbqjys6m8o0"]
+[gd_scene load_steps=77 format=3 uid="uid://cldbqjys6m8o0"]
 
 [ext_resource type="Script" uid="uid://cicaebvb5gobd" path="res://Terrain.cs" id="1_ig7tw"]
 [ext_resource type="PackedScene" uid="uid://cutmcayiu5nn6" path="res://character.tscn" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://c8ra08ry0y6l0" path="res://GraphNode.cs" id="2_1bvp3"]
+[ext_resource type="Script" uid="uid://dv1qv5orrn2cb" path="res://GroundMesh.cs" id="2_h2yge"]
 
-[sub_resource type="CSharpScript" id="CSharpScript_0xm2m"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1bvp3"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
-albedo_color = Color(1, 0, 0, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_1bvp3"]
+[sub_resource type="SphereMesh" id="SphereMesh_lquwl"]
 radius = 0.1
 height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lquwl"]
-albedo_color = Color(0, 1, 0, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7mycd"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="SphereMesh" id="SphereMesh_7mycd"]
+[sub_resource type="SphereMesh" id="SphereMesh_272bh"]
 radius = 0.1
 height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_272bh"]
-albedo_color = Color(1, 0.2, 0.8, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5vw27"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_5vw27"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 2.23607
-radial_segments = 16
-rings = 1
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kek77"]
-albedo_color = Color(0, 0, 1, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_4c57u"]
+[sub_resource type="SphereMesh" id="SphereMesh_kek77"]
 radius = 0.1
 height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_efxa6"]
-albedo_color = Color(1, 0.2, 0.8, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4c57u"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_dg77c"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 2.23607
-radial_segments = 16
-rings = 1
+[sub_resource type="SphereMesh" id="SphereMesh_efxa6"]
+radius = 0.1
+height = 0.2
 
-[sub_resource type="CSharpScript" id="CSharpScript_ycdy4"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dg77c"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ycdy4"]
+radius = 0.1
+height = 0.2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w48qg"]
-albedo_color = Color(0.5, 0.5, 0.5, 1)
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_vivmo"]
-_surfaces = [{
-"aabb": AABB(-1, 0, -1, 2, 1e-05, 2),
-"format": 34359742465,
-"index_count": 3,
-"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 3,
-"vertex_data": PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 191, 0, 0, 0, 0, 0, 0, 128, 63)
-}]
-
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_2cqfq"]
-data = PackedVector3Array(0, 0, -1, 1, 0, 0, -1, 0, 1)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yaehf"]
-albedo_color = Color(0, 0, 1, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_074og"]
+[sub_resource type="SphereMesh" id="SphereMesh_vivmo"]
 radius = 0.1
 height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cegan"]
-albedo_color = Color(1, 0.2, 0.8, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2cqfq"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_82xsv"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 6.40312
-radial_segments = 16
-rings = 1
+[sub_resource type="SphereMesh" id="SphereMesh_yaehf"]
+radius = 0.1
+height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_getpj"]
-albedo_color = Color(1, 0.2, 0.8, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_074og"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_ryguw"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 7.2111
-radial_segments = 16
-rings = 1
+[sub_resource type="SphereMesh" id="SphereMesh_cegan"]
+radius = 0.1
+height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d13ii"]
-albedo_color = Color(0.5, 0.5, 0.5, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_82xsv"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_1u8w0"]
-_surfaces = [{
-"aabb": AABB(-1, 0, 0, 6, 1e-05, 5),
-"format": 34359742465,
-"index_count": 3,
-"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 3,
-"vertex_data": PackedByteArray(0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 160, 64, 0, 0, 128, 191, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0)
-}]
+[sub_resource type="SphereMesh" id="SphereMesh_getpj"]
+radius = 0.1
+height = 0.2
 
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_0odxb"]
-data = PackedVector3Array(5, 0, 5, -1, 0, 1, 1, 0, 0)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryguw"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_d13ii"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1u8w0"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0odxb"]
+radius = 0.1
+height = 0.2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lswn8"]
-albedo_color = Color(0, 1, 0, 1)
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_a6jrf"]
 radius = 0.1
 height = 0.2
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xuqvo"]
-albedo_color = Color(1, 0.2, 0.8, 1)
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_qsp4k"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 3.0
-radial_segments = 16
-rings = 1
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kq58d"]
-albedo_color = Color(1, 0.2, 0.8, 1)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_seu75"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 7.34847
-radial_segments = 16
-rings = 1
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htxhm"]
-albedo_color = Color(0.5, 0.5, 0.5, 1)
-
-[sub_resource type="ArrayMesh" id="ArrayMesh_jq2sk"]
-_surfaces = [{
-"aabb": AABB(1, 0, 0, 4, 1, 7),
-"format": 34359742465,
-"index_count": 3,
-"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
-"primitive": 3,
-"uv_scale": Vector4(0, 0, 0, 0),
-"vertex_count": 3,
-"vertex_data": PackedByteArray(0, 0, 64, 64, 0, 0, 128, 63, 0, 0, 224, 64, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 160, 64)
-}]
-
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_4k2k6"]
-data = PackedVector3Array(3, 1, 7, 1, 0, 0, 5, 0, 5)
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0rl1p"]
-albedo_color = Color(1, 0, 0, 1)
-
-[sub_resource type="SphereMesh" id="SphereMesh_ok6jj"]
+[sub_resource type="SphereMesh" id="SphereMesh_qsp4k"]
 radius = 0.1
 height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_facbu"]
-albedo_color = Color(1, 0.2, 0.8, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kq58d"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_b1qrp"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 2.82843
-radial_segments = 16
-rings = 1
+[sub_resource type="SphereMesh" id="SphereMesh_seu75"]
+radius = 0.1
+height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_come4"]
-albedo_color = Color(1, 0.2, 0.8, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htxhm"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="CylinderMesh" id="CylinderMesh_h8e4i"]
-top_radius = 0.01
-bottom_radius = 0.01
-height = 8.24621
-radial_segments = 16
-rings = 1
+[sub_resource type="SphereMesh" id="SphereMesh_jq2sk"]
+radius = 0.1
+height = 0.2
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4lmeg"]
-albedo_color = Color(0.5, 0.5, 0.5, 1)
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4k2k6"]
+albedo_color = Color(0.8, 0.8, 0.8, 1)
 
-[sub_resource type="ArrayMesh" id="ArrayMesh_0cp0l"]
+[sub_resource type="SphereMesh" id="SphereMesh_0rl1p"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="Image" id="Image_ok6jj"]
+data = {
+"data": PackedByteArray(89, 165, 63, 51, 127, 25, 51, 127, 25, 78, 154, 52, 51, 127, 25, 58, 134, 32, 93, 170, 68, 77, 153, 51, 51, 128, 26, 96, 172, 70, 56, 132, 30, 57, 134, 32, 76, 153, 51, 62, 139, 37, 67, 143, 41, 58, 134, 32, 77, 154, 52, 51, 127, 25, 100, 177, 75, 82, 158, 56, 68, 145, 43, 51, 127, 25, 51, 127, 25, 92, 168, 66, 100, 177, 75, 79, 156, 54, 51, 127, 25, 92, 169, 67, 51, 127, 25, 102, 178, 76, 91, 167, 65, 77, 154, 52, 52, 129, 27, 51, 127, 25, 61, 138, 36, 82, 159, 57, 101, 177, 75, 51, 127, 25, 79, 155, 53, 99, 176, 74, 95, 171, 69, 67, 144, 42, 51, 127, 25, 51, 127, 25, 51, 127, 25, 98, 174, 72, 86, 162, 60, 51, 127, 25, 57, 133, 31, 97, 173, 71, 60, 136, 34, 87, 164, 62, 51, 127, 25, 51, 127, 25, 84, 160, 58, 77, 154, 52, 51, 127, 25, 70, 146, 44, 92, 168, 66, 86, 162, 60, 54, 131, 29, 51, 127, 25, 66, 142, 40, 58, 135, 33, 51, 127, 25, 93, 169, 67, 51, 127, 25, 73, 150, 48, 51, 127, 25, 99, 175, 73, 71, 148, 46, 77, 154, 52, 76, 152, 50, 51, 127, 25, 101, 178, 76, 51, 127, 25, 51, 127, 25, 51, 127, 25, 88, 164, 62, 51, 127, 25, 102, 178, 76, 102, 178, 76, 73, 150, 48, 66, 143, 41, 85, 161, 59, 51, 127, 25, 66, 143, 41, 51, 127, 25, 71, 148, 46, 98, 175, 73, 78, 155, 53, 68, 145, 43, 60, 137, 35, 102, 178, 76, 83, 159, 57, 94, 170, 68, 51, 127, 25, 102, 178, 76, 102, 178, 76, 63, 140, 38, 92, 169, 67, 51, 127, 25, 51, 127, 25, 72, 149, 47, 63, 140, 38, 97, 174, 72, 51, 127, 25, 51, 127, 25, 54, 131, 29, 83, 160, 58, 77, 153, 51, 102, 178, 76, 96, 173, 71, 89, 166, 64, 92, 169, 67, 60, 136, 34, 80, 156, 54, 102, 178, 76, 88, 164, 62, 51, 127, 25, 64, 141, 39, 102, 178, 76, 51, 127, 25, 55, 131, 29, 58, 135, 33, 51, 127, 25, 54, 131, 29, 83, 160, 58, 70, 147, 45, 51, 127, 25, 102, 178, 76, 51, 127, 25, 51, 127, 25, 62, 139, 37, 63, 139, 37, 95, 172, 70, 101, 177, 75, 51, 127, 25, 51, 127, 25, 102, 178, 76, 102, 178, 76, 56, 132, 30, 102, 178, 76, 102, 178, 76, 59, 136, 34, 79, 156, 54, 86, 163, 61, 86, 162, 60, 52, 129, 27, 60, 137, 35, 52, 128, 26, 51, 127, 25, 55, 132, 30, 102, 178, 76, 102, 178, 76, 98, 174, 72, 51, 127, 25, 102, 178, 76, 52, 129, 27, 60, 137, 35, 81, 157, 55, 80, 157, 55, 92, 169, 67, 51, 127, 25, 84, 160, 58, 68, 144, 42, 102, 178, 76, 72, 148, 46, 64, 141, 39, 102, 178, 76, 73, 150, 48, 79, 156, 54, 102, 178, 76, 100, 176, 74, 51, 127, 25, 51, 127, 25, 51, 127, 25, 52, 128, 26, 102, 178, 76, 93, 169, 67, 69, 145, 43, 83, 159, 57, 68, 145, 43, 51, 127, 25, 102, 178, 76, 102, 178, 76, 102, 178, 76, 51, 127, 25, 63, 140, 38, 79, 156, 54, 85, 161, 59, 102, 178, 76, 101, 177, 75, 95, 171, 69, 59, 136, 34, 64, 140, 38, 78, 154, 52, 99, 176, 74, 57, 133, 31, 102, 178, 76, 89, 165, 63, 52, 129, 27, 59, 135, 33, 55, 132, 30, 102, 178, 76, 87, 163, 61, 51, 127, 25, 70, 146, 44, 99, 176, 74, 102, 178, 76, 97, 174, 72, 102, 178, 76, 102, 178, 76, 73, 150, 48, 102, 178, 76, 102, 178, 76, 51, 127, 25, 83, 159, 57, 54, 130, 28, 86, 163, 61, 76, 153, 51, 92, 168, 66, 51, 127, 25, 99, 176, 74, 64, 141, 39, 78, 154, 52, 93, 169, 67, 53, 130, 28, 78, 155, 53, 98, 175, 73, 82, 159, 57, 53, 129, 27, 102, 178, 76, 51, 127, 25, 51, 127, 25, 54, 131, 29, 62, 138, 36, 51, 127, 25, 60, 137, 35, 58, 135, 33, 102, 178, 76, 74, 150, 48, 66, 142, 40, 72, 149, 47, 96, 173, 71, 88, 165, 63, 102, 178, 76, 65, 141, 39, 102, 178, 76, 62, 138, 36, 52, 128, 26, 102, 178, 76, 83, 160, 58, 85, 161, 59, 67, 144, 42, 102, 178, 76, 51, 127, 25, 74, 150, 48, 102, 178, 76, 62, 138, 36, 102, 178, 76, 102, 178, 76, 102, 178, 76, 51, 127, 25, 61, 137, 35, 82, 159, 57, 51, 127, 25, 102, 178, 76, 69, 146, 44, 89, 166, 64, 88, 164, 62, 102, 178, 76, 60, 137, 35, 102, 178, 76, 95, 172, 70, 51, 127, 25, 64, 140, 38, 88, 165, 63, 51, 127, 25, 90, 167, 65, 78, 154, 52, 66, 142, 40, 64, 141, 39, 54, 131, 29, 84, 161, 59, 87, 163, 61, 84, 161, 59, 62, 139, 37, 89, 165, 63, 51, 127, 25, 51, 127, 25, 102, 178, 76, 60, 137, 35, 102, 178, 76, 65, 141, 39, 51, 127, 25, 82, 159, 57, 65, 141, 39, 51, 127, 25, 52, 128, 26, 87, 164, 62, 51, 127, 25, 102, 178, 76, 52, 128, 26, 88, 164, 62, 53, 129, 27, 87, 163, 61, 88, 164, 62, 102, 178, 76, 65, 142, 40, 85, 161, 59, 70, 146, 44, 71, 147, 45, 53, 129, 27, 98, 175, 73, 80, 157, 55, 79, 155, 53, 89, 166, 64, 69, 146, 44, 88, 164, 62, 102, 178, 76, 91, 168, 66, 55, 132, 30, 62, 138, 36, 79, 156, 54, 100, 176, 74, 91, 167, 65, 62, 139, 37, 83, 159, 57, 95, 172, 70, 72, 149, 47, 102, 178, 76, 76, 153, 51, 102, 178, 76, 51, 127, 25, 69, 146, 44, 70, 146, 44, 51, 127, 25, 81, 157, 55, 69, 145, 43, 51, 127, 25, 102, 178, 76, 73, 150, 48, 61, 138, 36, 75, 151, 49, 92, 169, 67, 69, 146, 44, 51, 127, 25, 52, 129, 27, 99, 175, 73, 73, 150, 48, 102, 178, 76, 102, 178, 76, 76, 153, 51, 54, 130, 28, 102, 178, 76, 102, 178, 76, 86, 163, 61, 87, 163, 61, 102, 178, 76, 76, 153, 51, 63, 139, 37, 51, 127, 25, 51, 127, 25, 102, 178, 76, 86, 162, 60, 102, 178, 76, 81, 158, 56, 51, 127, 25, 67, 143, 41, 51, 127, 25, 66, 143, 41, 51, 127, 25, 51, 127, 25, 88, 164, 62, 51, 127, 25, 56, 132, 30, 102, 178, 76, 101, 178, 76, 101, 177, 75, 68, 145, 43, 84, 160, 58, 51, 127, 25, 98, 175, 73, 60, 136, 34, 79, 156, 54, 51, 127, 25, 51, 127, 25, 88, 164, 62, 51, 127, 25, 78, 155, 53, 98, 174, 72, 78, 154, 52, 93, 169, 67, 102, 178, 76, 90, 166, 64, 102, 178, 76, 65, 141, 39, 69, 145, 43, 102, 178, 76, 99, 175, 73, 102, 178, 76, 102, 178, 76, 100, 176, 74, 88, 165, 63, 51, 127, 25, 99, 175, 73, 102, 178, 76, 102, 178, 76, 52, 129, 27, 92, 169, 67, 102, 178, 76, 99, 176, 74, 100, 177, 75, 72, 148, 46, 102, 178, 76, 53, 129, 27, 58, 135, 33, 101, 177, 75, 65, 142, 40, 82, 158, 56, 102, 178, 76, 102, 178, 76, 51, 127, 25, 102, 178, 76, 64, 141, 39, 102, 178, 76, 68, 144, 42, 51, 127, 25, 102, 178, 76, 51, 127, 25, 102, 178, 76, 77, 153, 51, 102, 178, 76, 51, 127, 25, 80, 157, 55, 88, 164, 62, 62, 139, 37, 51, 127, 25, 53, 129, 27, 95, 171, 69, 51, 127, 25, 51, 127, 25, 73, 150, 48, 67, 143, 41, 81, 157, 55, 102, 178, 76, 92, 169, 67, 59, 135, 33, 102, 178, 76, 75, 151, 49, 85, 162, 60, 78, 155, 53, 51, 127, 25, 59, 136, 34, 102, 178, 76, 102, 178, 76, 102, 178, 76, 102, 178, 76, 62, 138, 36, 56, 133, 31, 69, 145, 43, 101, 178, 76, 102, 178, 76, 51, 127, 25, 101, 178, 76, 72, 149, 47, 102, 178, 76, 98, 174, 72, 102, 178, 76, 57, 133, 31, 102, 178, 76, 51, 127, 25, 85, 162, 60, 85, 161, 59, 73, 149, 47, 96, 173, 71, 72, 149, 47, 90, 166, 64, 59, 136, 34, 66, 142, 40, 51, 127, 25, 51, 127, 25, 51, 127, 25, 76, 152, 50, 77, 153, 51, 65, 141, 39, 74, 150, 48, 90, 167, 65, 51, 127, 25, 86, 162, 60, 97, 174, 72, 65, 141, 39, 100, 177, 75, 102, 178, 76, 64, 140, 38, 60, 136, 34, 59, 136, 34, 69, 146, 44, 80, 157, 55, 51, 127, 25, 51, 127, 25, 102, 178, 76, 67, 144, 42, 95, 171, 69, 84, 160, 58, 74, 151, 49, 102, 178, 76, 71, 147, 45, 101, 177, 75, 51, 127, 25, 74, 150, 48, 53, 130, 28, 90, 166, 64, 102, 178, 76, 51, 127, 25, 60, 137, 35, 93, 169, 67, 67, 143, 41, 79, 156, 54, 74, 151, 49, 102, 178, 76, 51, 127, 25, 86, 162, 60, 58, 134, 32, 74, 151, 49, 78, 154, 52, 63, 139, 37, 88, 165, 63, 59, 135, 33, 51, 128, 26, 75, 151, 49, 51, 127, 25, 51, 127, 25, 51, 127, 25, 55, 131, 29, 54, 131, 29, 93, 170, 68, 66, 142, 40, 102, 178, 76, 51, 127, 25, 72, 148, 46, 51, 127, 25, 102, 178, 76, 51, 127, 25, 51, 127, 25, 81, 158, 56, 89, 166, 64, 102, 178, 76, 102, 178, 76, 51, 127, 25, 81, 157, 55, 102, 178, 76, 102, 178, 76, 51, 127, 25, 51, 127, 25, 102, 178, 76, 60, 137, 35, 51, 127, 25, 58, 135, 33, 51, 127, 25, 51, 127, 25, 57, 133, 31, 51, 127, 25, 87, 164, 62, 86, 162, 60, 71, 147, 45, 51, 127, 25, 77, 153, 51, 93, 170, 68, 102, 178, 76, 81, 158, 56, 65, 142, 40, 75, 152, 50, 77, 153, 51, 51, 127, 25, 102, 178, 76, 60, 137, 35, 83, 159, 57, 51, 127, 25, 102, 178, 76, 102, 178, 76, 73, 149, 47, 99, 175, 73, 55, 132, 30, 85, 161, 59, 82, 159, 57, 51, 128, 26, 51, 127, 25, 51, 127, 25, 56, 132, 30, 102, 178, 76, 84, 160, 58, 51, 127, 25, 100, 176, 74, 102, 178, 76, 52, 129, 27, 102, 178, 76, 54, 131, 29, 70, 146, 44, 93, 170, 68, 75, 152, 50, 51, 127, 25, 51, 127, 25, 102, 178, 76, 74, 151, 49, 54, 130, 28, 70, 146, 44, 65, 142, 40, 51, 127, 25, 51, 128, 26, 91, 168, 66, 92, 169, 67, 51, 127, 25, 66, 142, 40, 55, 131, 29, 91, 167, 65, 72, 149, 47, 102, 178, 76, 51, 127, 25, 51, 127, 25, 57, 134, 32, 51, 127, 25, 73, 150, 48, 75, 152, 50, 102, 178, 76, 102, 178, 76, 58, 134, 32, 89, 166, 64, 85, 162, 60, 102, 178, 76, 51, 127, 25, 51, 127, 25, 51, 127, 25, 67, 144, 42, 69, 146, 44, 91, 167, 65, 62, 139, 37, 101, 177, 75, 96, 172, 70, 69, 145, 43, 51, 127, 25, 100, 177, 75, 51, 127, 25, 102, 178, 76, 79, 155, 53, 54, 130, 28, 83, 159, 57, 94, 170, 68, 83, 159, 57, 53, 129, 27, 95, 171, 69, 102, 178, 76, 51, 128, 26, 66, 143, 41, 74, 150, 48, 73, 149, 47, 91, 168, 66, 88, 164, 62, 51, 127, 25, 77, 153, 51, 102, 178, 76, 94, 171, 69, 94, 171, 69, 53, 129, 27, 51, 127, 25, 85, 162, 60, 79, 155, 53, 86, 163, 61, 102, 178, 76, 79, 155, 53, 66, 143, 41, 86, 162, 60, 51, 127, 25, 86, 163, 61, 102, 178, 76, 71, 148, 46, 51, 127, 25, 83, 159, 57, 102, 178, 76, 96, 172, 70, 66, 143, 41, 78, 155, 53, 51, 127, 25, 71, 147, 45, 51, 127, 25, 51, 127, 25, 102, 178, 76, 99, 176, 74, 102, 178, 76, 102, 178, 76, 102, 178, 76, 88, 165, 63, 100, 177, 75, 56, 133, 31, 73, 149, 47, 70, 147, 45, 51, 127, 25, 100, 176, 74, 96, 172, 70, 102, 178, 76, 89, 165, 63, 102, 178, 76, 97, 174, 72, 51, 127, 25, 101, 177, 75, 51, 127, 25, 98, 175, 73, 79, 156, 54, 75, 152, 50, 51, 127, 25, 71, 147, 45, 51, 127, 25, 92, 168, 66, 57, 133, 31, 51, 127, 25, 70, 146, 44, 88, 164, 62, 61, 138, 36, 51, 127, 25, 51, 127, 25, 92, 169, 67, 94, 171, 69, 93, 170, 68, 102, 178, 76, 79, 156, 54, 92, 169, 67, 100, 176, 74, 102, 178, 76, 51, 128, 26, 73, 149, 47, 65, 142, 40, 54, 131, 29, 102, 178, 76, 51, 127, 25, 51, 127, 25, 70, 146, 44, 95, 172, 70, 51, 127, 25, 84, 161, 59, 102, 178, 76, 62, 138, 36, 66, 142, 40, 62, 138, 36, 102, 178, 76, 78, 154, 52, 102, 178, 76, 102, 178, 76, 81, 158, 56, 51, 127, 25, 51, 127, 25, 97, 173, 71, 96, 173, 71, 92, 169, 67, 95, 171, 69, 53, 130, 28, 102, 178, 76, 56, 132, 30, 98, 174, 72, 77, 153, 51, 51, 127, 25, 61, 138, 36, 102, 178, 76, 66, 142, 40, 51, 127, 25, 90, 166, 64, 54, 131, 29, 59, 135, 33, 89, 165, 63, 51, 127, 25, 93, 169, 67, 89, 165, 63, 85, 162, 60, 91, 168, 66, 51, 127, 25, 91, 168, 66, 65, 141, 39, 70, 147, 45, 102, 178, 76, 74, 150, 48, 89, 165, 63, 95, 172, 70, 56, 133, 31, 101, 177, 75, 51, 127, 25, 90, 166, 64, 83, 160, 58, 77, 153, 51, 51, 127, 25, 101, 178, 76, 51, 127, 25, 52, 128, 26, 102, 178, 76, 78, 155, 53, 76, 152, 50, 89, 166, 64, 72, 148, 46, 102, 178, 76, 59, 135, 33, 53, 129, 27, 61, 138, 36, 84, 160, 58, 60, 136, 34, 69, 146, 44, 67, 144, 42, 67, 143, 41, 51, 127, 25, 51, 127, 25, 83, 160, 58, 51, 127, 25, 102, 178, 76, 77, 153, 51, 67, 144, 42, 61, 138, 36, 102, 178, 76, 65, 142, 40, 51, 127, 25, 51, 127, 25, 55, 132, 30, 65, 141, 39, 51, 127, 25, 92, 168, 66, 52, 129, 27, 102, 178, 76, 102, 178, 76, 79, 155, 53, 91, 167, 65, 51, 127, 25, 53, 130, 28, 72, 148, 46, 57, 134, 32, 65, 141, 39, 51, 127, 25, 88, 164, 62, 51, 127, 25, 51, 127, 25, 73, 149, 47, 101, 178, 76, 71, 148, 46, 96, 172, 70, 78, 155, 53, 78, 155, 53, 102, 178, 76, 51, 127, 25, 102, 178, 76, 88, 164, 62, 99, 175, 73, 88, 165, 63, 90, 167, 65, 51, 127, 25, 84, 160, 58, 68, 145, 43, 96, 173, 71, 102, 178, 76, 51, 127, 25, 84, 160, 58, 70, 146, 44, 72, 149, 47, 70, 146, 44, 102, 178, 76, 90, 166, 64, 51, 127, 25, 102, 178, 76, 51, 127, 25, 98, 175, 73, 76, 152, 50, 65, 142, 40, 94, 170, 68, 51, 127, 25, 98, 174, 72, 102, 178, 76, 56, 133, 31, 84, 161, 59, 74, 150, 48, 101, 177, 75, 80, 157, 55, 98, 175, 73, 51, 127, 25, 102, 178, 76, 64, 141, 39, 94, 170, 68, 51, 127, 25, 69, 145, 43, 51, 127, 25, 102, 178, 76, 102, 178, 76, 83, 159, 57, 55, 131, 29, 79, 156, 54, 80, 157, 55, 87, 164, 62, 51, 127, 25, 69, 146, 44, 82, 159, 57, 51, 127, 25, 73, 150, 48, 89, 166, 64, 96, 173, 71, 57, 133, 31, 74, 151, 49, 60, 137, 35, 51, 127, 25, 77, 153, 51, 102, 178, 76, 56, 132, 30, 65, 142, 40, 98, 175, 73, 60, 137, 35, 51, 127, 25, 80, 157, 55, 100, 176, 74, 59, 135, 33, 83, 159, 57, 51, 127, 25, 51, 127, 25, 87, 164, 62, 88, 165, 63, 98, 175, 73, 61, 137, 35, 102, 178, 76, 102, 178, 76, 51, 127, 25, 52, 129, 27, 83, 159, 57, 51, 127, 25, 102, 178, 76, 101, 178, 76, 51, 127, 25, 68, 145, 43, 65, 142, 40, 102, 178, 76, 51, 127, 25, 102, 178, 76, 67, 144, 42, 51, 127, 25, 88, 165, 63, 78, 154, 52, 76, 153, 51, 102, 178, 76, 75, 152, 50, 51, 127, 25, 60, 137, 35, 51, 127, 25, 102, 178, 76, 95, 172, 70, 66, 143, 41, 70, 147, 45, 64, 140, 38, 73, 150, 48, 71, 147, 45, 99, 176, 74, 102, 178, 76, 73, 150, 48, 62, 138, 36, 81, 158, 56, 51, 127, 25, 102, 178, 76, 102, 178, 76, 96, 173, 71, 64, 140, 38, 78, 155, 53, 97, 173, 71, 102, 178, 76, 94, 171, 69, 89, 166, 64, 98, 174, 72, 67, 143, 41, 53, 130, 28, 51, 127, 25, 73, 149, 47, 51, 127, 25, 51, 127, 25, 102, 178, 76, 100, 176, 74, 102, 178, 76, 85, 162, 60, 51, 127, 25, 53, 130, 28, 102, 178, 76, 96, 173, 71, 74, 150, 48, 76, 152, 50, 80, 157, 55, 102, 178, 76, 80, 157, 55, 51, 127, 25, 81, 157, 55, 82, 159, 57, 100, 177, 75, 102, 178, 76, 97, 174, 72, 84, 161, 59, 94, 171, 69, 75, 152, 50, 102, 178, 76, 60, 137, 35, 68, 144, 42, 67, 144, 42, 62, 138, 36, 102, 178, 76, 102, 178, 76, 55, 131, 29, 62, 139, 37, 51, 127, 25, 61, 138, 36, 88, 164, 62, 102, 178, 76, 88, 164, 62, 71, 147, 45, 102, 178, 76, 51, 127, 25, 90, 166, 64, 51, 127, 25, 51, 127, 25, 102, 178, 76, 51, 127, 25, 54, 130, 28, 102, 178, 76, 52, 128, 26, 89, 165, 63, 55, 131, 29, 99, 175, 73, 67, 144, 42, 51, 127, 25),
+"format": "RGB8",
+"height": 32,
+"mipmaps": false,
+"width": 32
+}
+
+[sub_resource type="ImageTexture" id="ImageTexture_facbu"]
+image = SubResource("Image_ok6jj")
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b1qrp"]
+albedo_color = Color(0.3, 0.6, 0.2, 1)
+albedo_texture = SubResource("ImageTexture_facbu")
+roughness = 0.9
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_come4"]
 _surfaces = [{
-"aabb": AABB(-3, 0, -1, 3, 1e-05, 4),
-"format": 34359742465,
+"aabb": AABB(-3, 0, -5, 8, 1e-05, 8),
+"attribute_data": PackedByteArray(0, 0, 192, 191, 0, 0, 192, 63, 0, 0, 0, 0, 0, 0, 32, 192, 0, 0, 32, 64, 0, 0, 0, 0),
+"format": 34359742481,
 "index_count": 3,
 "index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
 "primitive": 3,
 "uv_scale": Vector4(0, 0, 0, 0),
 "vertex_count": 3,
-"vertex_data": PackedByteArray(0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 0, 0, 0, 0, 128, 63)
+"vertex_data": PackedByteArray(0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 192, 0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 0, 0)
 }]
 
-[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_d2t1y"]
-data = PackedVector3Array(-3, 0, 3, 0, 0, -1, -1, 0, 1)
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_h8e4i"]
+data = PackedVector3Array(-3, 0, 3, 0, 0, -5, 5, 0, 0)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_4lmeg"]
+_surfaces = [{
+"aabb": AABB(-3, 0, 3, 8, 1, 4),
+"attribute_data": PackedByteArray(0, 0, 192, 191, 0, 0, 192, 63, 0, 0, 32, 64, 0, 0, 32, 64, 0, 0, 192, 63, 0, 0, 96, 64),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 160, 64, 0, 0, 64, 64, 0, 0, 128, 63, 0, 0, 224, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_0cp0l"]
+data = PackedVector3Array(-3, 0, 3, 5, 0, 5, 3, 1, 7)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_d2t1y"]
+_surfaces = [{
+"aabb": AABB(-3, 0, 0, 8, 1e-05, 5),
+"attribute_data": PackedByteArray(0, 0, 192, 191, 0, 0, 192, 63, 0, 0, 32, 64, 0, 0, 0, 0, 0, 0, 32, 64, 0, 0, 32, 64),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 160, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_gngh3"]
+data = PackedVector3Array(-3, 0, 3, 5, 0, 0, 5, 0, 5)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_0n3wm"]
+_surfaces = [{
+"aabb": AABB(-5, 0, 3, 4.76563, 0.256752, 5.05429),
+"attribute_data": PackedByteArray(0, 255, 239, 189, 92, 222, 128, 64, 0, 0, 32, 192, 0, 0, 32, 64, 0, 0, 192, 191, 0, 0, 192, 63),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 255, 111, 190, 6, 117, 131, 62, 92, 222, 0, 65, 0, 0, 160, 192, 0, 0, 0, 0, 0, 0, 160, 64, 0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_qnost"]
+data = PackedVector3Array(-0.234371, 0.256752, 8.05429, -5, 0, 5, -3, 0, 3)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_wnkbs"]
+_surfaces = [{
+"aabb": AABB(-3, 0, 3, 6, 1, 5.05429),
+"attribute_data": PackedByteArray(0, 255, 239, 189, 92, 222, 128, 64, 0, 0, 192, 191, 0, 0, 192, 63, 0, 0, 192, 63, 0, 0, 96, 64),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 255, 111, 190, 6, 117, 131, 62, 92, 222, 0, 65, 0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 64, 64, 0, 0, 128, 63, 0, 0, 224, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_f6a44"]
+data = PackedVector3Array(-0.234371, 0.256752, 8.05429, -3, 0, 3, 3, 1, 7)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_0cbny"]
+_surfaces = [{
+"aabb": AABB(-5, -0.705085, 5, 4.76563, 0.961837, 8.08595),
+"attribute_data": PackedByteArray(48, 146, 194, 191, 11, 96, 209, 64, 0, 0, 32, 192, 0, 0, 32, 64, 0, 255, 239, 189, 92, 222, 128, 64),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(48, 146, 66, 192, 112, 128, 52, 191, 11, 96, 81, 65, 0, 0, 160, 192, 0, 0, 0, 0, 0, 0, 160, 64, 0, 255, 111, 190, 6, 117, 131, 62, 92, 222, 0, 65)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_hrvbo"]
+data = PackedVector3Array(-3.04017, -0.705085, 13.0859, -5, 0, 5, -0.234371, 0.256752, 8.05429)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_uypp3"]
+_surfaces = [{
+"aabb": AABB(-3.04017, -0.705085, 7, 6.04017, 1.70508, 6.08595),
+"attribute_data": PackedByteArray(48, 146, 194, 191, 11, 96, 209, 64, 0, 255, 239, 189, 92, 222, 128, 64, 0, 0, 192, 63, 0, 0, 96, 64),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(48, 146, 66, 192, 112, 128, 52, 191, 11, 96, 81, 65, 0, 255, 111, 190, 6, 117, 131, 62, 92, 222, 0, 65, 0, 0, 64, 64, 0, 0, 128, 63, 0, 0, 224, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_blkrb"]
+data = PackedVector3Array(-3.04017, -0.705085, 13.0859, -0.234371, 0.256752, 8.05429, 3, 1, 7)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_abqjc"]
+_surfaces = [{
+"aabb": AABB(-11.8014, 0, -1.48996, 8.80144, 0.526114, 6.48996),
+"attribute_data": PackedByteArray(182, 210, 188, 192, 226, 182, 62, 191, 0, 0, 192, 191, 0, 0, 192, 63, 0, 0, 32, 192, 0, 0, 32, 64),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(182, 210, 60, 193, 100, 175, 6, 63, 226, 182, 190, 191, 0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 160, 192, 0, 0, 0, 0, 0, 0, 160, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_6iyjs"]
+data = PackedVector3Array(-11.8014, 0.526114, -1.48996, -3, 0, 3, -5, 0, 5)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_4w656"]
+_surfaces = [{
+"aabb": AABB(-11.8014, -0.802175, -9.57519, 11.8014, 1.32829, 8.08523),
+"attribute_data": PackedByteArray(182, 210, 188, 192, 226, 182, 62, 191, 72, 29, 141, 191, 246, 51, 153, 192, 0, 0, 0, 0, 0, 0, 32, 192),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(182, 210, 60, 193, 100, 175, 6, 63, 226, 182, 190, 191, 72, 29, 13, 192, 87, 91, 77, 191, 246, 51, 25, 193, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 192)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_e71vb"]
+data = PackedVector3Array(-11.8014, 0.526114, -1.48996, -2.20491, -0.802175, -9.57519, 0, 0, -5)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_rnkwl"]
+_surfaces = [{
+"aabb": AABB(-11.8014, 0, -5, 11.8014, 0.526114, 8),
+"attribute_data": PackedByteArray(182, 210, 188, 192, 226, 182, 62, 191, 0, 0, 0, 0, 0, 0, 32, 192, 0, 0, 192, 191, 0, 0, 192, 63),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(182, 210, 60, 193, 100, 175, 6, 63, 226, 182, 190, 191, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 192, 0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_vke2r"]
+data = PackedVector3Array(-11.8014, 0.526114, -1.48996, 0, 0, -5, -3, 0, 3)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_uit24"]
+_surfaces = [{
+"aabb": AABB(-14.5569, 0, -1.48996, 9.55691, 0.778711, 6.48996),
+"attribute_data": PackedByteArray(25, 233, 232, 192, 222, 21, 222, 190, 182, 210, 188, 192, 226, 182, 62, 191, 0, 0, 32, 192, 0, 0, 32, 64),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(25, 233, 104, 193, 161, 89, 71, 63, 222, 21, 94, 191, 182, 210, 60, 193, 100, 175, 6, 63, 226, 182, 190, 191, 0, 0, 160, 192, 0, 0, 0, 0, 0, 0, 160, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_ruth0"]
+data = PackedVector3Array(-14.5569, 0.778711, -0.867521, -11.8014, 0.526114, -1.48996, -5, 0, 5)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_rm4vd"]
+_surfaces = [{
+"aabb": AABB(-11.8014, -0.802175, -10.556, 9.59653, 1.32829, 9.06601),
+"attribute_data": PackedByteArray(232, 98, 187, 192, 60, 229, 168, 192, 72, 29, 141, 191, 246, 51, 153, 192, 182, 210, 188, 192, 226, 182, 62, 191),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(232, 98, 59, 193, 30, 3, 47, 191, 60, 229, 40, 193, 72, 29, 13, 192, 87, 91, 77, 191, 246, 51, 25, 193, 182, 210, 60, 193, 100, 175, 6, 63, 226, 182, 190, 191)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_pjyto"]
+data = PackedVector3Array(-11.7116, -0.683641, -10.556, -2.20491, -0.802175, -9.57519, -11.8014, 0.526114, -1.48996)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_sm6fg"]
+_surfaces = [{
+"aabb": AABB(-14.5569, -0.683641, -10.556, 2.84526, 1.46235, 9.68844),
+"attribute_data": PackedByteArray(232, 98, 187, 192, 60, 229, 168, 192, 182, 210, 188, 192, 226, 182, 62, 191, 25, 233, 232, 192, 222, 21, 222, 190),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(232, 98, 59, 193, 30, 3, 47, 191, 60, 229, 40, 193, 182, 210, 60, 193, 100, 175, 6, 63, 226, 182, 190, 191, 25, 233, 104, 193, 161, 89, 71, 63, 222, 21, 94, 191)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_b17eg"]
+data = PackedVector3Array(-11.7116, -0.683641, -10.556, -11.8014, 0.526114, -1.48996, -14.5569, 0.778711, -0.867521)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_ntx8l"]
+_surfaces = [{
+"aabb": AABB(-19.989, -0.878375, -10.556, 8.27733, 1.65709, 9.68844),
+"attribute_data": PackedByteArray(107, 233, 31, 193, 51, 130, 37, 191, 232, 98, 187, 192, 60, 229, 168, 192, 25, 233, 232, 192, 222, 21, 222, 190),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(107, 233, 159, 193, 52, 221, 96, 191, 51, 130, 165, 191, 232, 98, 59, 193, 30, 3, 47, 191, 60, 229, 40, 193, 25, 233, 104, 193, 161, 89, 71, 63, 222, 21, 94, 191)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_uatky"]
+data = PackedVector3Array(-19.989, -0.878375, -1.29304, -11.7116, -0.683641, -10.556, -14.5569, 0.778711, -0.867521)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_rqtf5"]
+_surfaces = [{
+"aabb": AABB(-23.9796, -0.878375, -1.29304, 9.42274, 1.65709, 5.2317),
+"attribute_data": PackedByteArray(80, 214, 63, 193, 35, 19, 252, 63, 107, 233, 31, 193, 51, 130, 37, 191, 25, 233, 232, 192, 222, 21, 222, 190),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(80, 214, 191, 193, 89, 237, 64, 63, 35, 19, 124, 64, 107, 233, 159, 193, 52, 221, 96, 191, 51, 130, 165, 191, 25, 233, 104, 193, 161, 89, 71, 63, 222, 21, 94, 191)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_1vm84"]
+data = PackedVector3Array(-23.9796, 0.753622, 3.93867, -19.989, -0.878375, -1.29304, -14.5569, 0.778711, -0.867521)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_wu3dr"]
+_surfaces = [{
+"aabb": AABB(-28.4397, -0.878375, -1.29304, 8.45072, 1.632, 5.2317),
+"attribute_data": PackedByteArray(128, 132, 99, 193, 39, 213, 86, 62, 107, 233, 31, 193, 51, 130, 37, 191, 80, 214, 63, 193, 35, 19, 252, 63),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(128, 132, 227, 193, 20, 3, 3, 191, 39, 213, 214, 62, 107, 233, 159, 193, 52, 221, 96, 191, 51, 130, 165, 191, 80, 214, 191, 193, 89, 237, 64, 63, 35, 19, 124, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_cyx1q"]
+data = PackedVector3Array(-28.4397, -0.511766, 0.419595, -19.989, -0.878375, -1.29304, -23.9796, 0.753622, 3.93867)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_0dhbp"]
+_surfaces = [{
+"aabb": AABB(-28.7329, -0.878375, -3.78745, 8.7439, 0.434323, 4.20705),
+"attribute_data": PackedByteArray(236, 220, 101, 193, 160, 101, 242, 191, 107, 233, 31, 193, 51, 130, 37, 191, 128, 132, 99, 193, 39, 213, 86, 62),
+"format": 34359742481,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(236, 220, 229, 193, 201, 90, 227, 190, 160, 101, 114, 192, 107, 233, 159, 193, 52, 221, 96, 191, 51, 130, 165, 191, 128, 132, 227, 193, 20, 3, 3, 191, 39, 213, 214, 62)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_jx0wj"]
+data = PackedVector3Array(-28.7329, -0.444052, -3.78745, -19.989, -0.878375, -1.29304, -28.4397, -0.511766, 0.419595)
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
 sky_top_color = Color(0.269359, 0.338252, 1, 1)
@@ -214,136 +419,306 @@ sky = SubResource("Sky_h2yge")
 [node name="Main" type="Node3D"]
 
 [node name="Terrain" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00284195, -9.53674e-07, -0.0111032)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0276532, 0.0566006, -0.0305906)
 script = ExtResource("1_ig7tw")
 
-[node name="test" type="Node3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
-script = SubResource("CSharpScript_0xm2m")
+[node name="Node1" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 0)
+script = ExtResource("2_1bvp3")
 
-[node name="@MeshInstance3D@26348" type="MeshInstance3D" parent="Terrain/test"]
-material_override = SubResource("StandardMaterial3D_h2yge")
-mesh = SubResource("SphereMesh_1bvp3")
+[node name="@MeshInstance3D@115588" type="MeshInstance3D" parent="Terrain/Node1"]
+material_override = SubResource("StandardMaterial3D_1bvp3")
+mesh = SubResource("SphereMesh_lquwl")
 
-[node name="@Node3D@26358" type="Node3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
-script = SubResource("CSharpScript_0xm2m")
+[node name="Node2" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5, 0, 5)
+script = ExtResource("2_1bvp3")
 
-[node name="@MeshInstance3D@26357" type="MeshInstance3D" parent="Terrain/@Node3D@26358"]
-material_override = SubResource("StandardMaterial3D_lquwl")
-mesh = SubResource("SphereMesh_7mycd")
+[node name="@MeshInstance3D@115589" type="MeshInstance3D" parent="Terrain/Node2"]
+material_override = SubResource("StandardMaterial3D_7mycd")
+mesh = SubResource("SphereMesh_272bh")
 
-[node name="@MeshInstance3D@26359" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.2, 0.894427, 0.4, -0.894427, -3.90967e-08, 0.447214, 0.4, -0.447214, 0.8, 0, 0, 0.5)
-material_override = SubResource("StandardMaterial3D_272bh")
-mesh = SubResource("CylinderMesh_5vw27")
+[node name="Node3" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -5)
+script = ExtResource("2_1bvp3")
 
-[node name="@Node3D@26369" type="Node3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
-script = SubResource("CSharpScript_0xm2m")
+[node name="@MeshInstance3D@115590" type="MeshInstance3D" parent="Terrain/Node3"]
+material_override = SubResource("StandardMaterial3D_5vw27")
+mesh = SubResource("SphereMesh_kek77")
 
-[node name="@MeshInstance3D@26368" type="MeshInstance3D" parent="Terrain/@Node3D@26369"]
-material_override = SubResource("StandardMaterial3D_kek77")
-mesh = SubResource("SphereMesh_4c57u")
-
-[node name="@MeshInstance3D@26370" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.8, -0.447214, 0.4, 0.447213, -1.95483e-08, -0.894427, 0.4, 0.894427, 0.2, -0.5, 0, 0)
-material_override = SubResource("StandardMaterial3D_efxa6")
-mesh = SubResource("CylinderMesh_dg77c")
-
-[node name="@StaticBody3D@26372" type="StaticBody3D" parent="Terrain"]
-script = SubResource("CSharpScript_ycdy4")
-
-[node name="@MeshInstance3D@26371" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26372"]
-material_override = SubResource("StandardMaterial3D_w48qg")
-mesh = SubResource("ArrayMesh_vivmo")
-
-[node name="@CollisionShape3D@26373" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26372"]
-shape = SubResource("ConcavePolygonShape3D_2cqfq")
-
-[node name="@Node3D@26383" type="Node3D" parent="Terrain"]
+[node name="Node4" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
-script = SubResource("CSharpScript_0xm2m")
+script = ExtResource("2_1bvp3")
 
-[node name="@MeshInstance3D@26382" type="MeshInstance3D" parent="Terrain/@Node3D@26383"]
-material_override = SubResource("StandardMaterial3D_yaehf")
-mesh = SubResource("SphereMesh_074og")
+[node name="@MeshInstance3D@115594" type="MeshInstance3D" parent="Terrain/Node4"]
+material_override = SubResource("StandardMaterial3D_4c57u")
+mesh = SubResource("SphereMesh_efxa6")
 
-[node name="@MeshInstance3D@26384" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.609756, -0.624695, -0.487805, 0.624695, -2.73063e-08, 0.780869, -0.487805, -0.780869, 0.390244, 3, 0, 2.5)
-material_override = SubResource("StandardMaterial3D_cegan")
-mesh = SubResource("CylinderMesh_82xsv")
-
-[node name="@MeshInstance3D@26385" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.307692, -0.83205, -0.461538, 0.83205, -3.63701e-08, 0.5547, -0.461538, -0.5547, 0.692308, 2, 0, 3)
-material_override = SubResource("StandardMaterial3D_getpj")
-mesh = SubResource("CylinderMesh_ryguw")
-
-[node name="@StaticBody3D@26387" type="StaticBody3D" parent="Terrain"]
-script = SubResource("CSharpScript_ycdy4")
-
-[node name="@MeshInstance3D@26386" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26387"]
-material_override = SubResource("StandardMaterial3D_d13ii")
-mesh = SubResource("ArrayMesh_1u8w0")
-
-[node name="@CollisionShape3D@26388" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26387"]
-shape = SubResource("ConcavePolygonShape3D_0odxb")
-
-[node name="@Node3D@26398" type="Node3D" parent="Terrain"]
+[node name="Node5" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 7)
-script = SubResource("CSharpScript_0xm2m")
+script = ExtResource("2_1bvp3")
 
-[node name="@MeshInstance3D@26397" type="MeshInstance3D" parent="Terrain/@Node3D@26398"]
+[node name="@MeshInstance3D@115609" type="MeshInstance3D" parent="Terrain/Node5"]
+material_override = SubResource("StandardMaterial3D_dg77c")
+mesh = SubResource("SphereMesh_ycdy4")
+
+[node name="Node6" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115619" type="MeshInstance3D" parent="Terrain/Node6"]
+material_override = SubResource("StandardMaterial3D_w48qg")
+mesh = SubResource("SphereMesh_vivmo")
+
+[node name="Node7" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.234371, 0.256752, 8.05429)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115635" type="MeshInstance3D" parent="Terrain/Node7"]
+material_override = SubResource("StandardMaterial3D_2cqfq")
+mesh = SubResource("SphereMesh_yaehf")
+
+[node name="Node8" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.20491, -0.802175, -9.57519)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115654" type="MeshInstance3D" parent="Terrain/Node8"]
+material_override = SubResource("StandardMaterial3D_074og")
+mesh = SubResource("SphereMesh_cegan")
+
+[node name="Node9" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.04017, -0.705085, 13.0859)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115676" type="MeshInstance3D" parent="Terrain/Node9"]
+material_override = SubResource("StandardMaterial3D_82xsv")
+mesh = SubResource("SphereMesh_getpj")
+
+[node name="Node10" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.8014, 0.526114, -1.48996)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115704" type="MeshInstance3D" parent="Terrain/Node10"]
+material_override = SubResource("StandardMaterial3D_ryguw")
+mesh = SubResource("SphereMesh_d13ii")
+
+[node name="Node11" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.5569, 0.778711, -0.867521)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115735" type="MeshInstance3D" parent="Terrain/Node11"]
+material_override = SubResource("StandardMaterial3D_1u8w0")
+mesh = SubResource("SphereMesh_0odxb")
+
+[node name="Node12" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.7116, -0.683641, -10.556)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115769" type="MeshInstance3D" parent="Terrain/Node12"]
 material_override = SubResource("StandardMaterial3D_lswn8")
 mesh = SubResource("SphereMesh_a6jrf")
 
-[node name="@MeshInstance3D@26399" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.333333, 0.666667, 0.666667, -0.666667, -0.333333, 0.666667, 0.666667, -0.666667, 0.333333, 4, 0.5, 6)
+[node name="Node13" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.989, -0.878375, -1.29304)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115809" type="MeshInstance3D" parent="Terrain/Node13"]
 material_override = SubResource("StandardMaterial3D_xuqvo")
-mesh = SubResource("CylinderMesh_qsp4k")
+mesh = SubResource("SphereMesh_qsp4k")
 
-[node name="@MeshInstance3D@26400" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.914258, -0.272166, -0.300097, 0.272166, -0.136083, 0.952579, -0.300097, -0.952579, -0.0503407, 2, 0.5, 3.5)
+[node name="Node14" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.9796, 0.753622, 3.93867)
+script = ExtResource("2_1bvp3")
+
+[node name="@MeshInstance3D@115852" type="MeshInstance3D" parent="Terrain/Node14"]
 material_override = SubResource("StandardMaterial3D_kq58d")
-mesh = SubResource("CylinderMesh_seu75")
+mesh = SubResource("SphereMesh_seu75")
 
-[node name="@StaticBody3D@26402" type="StaticBody3D" parent="Terrain"]
-script = SubResource("CSharpScript_ycdy4")
+[node name="Node15" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.4397, -0.511766, 0.419595)
+script = ExtResource("2_1bvp3")
 
-[node name="@MeshInstance3D@26401" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26402"]
+[node name="@MeshInstance3D@115898" type="MeshInstance3D" parent="Terrain/Node15"]
 material_override = SubResource("StandardMaterial3D_htxhm")
-mesh = SubResource("ArrayMesh_jq2sk")
+mesh = SubResource("SphereMesh_jq2sk")
 
-[node name="@CollisionShape3D@26403" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26402"]
-shape = SubResource("ConcavePolygonShape3D_4k2k6")
+[node name="Node16" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.7329, -0.444052, -3.78745)
+script = ExtResource("2_1bvp3")
 
-[node name="@Node3D@26413" type="Node3D" parent="Terrain"]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
-script = SubResource("CSharpScript_0xm2m")
+[node name="@MeshInstance3D@115947" type="MeshInstance3D" parent="Terrain/Node16"]
+material_override = SubResource("StandardMaterial3D_4k2k6")
+mesh = SubResource("SphereMesh_0rl1p")
 
-[node name="@MeshInstance3D@26412" type="MeshInstance3D" parent="Terrain/@Node3D@26413"]
-material_override = SubResource("StandardMaterial3D_0rl1p")
-mesh = SubResource("SphereMesh_ok6jj")
+[node name="@StaticBody3D@115949" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
 
-[node name="@MeshInstance3D@26414" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.5, 0.707107, 0.5, -0.707107, -3.09086e-08, 0.707107, 0.5, -0.707107, 0.5, -2, 0, 2)
-material_override = SubResource("StandardMaterial3D_facbu")
-mesh = SubResource("CylinderMesh_b1qrp")
+[node name="@MeshInstance3D@115948" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115949"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_come4")
 
-[node name="@MeshInstance3D@26415" type="MeshInstance3D" parent="Terrain"]
-transform = Transform3D(0.0588235, 0.970142, -0.235294, -0.970142, -4.24063e-08, -0.242536, -0.235294, 0.242536, 0.941176, 1, 0, 4)
-material_override = SubResource("StandardMaterial3D_come4")
-mesh = SubResource("CylinderMesh_h8e4i")
+[node name="@CollisionShape3D@115950" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115949"]
+shape = SubResource("ConcavePolygonShape3D_h8e4i")
 
-[node name="@StaticBody3D@26417" type="StaticBody3D" parent="Terrain"]
-script = SubResource("CSharpScript_ycdy4")
+[node name="@StaticBody3D@115952" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
 
-[node name="@MeshInstance3D@26416" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26417"]
-material_override = SubResource("StandardMaterial3D_4lmeg")
-mesh = SubResource("ArrayMesh_0cp0l")
+[node name="@MeshInstance3D@115951" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115952"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_4lmeg")
 
-[node name="@CollisionShape3D@26418" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26417"]
-shape = SubResource("ConcavePolygonShape3D_d2t1y")
+[node name="@CollisionShape3D@115953" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115952"]
+shape = SubResource("ConcavePolygonShape3D_0cp0l")
+
+[node name="@StaticBody3D@115955" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115954" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115955"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_d2t1y")
+
+[node name="@CollisionShape3D@115956" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115955"]
+shape = SubResource("ConcavePolygonShape3D_gngh3")
+
+[node name="@StaticBody3D@115958" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115957" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115958"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_0n3wm")
+
+[node name="@CollisionShape3D@115959" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115958"]
+shape = SubResource("ConcavePolygonShape3D_qnost")
+
+[node name="@StaticBody3D@115961" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115960" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115961"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_wnkbs")
+
+[node name="@CollisionShape3D@115962" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115961"]
+shape = SubResource("ConcavePolygonShape3D_f6a44")
+
+[node name="@StaticBody3D@115964" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115963" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115964"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_0cbny")
+
+[node name="@CollisionShape3D@115965" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115964"]
+shape = SubResource("ConcavePolygonShape3D_hrvbo")
+
+[node name="@StaticBody3D@115967" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115966" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115967"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_uypp3")
+
+[node name="@CollisionShape3D@115968" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115967"]
+shape = SubResource("ConcavePolygonShape3D_blkrb")
+
+[node name="@StaticBody3D@115970" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115969" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115970"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_abqjc")
+
+[node name="@CollisionShape3D@115971" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115970"]
+shape = SubResource("ConcavePolygonShape3D_6iyjs")
+
+[node name="@StaticBody3D@115973" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115972" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115973"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_4w656")
+
+[node name="@CollisionShape3D@115974" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115973"]
+shape = SubResource("ConcavePolygonShape3D_e71vb")
+
+[node name="@StaticBody3D@115976" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115975" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115976"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_rnkwl")
+
+[node name="@CollisionShape3D@115977" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115976"]
+shape = SubResource("ConcavePolygonShape3D_vke2r")
+
+[node name="@StaticBody3D@115979" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115978" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115979"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_uit24")
+
+[node name="@CollisionShape3D@115980" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115979"]
+shape = SubResource("ConcavePolygonShape3D_ruth0")
+
+[node name="@StaticBody3D@115982" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115981" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115982"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_rm4vd")
+
+[node name="@CollisionShape3D@115983" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115982"]
+shape = SubResource("ConcavePolygonShape3D_pjyto")
+
+[node name="@StaticBody3D@115985" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115984" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115985"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_sm6fg")
+
+[node name="@CollisionShape3D@115986" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115985"]
+shape = SubResource("ConcavePolygonShape3D_b17eg")
+
+[node name="@StaticBody3D@115988" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115987" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115988"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_ntx8l")
+
+[node name="@CollisionShape3D@115989" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115988"]
+shape = SubResource("ConcavePolygonShape3D_uatky")
+
+[node name="@StaticBody3D@115991" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115990" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115991"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_rqtf5")
+
+[node name="@CollisionShape3D@115992" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115991"]
+shape = SubResource("ConcavePolygonShape3D_1vm84")
+
+[node name="@StaticBody3D@115994" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115993" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115994"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_wu3dr")
+
+[node name="@CollisionShape3D@115995" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115994"]
+shape = SubResource("ConcavePolygonShape3D_cyx1q")
+
+[node name="@StaticBody3D@115997" type="StaticBody3D" parent="Terrain"]
+script = ExtResource("2_h2yge")
+
+[node name="@MeshInstance3D@115996" type="MeshInstance3D" parent="Terrain/@StaticBody3D@115997"]
+material_override = SubResource("StandardMaterial3D_b1qrp")
+mesh = SubResource("ArrayMesh_0dhbp")
+
+[node name="@CollisionShape3D@115998" type="CollisionShape3D" parent="Terrain/@StaticBody3D@115997"]
+shape = SubResource("ConcavePolygonShape3D_jx0wj")
 
 [node name="Character" parent="." instance=ExtResource("2_0xm2m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14529, 4.21782)
