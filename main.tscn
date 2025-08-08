@@ -1,0 +1,354 @@
+[gd_scene load_steps=48 format=3 uid="uid://cldbqjys6m8o0"]
+
+[ext_resource type="Script" uid="uid://cicaebvb5gobd" path="res://Terrain.cs" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://cutmcayiu5nn6" path="res://character.tscn" id="2_0xm2m"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_0xm2m"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_1bvp3"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lquwl"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_7mycd"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_272bh"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_5vw27"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 2.23607
+radial_segments = 16
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kek77"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_4c57u"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_efxa6"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_dg77c"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 2.23607
+radial_segments = 16
+rings = 1
+
+[sub_resource type="CSharpScript" id="CSharpScript_ycdy4"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w48qg"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_vivmo"]
+_surfaces = [{
+"aabb": AABB(-1, 0, -1, 2, 1e-05, 2),
+"format": 34359742465,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 191, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 191, 0, 0, 0, 0, 0, 0, 128, 63)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_2cqfq"]
+data = PackedVector3Array(0, 0, -1, 1, 0, 0, -1, 0, 1)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yaehf"]
+albedo_color = Color(0, 0, 1, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_074og"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cegan"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_82xsv"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 6.40312
+radial_segments = 16
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_getpj"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_ryguw"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 7.2111
+radial_segments = 16
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d13ii"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_1u8w0"]
+_surfaces = [{
+"aabb": AABB(-1, 0, 0, 6, 1e-05, 5),
+"format": 34359742465,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 160, 64, 0, 0, 128, 191, 0, 0, 0, 0, 0, 0, 128, 63, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_0odxb"]
+data = PackedVector3Array(5, 0, 5, -1, 0, 1, 1, 0, 0)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lswn8"]
+albedo_color = Color(0, 1, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_a6jrf"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xuqvo"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_qsp4k"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 3.0
+radial_segments = 16
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kq58d"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_seu75"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 7.34847
+radial_segments = 16
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htxhm"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_jq2sk"]
+_surfaces = [{
+"aabb": AABB(1, 0, 0, 4, 1, 7),
+"format": 34359742465,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 0, 64, 64, 0, 0, 128, 63, 0, 0, 224, 64, 0, 0, 128, 63, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 160, 64, 0, 0, 0, 0, 0, 0, 160, 64)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_4k2k6"]
+data = PackedVector3Array(3, 1, 7, 1, 0, 0, 5, 0, 5)
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0rl1p"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ok6jj"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_facbu"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_b1qrp"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 2.82843
+radial_segments = 16
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_come4"]
+albedo_color = Color(1, 0.2, 0.8, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_h8e4i"]
+top_radius = 0.01
+bottom_radius = 0.01
+height = 8.24621
+radial_segments = 16
+rings = 1
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4lmeg"]
+albedo_color = Color(0.5, 0.5, 0.5, 1)
+
+[sub_resource type="ArrayMesh" id="ArrayMesh_0cp0l"]
+_surfaces = [{
+"aabb": AABB(-3, 0, -1, 3, 1e-05, 4),
+"format": 34359742465,
+"index_count": 3,
+"index_data": PackedByteArray(0, 0, 1, 0, 2, 0),
+"primitive": 3,
+"uv_scale": Vector4(0, 0, 0, 0),
+"vertex_count": 3,
+"vertex_data": PackedByteArray(0, 0, 64, 192, 0, 0, 0, 0, 0, 0, 64, 64, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 128, 191, 0, 0, 128, 191, 0, 0, 0, 0, 0, 0, 128, 63)
+}]
+
+[sub_resource type="ConcavePolygonShape3D" id="ConcavePolygonShape3D_d2t1y"]
+data = PackedVector3Array(-3, 0, 3, 0, 0, -1, -1, 0, 1)
+
+[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
+sky_top_color = Color(0.269359, 0.338252, 1, 1)
+
+[sub_resource type="Sky" id="Sky_h2yge"]
+sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
+
+[sub_resource type="Environment" id="Environment_0xm2m"]
+background_mode = 2
+sky = SubResource("Sky_h2yge")
+
+[node name="Main" type="Node3D"]
+
+[node name="Terrain" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.00284195, -9.53674e-07, -0.0111032)
+script = ExtResource("1_ig7tw")
+
+[node name="test" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1, 0, 0)
+script = SubResource("CSharpScript_0xm2m")
+
+[node name="@MeshInstance3D@26348" type="MeshInstance3D" parent="Terrain/test"]
+material_override = SubResource("StandardMaterial3D_h2yge")
+mesh = SubResource("SphereMesh_1bvp3")
+
+[node name="@Node3D@26358" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1, 0, 1)
+script = SubResource("CSharpScript_0xm2m")
+
+[node name="@MeshInstance3D@26357" type="MeshInstance3D" parent="Terrain/@Node3D@26358"]
+material_override = SubResource("StandardMaterial3D_lquwl")
+mesh = SubResource("SphereMesh_7mycd")
+
+[node name="@MeshInstance3D@26359" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.2, 0.894427, 0.4, -0.894427, -3.90967e-08, 0.447214, 0.4, -0.447214, 0.8, 0, 0, 0.5)
+material_override = SubResource("StandardMaterial3D_272bh")
+mesh = SubResource("CylinderMesh_5vw27")
+
+[node name="@Node3D@26369" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -1)
+script = SubResource("CSharpScript_0xm2m")
+
+[node name="@MeshInstance3D@26368" type="MeshInstance3D" parent="Terrain/@Node3D@26369"]
+material_override = SubResource("StandardMaterial3D_kek77")
+mesh = SubResource("SphereMesh_4c57u")
+
+[node name="@MeshInstance3D@26370" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.8, -0.447214, 0.4, 0.447213, -1.95483e-08, -0.894427, 0.4, 0.894427, 0.2, -0.5, 0, 0)
+material_override = SubResource("StandardMaterial3D_efxa6")
+mesh = SubResource("CylinderMesh_dg77c")
+
+[node name="@StaticBody3D@26372" type="StaticBody3D" parent="Terrain"]
+script = SubResource("CSharpScript_ycdy4")
+
+[node name="@MeshInstance3D@26371" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26372"]
+material_override = SubResource("StandardMaterial3D_w48qg")
+mesh = SubResource("ArrayMesh_vivmo")
+
+[node name="@CollisionShape3D@26373" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26372"]
+shape = SubResource("ConcavePolygonShape3D_2cqfq")
+
+[node name="@Node3D@26383" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5, 0, 5)
+script = SubResource("CSharpScript_0xm2m")
+
+[node name="@MeshInstance3D@26382" type="MeshInstance3D" parent="Terrain/@Node3D@26383"]
+material_override = SubResource("StandardMaterial3D_yaehf")
+mesh = SubResource("SphereMesh_074og")
+
+[node name="@MeshInstance3D@26384" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.609756, -0.624695, -0.487805, 0.624695, -2.73063e-08, 0.780869, -0.487805, -0.780869, 0.390244, 3, 0, 2.5)
+material_override = SubResource("StandardMaterial3D_cegan")
+mesh = SubResource("CylinderMesh_82xsv")
+
+[node name="@MeshInstance3D@26385" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.307692, -0.83205, -0.461538, 0.83205, -3.63701e-08, 0.5547, -0.461538, -0.5547, 0.692308, 2, 0, 3)
+material_override = SubResource("StandardMaterial3D_getpj")
+mesh = SubResource("CylinderMesh_ryguw")
+
+[node name="@StaticBody3D@26387" type="StaticBody3D" parent="Terrain"]
+script = SubResource("CSharpScript_ycdy4")
+
+[node name="@MeshInstance3D@26386" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26387"]
+material_override = SubResource("StandardMaterial3D_d13ii")
+mesh = SubResource("ArrayMesh_1u8w0")
+
+[node name="@CollisionShape3D@26388" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26387"]
+shape = SubResource("ConcavePolygonShape3D_0odxb")
+
+[node name="@Node3D@26398" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3, 1, 7)
+script = SubResource("CSharpScript_0xm2m")
+
+[node name="@MeshInstance3D@26397" type="MeshInstance3D" parent="Terrain/@Node3D@26398"]
+material_override = SubResource("StandardMaterial3D_lswn8")
+mesh = SubResource("SphereMesh_a6jrf")
+
+[node name="@MeshInstance3D@26399" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.333333, 0.666667, 0.666667, -0.666667, -0.333333, 0.666667, 0.666667, -0.666667, 0.333333, 4, 0.5, 6)
+material_override = SubResource("StandardMaterial3D_xuqvo")
+mesh = SubResource("CylinderMesh_qsp4k")
+
+[node name="@MeshInstance3D@26400" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.914258, -0.272166, -0.300097, 0.272166, -0.136083, 0.952579, -0.300097, -0.952579, -0.0503407, 2, 0.5, 3.5)
+material_override = SubResource("StandardMaterial3D_kq58d")
+mesh = SubResource("CylinderMesh_seu75")
+
+[node name="@StaticBody3D@26402" type="StaticBody3D" parent="Terrain"]
+script = SubResource("CSharpScript_ycdy4")
+
+[node name="@MeshInstance3D@26401" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26402"]
+material_override = SubResource("StandardMaterial3D_htxhm")
+mesh = SubResource("ArrayMesh_jq2sk")
+
+[node name="@CollisionShape3D@26403" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26402"]
+shape = SubResource("ConcavePolygonShape3D_4k2k6")
+
+[node name="@Node3D@26413" type="Node3D" parent="Terrain"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3, 0, 3)
+script = SubResource("CSharpScript_0xm2m")
+
+[node name="@MeshInstance3D@26412" type="MeshInstance3D" parent="Terrain/@Node3D@26413"]
+material_override = SubResource("StandardMaterial3D_0rl1p")
+mesh = SubResource("SphereMesh_ok6jj")
+
+[node name="@MeshInstance3D@26414" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.5, 0.707107, 0.5, -0.707107, -3.09086e-08, 0.707107, 0.5, -0.707107, 0.5, -2, 0, 2)
+material_override = SubResource("StandardMaterial3D_facbu")
+mesh = SubResource("CylinderMesh_b1qrp")
+
+[node name="@MeshInstance3D@26415" type="MeshInstance3D" parent="Terrain"]
+transform = Transform3D(0.0588235, 0.970142, -0.235294, -0.970142, -4.24063e-08, -0.242536, -0.235294, 0.242536, 0.941176, 1, 0, 4)
+material_override = SubResource("StandardMaterial3D_come4")
+mesh = SubResource("CylinderMesh_h8e4i")
+
+[node name="@StaticBody3D@26417" type="StaticBody3D" parent="Terrain"]
+script = SubResource("CSharpScript_ycdy4")
+
+[node name="@MeshInstance3D@26416" type="MeshInstance3D" parent="Terrain/@StaticBody3D@26417"]
+material_override = SubResource("StandardMaterial3D_4lmeg")
+mesh = SubResource("ArrayMesh_0cp0l")
+
+[node name="@CollisionShape3D@26418" type="CollisionShape3D" parent="Terrain/@StaticBody3D@26417"]
+shape = SubResource("ConcavePolygonShape3D_d2t1y")
+
+[node name="Character" parent="." instance=ExtResource("2_0xm2m")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.14529, 4.21782)
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0xm2m")
