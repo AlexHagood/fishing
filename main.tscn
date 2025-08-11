@@ -1,7 +1,8 @@
-[gd_scene load_steps=6 format=3 uid="uid://cldbqjys6m8o0"]
+[gd_scene load_steps=10 format=3 uid="uid://cldbqjys6m8o0"]
 
-[ext_resource type="Script" uid="uid://cicaebvb5gobd" path="res://Terrain.cs" id="1_ig7tw"]
+[ext_resource type="PackedScene" uid="uid://bk8ja346yxa6l" path="res://terrain.tscn" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://cutmcayiu5nn6" path="res://character.tscn" id="2_0xm2m"]
+[ext_resource type="Script" uid="uid://da84ai3gey451" path="res://PickupableItem.cs" id="3_h2yge"]
 
 [sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
 sky_top_color = Color(0.269359, 0.338252, 1, 1)
@@ -13,11 +14,18 @@ sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
 background_mode = 2
 sky = SubResource("Sky_h2yge")
 
+[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
+albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_0xm2m"]
+points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
+
 [node name="Main" type="Node3D"]
 
-[node name="Terrain" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0396676, 0.0566001, -0.0214101)
-script = ExtResource("1_ig7tw")
+[node name="Terrain" parent="." instance=ExtResource("1_h2yge")]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.90486, -2.27172, 2.5042)
 
 [node name="Character" parent="." instance=ExtResource("2_0xm2m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3705, 4.21782)
@@ -26,3 +34,17 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3705, 4.21782)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0xm2m")
+
+[node name="RigidBody3D" type="RigidBody3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.032196, 3.71295, -1.47477)
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
+mesh = SubResource("BoxMesh_0xm2m")
+surface_material_override/0 = SubResource("StandardMaterial3D_h2yge")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
+shape = SubResource("ConvexPolygonShape3D_0xm2m")
+
+[node name="PickupableItem" type="Node" parent="RigidBody3D"]
+script = ExtResource("3_h2yge")
+metadata/_custom_type_script = "uid://da84ai3gey451"

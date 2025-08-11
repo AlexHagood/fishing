@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Linq;
 
 public partial class GroundMesh : StaticBody3D
 {
@@ -38,6 +39,9 @@ public partial class GroundMesh : StaticBody3D
         NodeB = B;
         NodeC = C;
         
+        // Position this GroundMesh at the triangle's centroid
+        Position = (A.Position + B.Position + C.Position) / 3;
+        
         // Add this ground mesh to each node's reference list
         A.AddGroundMeshReference(this);
         B.AddGroundMeshReference(this);
@@ -46,25 +50,116 @@ public partial class GroundMesh : StaticBody3D
         CreateMeshFromNodes();
     }
     
-    // Method to update the mesh when node positions change
-    public void UpdateMesh()
+    // Efficient method to update mesh vertices without recreating the entire mesh
+    public void UpdateMeshGeometry()
     {
-        if (NodeA != null && NodeB != null && NodeC != null)
+        if (NodeA == null || NodeB == null || NodeC == null || MeshInstance == null)
+            return;
+            
+        // Update position to triangle centroid
+        Position = (NodeA.Position + NodeB.Position + NodeC.Position) / 3;
+            
+        // Get the current mesh
+        var arrayMesh = MeshInstance.Mesh as ArrayMesh;
+        if (arrayMesh == null)
         {
+            // If mesh doesn't exist or is wrong type, recreate it
             CreateMeshFromNodes();
+            return;
         }
+        
+        // Use positions relative to this GroundMesh's position
+        var relativeA = NodeA.Position - Position;
+        var relativeB = NodeB.Position - Position;
+        var relativeC = NodeC.Position - Position;
+        var vertices = EnsureClockwise([relativeA, relativeB, relativeC]);
+        var indices = new int[] { 0, 1, 2 };
+        // Use world positions for UV mapping, not relative positions  
+        var worldPositions = new Vector3[] { NodeA.Position, NodeB.Position, NodeC.Position };
+        var uvs = GenerateUVs(worldPositions);
+        
+        // Clear existing surfaces and add updated one
+        arrayMesh.ClearSurfaces();
+        
+        var arrays = new Godot.Collections.Array();
+        arrays.Resize((int)ArrayMesh.ArrayType.Max);
+        arrays[(int)ArrayMesh.ArrayType.Vertex] = vertices;
+        arrays[(int)ArrayMesh.ArrayType.Index] = indices;
+        arrays[(int)ArrayMesh.ArrayType.TexUV] = uvs;
+        
+        arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
+        
+        // Update collision shape to match new geometry
+        UpdateCollisionShape();
+        
+        GD.Print($"Updated mesh vertices (relative): {relativeA}, {relativeB}, {relativeC}");
+    }
+    
+    // Update collision shape to match new geometry
+    private void UpdateCollisionShape()
+    {
+        if (NodeA == null || NodeB == null || NodeC == null)
+            return;
+            
+        // Find existing collision shape
+        var existingCollision = GetChildren().OfType<CollisionShape3D>().FirstOrDefault();
+        
+        if (existingCollision != null)
+        {
+            // Remove old collision shape - easier than trying to transform it
+            RemoveChild(existingCollision);
+            existingCollision.QueueFree();
+        }
+        
+        // Create new collision shape with current triangle positions
+        // Use positions relative to this GroundMesh's position
+        var relativeA = NodeA.Position - Position;
+        var relativeB = NodeB.Position - Position;
+        var relativeC = NodeC.Position - Position;
+        
+        // Use the same winding order as the visual mesh for consistency
+        var vertices = EnsureClockwise([relativeA, relativeB, relativeC]);
+        
+        // ConcavePolygonShape3D expects faces as a flat array where every 3 vertices form a triangle
+        var faces = new Vector3[]
+        {
+            vertices[0], vertices[1], vertices[2]  // Single triangle face with correct winding
+        };
+        
+        var shape = new ConcavePolygonShape3D();
+        shape.SetFaces(faces);
+        
+        var collisionShape = new CollisionShape3D();
+        collisionShape.Shape = shape;
+        AddChild(collisionShape);
+        
+        // Set owner for editor persistence if needed
+        var editedSceneRoot = GetTree()?.EditedSceneRoot;
+        if (editedSceneRoot != null)
+        {
+            collisionShape.Owner = editedSceneRoot;
+        }
+        
+        GD.Print($"Updated collision shape with relative positions: {vertices[0]}, {vertices[1]}, {vertices[2]}");
     }
     
     // Helper method to create/update the mesh from current node positions
     private void CreateMeshFromNodes()
     {
-        GD.Print($"Creating mesh for nodes at: {NodeA.Position}, {NodeB.Position}, {NodeC.Position}");
+        // Use positions relative to this GroundMesh's position
+        var relativeA = NodeA.Position - Position;
+        var relativeB = NodeB.Position - Position;
+        var relativeC = NodeC.Position - Position;
+        
+        GD.Print($"Creating mesh with relative vertices: {relativeA}, {relativeB}, {relativeC}");
         var mesh = new ArrayMesh();
-        var vertices = EnsureClockwise([NodeA.Position, NodeB.Position, NodeC.Position]);
+        var vertices = EnsureClockwise([relativeA, relativeB, relativeC]);
         var indices = new int[] { 0, 1, 2 };
 
         // Generate proper UV coordinates for each vertex to prevent stretching
-        var uvs = GenerateUVs(vertices);
+        // Use world positions for UV mapping, not relative positions
+        var worldPositions = new Vector3[] { NodeA.Position, NodeB.Position, NodeC.Position };
+        var uvs = GenerateUVs(worldPositions);
 
         var arrays = new Godot.Collections.Array();
         arrays.Resize((int)ArrayMesh.ArrayType.Max); // Resize to match the maximum value of ArrayType
@@ -102,43 +197,18 @@ public partial class GroundMesh : StaticBody3D
         }
     }
 
-    public CollisionShape3D CreateCollisionShape()
-    {
-        // Assume the mesh is a triangle, so create a concave collision shape from its vertices
-        var shape = new ConcavePolygonShape3D();
-        var mesh = MeshInstance.Mesh as ArrayMesh;
-        if (mesh == null)
-            throw new InvalidOperationException("MeshInstance.Mesh is not an ArrayMesh.");
-
-        // Get the vertices and indices from the mesh
-        var arrays = mesh.SurfaceGetArrays(0);
-        var vertices = (Godot.Collections.Array)arrays[(int)ArrayMesh.ArrayType.Vertex];
-
-        // ConcavePolygonShape3D expects a flat array of Vector3s (every 3 is a triangle)
-        var points = new Vector3[3];
-        for (int i = 0; i < 3; i++)
-            points[i] = (Vector3)vertices[i];
-
-        shape.Data = points;
-
-        var collisionShape = new CollisionShape3D();
-        collisionShape.Shape = shape;
-        return collisionShape;
-    }
-
     public override void _Ready()
     {
         // Only create collision shape if MeshInstance exists (not the case for parameterless constructor)
         if (MeshInstance != null && MeshInstance.Mesh != null)
         {
-            var collider = CreateCollisionShape();
-            AddChild(collider);
+            // Use the new UpdateCollisionShape method for consistency
+            UpdateCollisionShape();
             
             // Set owners for persistence in editor only - now that scene tree is available
             var editedSceneRoot = GetTree()?.EditedSceneRoot;
             if (editedSceneRoot != null)
             {
-                collider.Owner = editedSceneRoot;
                 MeshInstance.Owner = editedSceneRoot;
             }
         }
@@ -158,10 +228,10 @@ public partial class GroundMesh : StaticBody3D
         Vector3 ac = c - a;
         Vector3 normal = ab.Cross(ac);
 
-        // In Godot, +Y is up. If the normal points down, swap to make it clockwise (facing up)
+        // In Godot, +Y is up. If the normal points DOWN, swap to make it point UP
         if (normal.Y > 0)
         {
-            // Swap b and c
+            // Swap b and c to flip the winding order so normal points up
             var temp = vertices[1];
             vertices[1] = vertices[2];
             vertices[2] = temp;

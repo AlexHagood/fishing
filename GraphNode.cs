@@ -24,9 +24,30 @@ public partial class GraphNode : StaticBody3D
             _position = value;
             base.Position = value; // Update the actual Node3D position
             
+            // Update all connected ground meshes when this node moves
+            if (ConnectedGroundMeshes != null && ConnectedGroundMeshes.Count > 0)
+            {
+                GD.Print($"GraphNode {Name}: Updating {ConnectedGroundMeshes.Count} connected ground meshes");
+                
+                foreach (var groundMesh in ConnectedGroundMeshes)
+                {
+                    if (groundMesh != null && IsInstanceValid(groundMesh))
+                    {
+                        try 
+                        {
+                            // Call the efficient transform-based update method
+                            groundMesh.UpdateMeshGeometry();
+                            GD.Print($"Updated ground mesh geometry for node {Name}");
+                        }
+                        catch (System.Exception ex)
+                        {
+                            GD.PrintErr($"Error updating ground mesh for node {Name}: {ex.Message}");
+                        }
+                    }
+                }
+            }
+            
             GD.Print($"GraphNode {Name} position changed from {oldPosition} to {value}");
-            GD.Print($"ParentTerrain is null: {ParentTerrain == null}");
-            GD.Print($"ConnectedGroundMeshes count: {ConnectedGroundMeshes.Count}");
         }
     }
 
@@ -36,6 +57,16 @@ public partial class GraphNode : StaticBody3D
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
         _position = Vector3.Zero;
+        SetupMeshInstance();
+    }
+
+    public GraphNode(Vector3 position)
+    {
+        Name = "GraphNode";
+        _position = position;
+        base.Position = position;
+        Connections = new List<GraphNode>();
+        ConnectedGroundMeshes = new List<GroundMesh>();
         SetupMeshInstance();
     }
 
@@ -76,6 +107,7 @@ public partial class GraphNode : StaticBody3D
     private void SetupMeshInstance()
     {
         MeshInstance = new MeshInstance3D();
+        MeshInstance.Position = Vector3.Zero; // Ensure mesh is centered at node origin
         AddChild(MeshInstance);
         
         MeshInstance.Mesh = new SphereMesh()
