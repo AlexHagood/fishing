@@ -5,6 +5,11 @@ public partial class GroundMesh : StaticBody3D
 {
     public MeshInstance3D MeshInstance;
     
+    // References to the nodes that form this triangle
+    public GraphNode NodeA { get; private set; }
+    public GraphNode NodeB { get; private set; }
+    public GraphNode NodeC { get; private set; }
+    
     // Static grass material to avoid recreating for every instance
     private static StandardMaterial3D _grassMaterial;
     public static StandardMaterial3D GrassMaterial
@@ -25,12 +30,37 @@ public partial class GroundMesh : StaticBody3D
         // Default constructor for Godot serialization
         // The actual mesh setup will be done in the parameterized constructor
     }
-    
+
     public GroundMesh(GraphNode A, GraphNode B, GraphNode C)
     {
-        GD.Print("Creating mesh");
+        // Store node references
+        NodeA = A;
+        NodeB = B;
+        NodeC = C;
+        
+        // Add this ground mesh to each node's reference list
+        A.AddGroundMeshReference(this);
+        B.AddGroundMeshReference(this);
+        C.AddGroundMeshReference(this);
+        
+        CreateMeshFromNodes();
+    }
+    
+    // Method to update the mesh when node positions change
+    public void UpdateMesh()
+    {
+        if (NodeA != null && NodeB != null && NodeC != null)
+        {
+            CreateMeshFromNodes();
+        }
+    }
+    
+    // Helper method to create/update the mesh from current node positions
+    private void CreateMeshFromNodes()
+    {
+        GD.Print($"Creating mesh for nodes at: {NodeA.Position}, {NodeB.Position}, {NodeC.Position}");
         var mesh = new ArrayMesh();
-        var vertices = EnsureClockwise([A.Position, B.Position, C.Position]);
+        var vertices = EnsureClockwise([NodeA.Position, NodeB.Position, NodeC.Position]);
         var indices = new int[] { 0, 1, 2 };
 
         // Generate proper UV coordinates for each vertex to prevent stretching
@@ -44,11 +74,32 @@ public partial class GroundMesh : StaticBody3D
 
         mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
 
-        MeshInstance = new MeshInstance3D();
-        MeshInstance.MaterialOverride = GrassMaterial; // Use static property
+        if (MeshInstance == null)
+        {
+            MeshInstance = new MeshInstance3D();
+            MeshInstance.MaterialOverride = CreateGrassMaterial();
+            MeshInstance.Visible = true; // Ensure visibility at runtime
+            AddChild(MeshInstance);
+        }
+        
         MeshInstance.Mesh = mesh;
+    }
 
-        AddChild(MeshInstance);
+    public override void _ExitTree()
+    {
+        // Clean up references when this ground mesh is destroyed
+        if (NodeA != null)
+        {
+            NodeA.RemoveGroundMeshReference(this);
+        }
+        if (NodeB != null)
+        {
+            NodeB.RemoveGroundMeshReference(this);
+        }
+        if (NodeC != null)
+        {
+            NodeC.RemoveGroundMeshReference(this);
+        }
     }
 
     public CollisionShape3D CreateCollisionShape()
@@ -82,7 +133,14 @@ public partial class GroundMesh : StaticBody3D
         {
             var collider = CreateCollisionShape();
             AddChild(collider);
-            collider.Owner = GetTree().EditedSceneRoot;
+            
+            // Set owners for persistence in editor only - now that scene tree is available
+            var editedSceneRoot = GetTree()?.EditedSceneRoot;
+            if (editedSceneRoot != null)
+            {
+                collider.Owner = editedSceneRoot;
+                MeshInstance.Owner = editedSceneRoot;
+            }
         }
     }
     
@@ -177,5 +235,20 @@ public partial class GroundMesh : StaticBody3D
         }
         
         return ImageTexture.CreateFromImage(image);
+    }
+    
+    // Method to set up node references for existing ground meshes (used for scene file loading)
+    public void SetupNodeReferences(GraphNode nodeA, GraphNode nodeB, GraphNode nodeC)
+    {
+        NodeA = nodeA;
+        NodeB = nodeB;
+        NodeC = nodeC;
+        
+        // Add this ground mesh to each node's reference list
+        if (nodeA != null) nodeA.AddGroundMeshReference(this);
+        if (nodeB != null) nodeB.AddGroundMeshReference(this);
+        if (nodeC != null) nodeC.AddGroundMeshReference(this);
+        
+        GD.Print($"Set up node references for ground mesh: {nodeA?.Name}, {nodeB?.Name}, {nodeC?.Name}");
     }
 }
