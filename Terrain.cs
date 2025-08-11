@@ -34,6 +34,27 @@ public partial class Terrain : Node3D
         GD.Print("Terrain reset complete - unified 3D Delaunay triangulation system ready!");
     }
 
+    public override void _Ready()
+    {
+        base._Ready();
+        var generatedNodes = GenerateNodes(20, new Vector3(0, 0, 0), new Vector3(40, 3, 40), 0);
+        var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
+        ForEachTriangle(triangulatedNodes, (nodeA, nodeB, nodeC) =>
+        {
+            CreateDebugLine(nodeA.Position, nodeB.Position);
+            CreateDebugLine(nodeB.Position, nodeC.Position);
+            CreateDebugLine(nodeC.Position, nodeA.Position);
+            var mesh = new GroundMesh(nodeA, nodeB, nodeC);
+            AddChild(mesh);
+        });
+
+        CreateDebugLine(new Vector3(0, 0, 0), new Vector3(0, 10, 0));
+
+        // Now manually add to our terrain's node collection if desired
+        nodes.AddRange(triangulatedNodes);
+
+        GD.Print($"Ready complete: {triangulatedNodes.Count} nodes generated and triangulated.");
+    }
 
     public List<GraphNode> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
     {
@@ -42,9 +63,10 @@ public partial class Terrain : Node3D
         
         for (int i = 0; i < count; i++)
         {
-            float x = (float)(startLocation.X + rng.NextDouble() * spread.X);
-            float y = (float)(startLocation.Y + rng.NextDouble() * spread.Y);
-            float z = (float)(startLocation.Z + rng.NextDouble() * spread.Z);
+            // Center the spread around the start location
+            float x = (float)(startLocation.X + (rng.NextDouble() - 0.5) * spread.X);
+            float y = (float)(startLocation.Y + (rng.NextDouble() - 0.5) * spread.Y);
+            float z = (float)(startLocation.Z + (rng.NextDouble() - 0.5) * spread.Z);
             var node = new GraphNode
             {
                 Name = $"Node_{nodeCount++}",
@@ -54,7 +76,7 @@ public partial class Terrain : Node3D
             generatedNodes.Add(node);
         }
         
-        GD.Print($"{count} nodes generated from {startLocation} with spread {spread}.");
+        GD.Print($"{count} nodes generated centered at {startLocation} with spread {spread}.");
         return generatedNodes;
     }
 
@@ -68,54 +90,81 @@ public partial class Terrain : Node3D
     {
         return DelaunayTriangulator.TriangulateAndConnect(graphNodes);
     }
-    public void ForEachTriangle(List<GraphNode> graphNodes, Action<GraphNode, GraphNode, GraphNode> triangleAction)
-    {
-        var visited = new HashSet<(int, int, int)>();
 
+    /// <summary>
+    /// Iterates over every triangle based on the actual connections between nodes.
+    /// Finds triangles by looking for sets of 3 nodes that are all connected to each other.
+    /// Uses node indices for efficient duplicate detection.
+    /// </summary>
+    /// <param name="graphNodes">List of nodes with connections</param>
+    /// <param name="action">Action to call for each triangle (nodeA, nodeB, nodeC)</param>
+    public void ForEachTriangle(List<GraphNode> graphNodes, Action<GraphNode, GraphNode, GraphNode> action)
+    {
+        if (graphNodes == null || graphNodes.Count < 3)
+        {
+            GD.Print("ForEachTriangle: Need at least 3 nodes to form triangles");
+            return;
+        }
+
+        // Use a HashSet of sorted index tuples for efficient duplicate detection
+        var processedTriangles = new HashSet<(int, int, int)>();
+        int triangleCount = 0;
+
+        // Create a lookup dictionary for fast node index retrieval
+        var nodeToIndex = new Dictionary<GraphNode, int>();
         for (int i = 0; i < graphNodes.Count; i++)
         {
-            var nodeA = graphNodes[i];
-            foreach (var nodeB in nodeA.Connections)
+            nodeToIndex[graphNodes[i]] = i;
+        }
+
+        // For each node, check all pairs of its connections to see if they form triangles
+        for (int aIndex = 0; aIndex < graphNodes.Count; aIndex++)
+        {
+            var nodeA = graphNodes[aIndex];
+            if (nodeA.Connections == null || nodeA.Connections.Count < 2)
+                continue;
+
+            // Check all pairs of connections from nodeA
+            for (int i = 0; i < nodeA.Connections.Count; i++)
             {
+                var nodeB = nodeA.Connections[i];
                 if (nodeB == nodeA) continue;
-                foreach (var nodeC in nodeB.Connections)
+
+                for (int j = i + 1; j < nodeA.Connections.Count; j++)
                 {
+                    var nodeC = nodeA.Connections[j];
                     if (nodeC == nodeA || nodeC == nodeB) continue;
-                    if (nodeA.Connections.Contains(nodeC))
+
+                    // Check if nodeB and nodeC are also connected to each other
+                    if (nodeB.Connections != null && nodeB.Connections.Contains(nodeC))
                     {
-                        // Sort indices to avoid duplicates
-                        var indices = new[] { graphNodes.IndexOf(nodeA), graphNodes.IndexOf(nodeB), graphNodes.IndexOf(nodeC) };
+                        // Get indices and create sorted tuple for duplicate detection
+                        var bIndex = nodeToIndex[nodeB];
+                        var cIndex = nodeToIndex[nodeC];
+                        
+                        // Sort the indices to create a unique triangle key
+                        var indices = new[] { aIndex, bIndex, cIndex };
                         Array.Sort(indices);
-                        var key = (indices[0], indices[1], indices[2]);
-                        if (!visited.Contains(key))
+                        var triangleKey = (indices[0], indices[1], indices[2]);
+
+                        // Check if we've already processed this triangle
+                        if (!processedTriangles.Contains(triangleKey))
                         {
-                            visited.Add(key);
-                            triangleAction(graphNodes[indices[0]], graphNodes[indices[1]], graphNodes[indices[2]]);
+                            processedTriangles.Add(triangleKey);
+                            action(nodeA, nodeB, nodeC);
+                            triangleCount++;
                         }
                     }
                 }
             }
         }
+
+        GD.Print($"ForEachTriangle: Processed {triangleCount} triangles from node connections");
     }
 
-    public override void _Ready()
-    {
-        base._Ready();
-        var generatedNodes = GenerateNodes(20, new Vector3(0, 0, 0), new Vector3(40, 5, 40), 0);
-        var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
-        ForEachTriangle(triangulatedNodes, (nodeA, nodeB, nodeC) =>
-        {
-            var mesh = new GroundMesh(nodeA, nodeB, nodeC);
-            AddChild(mesh);
-        });
 
-        CreateDebugLine(new Vector3(0, 0, 0), new Vector3(0, 10, 0));
 
-        // Now manually add to our terrain's node collection if desired
-        nodes.AddRange(triangulatedNodes);
 
-        GD.Print($"Ready complete: {triangulatedNodes.Count} nodes generated and triangulated.");
-    }
 
     /// <summary>
     /// Creates a debug line as a pink cylinder between two 3D points
@@ -180,36 +229,6 @@ public partial class Terrain : Node3D
         GD.Print($"Debug line created from {pointA} to {pointB} (length: {pointA.DistanceTo(pointB):F2})");
         
         return meshInstance;
-    }
-
-    /// <summary>
-    /// Demonstrates different ways to use the DelaunayTriangulator
-    /// </summary>
-    public void DemoTriangulation()
-    {
-        // Generate some test nodes
-        var testNodes = GenerateNodes(10, new Vector3(-10, 0, -10), new Vector3(20, 0, 20), 42);
-        
-        // Option 1: Simple triangulation (most common usage)
-        var triangulatedNodes = DelaunayTriangulator.TriangulateAndConnect(testNodes);
-        
-        // Option 2: Get triangle data without connecting (for analysis)
-        var triangles = DelaunayTriangulator.Triangulate2D(testNodes);
-        GD.Print($"Generated {triangles.Count} triangles: {string.Join(", ", triangles)}");
-        
-        // Option 3: Triangulate without clearing existing connections
-        DelaunayTriangulator.TriangulateAndConnect(testNodes, clearExistingConnections: false);
-        
-        // Visualize connections with debug lines
-        foreach (var node in triangulatedNodes)
-        {
-            foreach (var connection in node.Connections)
-            {
-                CreateDebugLine(node.Position, connection.Position);
-            }
-        }
-        
-        GD.Print($"Demo complete: {triangulatedNodes.Count} nodes triangulated");
     }
 
 }

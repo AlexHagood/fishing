@@ -102,14 +102,14 @@ public partial class Character : CharacterBody3D
             direction.Z * Speed
         );
 
-        // if (!isOnFloor)
-        //     Velocity = new Vector3(Velocity.X, Velocity.Y - Gravity * (float)delta, Velocity.Z);
+        if (!isOnFloor)
+            Velocity = new Vector3(Velocity.X, Velocity.Y - Gravity * (float)delta, Velocity.Z);
 
-        // if (isOnFloor && Input.IsActionJustPressed("jump"))
-        //     Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
+        if (isOnFloor && Input.IsActionJustPressed("jump"))
+            Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
 
 
-        Velocity = new Vector3(Velocity.X, 0, Velocity.Z);
+        //Velocity = new Vector3(Velocity.X, 0, Velocity.Z);
 
         // Godot 4 CharacterBody3D: MoveAndSlide() takes no arguments
         MoveAndSlide();
