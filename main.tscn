@@ -1,50 +1,54 @@
-[gd_scene load_steps=10 format=3 uid="uid://cldbqjys6m8o0"]
+[gd_scene load_steps=9 format=3 uid="uid://cldbqjys6m8o0"]
 
 [ext_resource type="PackedScene" uid="uid://bk8ja346yxa6l" path="res://terrain.tscn" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://cutmcayiu5nn6" path="res://character.tscn" id="2_0xm2m"]
-[ext_resource type="Script" uid="uid://da84ai3gey451" path="res://PickupableItem.cs" id="3_h2yge"]
+[ext_resource type="Shader" uid="uid://c2sdmw22wybh6" path="res://sky.gdshader" id="3_1bvp3"]
+[ext_resource type="PackedScene" uid="uid://bn862mp3xkohi" path="res://box.tscn" id="3_h2yge"]
+[ext_resource type="Script" uid="uid://ccahcvc6dmfry" path="res://NetworkManager.cs" id="5_lquwl"]
 
-[sub_resource type="ProceduralSkyMaterial" id="ProceduralSkyMaterial_0xm2m"]
-sky_top_color = Color(0.269359, 0.338252, 1, 1)
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
+shader = ExtResource("3_1bvp3")
+shader_parameter/sky_color = Color(0.03, 0.05, 0.11, 1)
+shader_parameter/moon_color = Color(0.9, 0.95, 0.85, 1)
+shader_parameter/moon_size = 0.08
+shader_parameter/moon_softness = 0.017
+shader_parameter/moon_direction = Vector3(0.3, 0.6, 0.2)
+shader_parameter/moon_ambient_strength = 0.12
+shader_parameter/star_base_color = Color(0.8, 1, 0.3, 1)
+shader_parameter/star_hue_offset = 0.6
+shader_parameter/star_intensity = 0.08
+shader_parameter/star_twinkle_speed = 1.2
+shader_parameter/star_twinkle_intensity = 0.2
+shader_parameter/layer_scale = 20.0
+shader_parameter/layer_scale_step = 10.0
+shader_parameter/layers_count = 3
 
-[sub_resource type="Sky" id="Sky_h2yge"]
-sky_material = SubResource("ProceduralSkyMaterial_0xm2m")
+[sub_resource type="Sky" id="Sky_7mycd"]
+sky_material = SubResource("ShaderMaterial_lquwl")
 
 [sub_resource type="Environment" id="Environment_0xm2m"]
 background_mode = 2
-sky = SubResource("Sky_h2yge")
-
-[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
-albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
-
-[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_0xm2m"]
-points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
+sky = SubResource("Sky_7mycd")
 
 [node name="Main" type="Node3D"]
 
 [node name="Terrain" parent="." instance=ExtResource("1_h2yge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.90486, -2.27172, 2.5042)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.82869, -2.08263, 2.5449)
+TerrainSize = Vector3(1000, 10, 1000)
+NodeCount = 1000
 
 [node name="Character" parent="." instance=ExtResource("2_0xm2m")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3705, 4.21782)
-
-[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.33068, 4.21782)
 
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0xm2m")
 
-[node name="RigidBody3D" type="RigidBody3D" parent="."]
+[node name="Box" parent="." instance=ExtResource("3_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.032196, 3.71295, -1.47477)
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="RigidBody3D"]
-mesh = SubResource("BoxMesh_0xm2m")
-surface_material_override/0 = SubResource("StandardMaterial3D_h2yge")
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.911274, 0.374109, 0.172111, -0.127376, -0.653522, 0.746113, 0.391606, 0.65799, 0.643191, 0, 0, 0)
+light_energy = 0.592
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="RigidBody3D"]
-shape = SubResource("ConvexPolygonShape3D_0xm2m")
-
-[node name="PickupableItem" type="Node" parent="RigidBody3D"]
-script = ExtResource("3_h2yge")
-metadata/_custom_type_script = "uid://da84ai3gey451"
+[node name="Node3D" type="Node3D" parent="."]
+script = ExtResource("5_lquwl")

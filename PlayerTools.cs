@@ -17,10 +17,111 @@ public static class PlayerTools
     public class ShovelTool : PlayerTool
     {
         public override string Name => "Shovel";
+        private GraphNode _targetNode = null;
+        private bool _holdingRaise = false;
+        private bool _holdingLower = false;
+        private float _holdTimer = 0f;
+        private const float HoldInterval = 0.2f;
+        private const float RaiseAmount = 0.1f;
+
         public ShovelTool(Character character) : base(character) { }
+
         public override void OnPrimaryAction()
         {
-            Character.RaiseNodeWithShovel();
+            // LMB pressed: start raising
+            _targetNode = RaycastForNode();
+            if (_targetNode != null)
+            {
+                _holdingRaise = true;
+                _holdTimer = 0f;
+                RaiseNode(_targetNode);
+            }
+        }
+
+        public override void OnPrimaryRelease()
+        {
+            // LMB released: stop raising
+            _holdingRaise = false;
+            _targetNode = null;
+        }
+
+        public override void OnProcess(double delta)
+        {
+            if (_holdingRaise && _targetNode != null)
+            {
+                _holdTimer += (float)delta;
+                if (_holdTimer >= HoldInterval)
+                {
+                    RaiseNode(_targetNode);
+                    _holdTimer = 0f;
+                }
+            }
+            else if (_holdingLower && _targetNode != null)
+            {
+                _holdTimer += (float)delta;
+                if (_holdTimer >= HoldInterval)
+                {
+                    LowerNode(_targetNode);
+                    _holdTimer = 0f;
+                }
+            }
+        }
+
+        // Right mouse button pressed: start lowering
+        public void OnSecondaryAction()
+        {
+            _targetNode = RaycastForNode();
+            if (_targetNode != null)
+            {
+                _holdingLower = true;
+                _holdTimer = 0f;
+                LowerNode(_targetNode);
+            }
+        }
+
+        // Right mouse button released: stop lowering
+        public void OnSecondaryRelease()
+        {
+            _holdingLower = false;
+            _targetNode = null;
+        }
+
+        private void RaiseNode(GraphNode node)
+        {
+            var pos = node.Position;
+            node.Position = new Vector3(pos.X, pos.Y + RaiseAmount, pos.Z);
+        }
+
+        private void LowerNode(GraphNode node)
+        {
+            var pos = node.Position;
+            node.Position = new Vector3(pos.X, pos.Y - RaiseAmount, pos.Z);
+        }
+
+        // Helper: Raycast from camera to find a GraphNode
+        private GraphNode RaycastForNode()
+        {
+            var camera = Character.GetNode<Camera3D>("Camera3D");
+            var spaceState = Character.GetWorld3D().DirectSpaceState;
+            var from = camera.GlobalTransform.Origin;
+            var to = from + camera.GlobalTransform.Basis.Z * -1000f;
+            var query = PhysicsRayQueryParameters3D.Create(from, to);
+            query.CollideWithAreas = false;
+            query.CollideWithBodies = true;
+            query.Exclude = new Godot.Collections.Array<Rid> { Character.GetRid() };
+            var result = spaceState.IntersectRay(query);
+            if (result.Count > 0)
+            {
+                var collider = result["collider"].AsGodotObject();
+                Node nodeToCheck = collider as Node;
+                while (nodeToCheck != null)
+                {
+                    if (nodeToCheck is GraphNode graphNode)
+                        return graphNode;
+                    nodeToCheck = nodeToCheck.GetParent();
+                }
+            }
+            return null;
         }
     }
 

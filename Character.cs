@@ -166,11 +166,25 @@ public partial class Character : CharacterBody3D
                 }
             }
             // Handle right mouse button (RMB)
-            else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
+            else if (mouseButton.ButtonIndex == MouseButton.Right)
             {
-                if (_heldItem != null)
+                if (mouseButton.Pressed)
                 {
-                    DropHeldItem();
+                    if (_heldItem != null)
+                    {
+                        DropHeldItem();
+                    }
+                    else if (_tools.Count > 0 && _tools[_currentToolIndex] is PlayerTools.ShovelTool shovel)
+                    {
+                        shovel.OnSecondaryAction();
+                    }
+                }
+                else // RMB released
+                {
+                    if (_tools.Count > 0 && _tools[_currentToolIndex] is PlayerTools.ShovelTool shovel)
+                    {
+                        shovel.OnSecondaryRelease();
+                    }
                 }
             }
             // Tool switching with mouse wheel and tool scroll for CreateNodeTool and LinkerTool
@@ -402,19 +416,14 @@ public partial class Character : CharacterBody3D
             {
                 // Otherwise, walk up the parent chain to find a RigidBody3D
                 Node nodeToCheck = collider as Node;
-                while (nodeToCheck != null)
+                while (nodeToCheck != null && rigidBody == null)
                 {
-                    if (nodeToCheck is RigidBody3D rb)
-                    {
-                        rigidBody = rb;
-                        break;
-                    }
+                    rigidBody = nodeToCheck as RigidBody3D;
                     nodeToCheck = nodeToCheck.GetParent();
                 }
             }
             if (rigidBody != null)
             {
-                GD.Print($"[DEBUG] Found RigidBody3D: {rigidBody.Name}");
                 // Find any PickupableItem child (not just by name)
                 PickupableItem pickupComponent = null;
                 foreach (var child in rigidBody.GetChildren())

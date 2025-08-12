@@ -1,0 +1,24 @@
+[gd_scene load_steps=5 format=3 uid="uid://bn862mp3xkohi"]
+
+[ext_resource type="Script" uid="uid://da84ai3gey451" path="res://PickupableItem.cs" id="1_g2tbl"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_0xm2m"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h2yge"]
+albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_0xm2m"]
+points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
+
+[node name="Box" type="RigidBody3D"]
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+mesh = SubResource("BoxMesh_0xm2m")
+surface_material_override/0 = SubResource("StandardMaterial3D_h2yge")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("ConvexPolygonShape3D_0xm2m")
+
+[node name="PickupableItem" type="Node" parent="."]
+script = ExtResource("1_g2tbl")
+metadata/_custom_type_script = "uid://da84ai3gey451"
