@@ -1,0 +1,22 @@
+[gd_scene load_steps=3 format=3 uid="uid://dlalag7lkhjcs"]
+
+[ext_resource type="PackedScene" uid="uid://d1835dbt3r5bu" path="res://GameItem.tscn" id="2_ttk8k"]
+
+[sub_resource type="CSharpScript" id="CSharpScript_tnite"]
+script/source = "using Godot;
+using System;
+
+public partial class Item : Node3D
+{
+    public void GrabItem()
+    {
+        GD.Print(\"Item grabbed\");
+
+    }
+}
+"
+
+[node name="Item" type="Node3D"]
+script = SubResource("CSharpScript_tnite")
+
+[node name="RigidBody3D" parent="." instance=ExtResource("2_ttk8k")]

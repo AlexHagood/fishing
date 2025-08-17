@@ -47,7 +47,6 @@ public partial class GraphNode : StaticBody3D
                 }
             }
             
-            GD.Print($"GraphNode {Name} position changed from {oldPosition} to {value}");
         }
     }
 
@@ -126,7 +125,6 @@ public partial class GraphNode : StaticBody3D
         
         // Ensure the MeshInstance starts visible
         MeshInstance.Visible = true;
-        GD.Print($"GraphNode {Name}: Created MeshInstance, visible={MeshInstance.Visible}");
         
         // Add collision shape for click detection
         var collisionShape = new CollisionShape3D();
@@ -157,7 +155,6 @@ public partial class GraphNode : StaticBody3D
         if (MeshInstance != null)
         {
             MeshInstance.Visible = true;
-            GD.Print($"GraphNode {Name} _Ready: MeshInstance visible={MeshInstance.Visible}, mesh null={MeshInstance.Mesh == null}");
         }
         else
         {

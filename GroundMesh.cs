@@ -92,7 +92,6 @@ public partial class GroundMesh : StaticBody3D
         // Update collision shape to match new geometry
         UpdateCollisionShape();
         
-        GD.Print($"Updated mesh vertices (relative): {relativeA}, {relativeB}, {relativeC}");
     }
     
     // Update collision shape to match new geometry
@@ -140,7 +139,6 @@ public partial class GroundMesh : StaticBody3D
             collisionShape.Owner = editedSceneRoot;
         }
         
-        GD.Print($"Updated collision shape with relative positions: {vertices[0]}, {vertices[1]}, {vertices[2]}");
     }
     
     // Helper method to create/update the mesh from current node positions
@@ -151,7 +149,6 @@ public partial class GroundMesh : StaticBody3D
         var relativeB = NodeB.Position - Position;
         var relativeC = NodeC.Position - Position;
         
-        GD.Print($"Creating mesh with relative vertices: {relativeA}, {relativeB}, {relativeC}");
         var mesh = new ArrayMesh();
         var vertices = EnsureClockwise([relativeA, relativeB, relativeC]);
         var indices = new int[] { 0, 1, 2 };

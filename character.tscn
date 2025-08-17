@@ -1,6 +1,9 @@
-[gd_scene load_steps=3 format=3 uid="uid://cutmcayiu5nn6"]
+[gd_scene load_steps=6 format=3 uid="uid://cutmcayiu5nn6"]
 
 [ext_resource type="Script" uid="uid://bgnxns4qvc8ol" path="res://Character.cs" id="1_glpr6"]
+[ext_resource type="Script" uid="uid://brdkkae6sg15t" path="res://Gui.cs" id="2_wa5vi"]
+[ext_resource type="Texture2D" uid="uid://c1fykfvqv6fk8" path="res://Textures/crosshair.png" id="3_wa5vi"]
+[ext_resource type="PackedScene" uid="uid://kb4bqlnq5k0a" path="res://inventory.tscn" id="4_wfnr8"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_vu45j"]
 
@@ -15,7 +18,36 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.46114e-05, 0.946008, -0.325
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
 shape = SubResource("CapsuleShape3D_vu45j")
 
-[node name="CanvasLayer" type="CanvasLayer" parent="."]
+[node name="GUI" type="CanvasLayer" parent="."]
+script = ExtResource("2_wa5vi")
 
-[node name="SpotLight3D" type="SpotLight3D" parent="."]
-spot_range = 6.60413
+[node name="Crosshair" type="TextureRect" parent="GUI"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -20.0
+offset_top = -20.0
+offset_right = 20.0
+offset_bottom = 20.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = ExtResource("3_wa5vi")
+stretch_mode = 2
+
+[node name="Inventory" parent="GUI" instance=ExtResource("4_wfnr8")]
+
+[node name="PickupBar" type="ProgressBar" parent="GUI"]
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -59.0
+offset_top = -7.0
+offset_right = 26.0
+offset_bottom = 5.0
+grow_horizontal = 2
+grow_vertical = 2
+show_percentage = false

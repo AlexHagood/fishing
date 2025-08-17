@@ -63,10 +63,10 @@ vec3 hash(vec3 x) {
 vec2 voronoi(in vec3 x){
 	vec3 p = floor(x);
 	vec3 f = fract(x);
-	
+
 	float res = 100.;
 	float id = 0.;
-	
+
 	for (float k = -1.; k <= 1.; k += 1.) {
 		for (float j = -1.; j <= 1.; j += 1.) {
 			for (float i = -1.; i <= 1.; i += 1.) {
@@ -80,32 +80,32 @@ vec2 voronoi(in vec3 x){
 		    }
 		}
 	}
-	
+
 	return vec2(sqrt(res), id);
 }
 void sky() {
 	COLOR = sky_color;
-	
+
 	// Add moon
 	vec3 moon_dir = normalize(moon_direction);
 	float moon_dot = dot(EYEDIR, moon_dir);
 	float moon_distance = acos(clamp(moon_dot, -1.0, 1.0));
 	float moon_mask = 1.0 - smoothstep(moon_size - moon_softness, moon_size, moon_distance);
-	
+
 	// Create moon with sharp edges and controlled brightness
 	COLOR = mix(COLOR, moon_color, moon_mask);
-	
+
 	// Add ambient lighting from moon
 	float moon_ambient = max(0.0, moon_dot * 0.5 + 0.5) * moon_ambient_strength;
 	vec3 moon_ambient_color = moon_color * moon_ambient * 0.1;
-	
+
 	// Add stars
 	for (int i = 0; i < layers_count; i++) {
 		vec3 pos = EYEDIR * (layer_scale + float(i) * layer_scale_step);
 		vec2 layer = voronoi(pos);
-		
+
 		vec3 rand = hash(vec3(layer.y));
-		
+
 		#ifdef USE_TWINKLE
 			float twinkle = sin(TIME * PI * star_twinkle_speed + rand.x * TAU);
 			twinkle *= star_twinkle_intensity;
@@ -113,13 +113,13 @@ void sky() {
 		#else
 			float star = smoothstep(star_intensity, 0., layer.x);
 		#endif
-		
+
 		vec3 star_color = star * hue((COLOR + star_base_color), rand.y * star_hue_offset, 1);
-		
+
 		// Reduce star visibility near moon to avoid overlap
 		float moon_proximity = smoothstep(moon_size * 2.0, moon_size * 4.0, acos(dot(EYEDIR, moon_dir)));
 		star_color *= moon_proximity;
-		
+
 		COLOR += star_color;
 	}
 }

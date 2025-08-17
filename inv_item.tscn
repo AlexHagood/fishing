@@ -1,0 +1,23 @@
+[gd_scene load_steps=3 format=3 uid="uid://dsi1xslh3qkr6"]
+
+[ext_resource type="Script" uid="uid://c7cyfrwu1bwq3" path="res://InvItem.cs" id="1_ev4ms"]
+
+[sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_psafj"]
+
+[node name="Inv Item" type="Control"]
+layout_mode = 3
+anchors_preset = 0
+offset_left = 11.0
+offset_top = 19.0
+offset_right = 143.0
+offset_bottom = 151.0
+script = ExtResource("1_ev4ms")
+
+[node name="ItemIcon" type="TextureRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+texture = SubResource("PlaceholderTexture2D_psafj")

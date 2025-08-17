@@ -1,6 +1,7 @@
 using Godot;
 using System;
 using System.Collections.Generic;
+using System.Runtime.InteropServices;
 
 public partial class Character : CharacterBody3D
 {
@@ -17,7 +18,7 @@ public partial class Character : CharacterBody3D
     
     // Pickup system
     private RigidBody3D _heldItem;
-    private PickupableItem _heldPickupableComponent;
+    private GameItem _heldPickupableComponent;
     private Node3D _holdPosition;
 
     private float _baseSpeed = 5.0f;
@@ -31,10 +32,22 @@ public partial class Character : CharacterBody3D
     private int _currentToolIndex = 0;
     private Label _toolLabel;
 
+    private Camera3D camera;
+
+    private Gui _gui;
+
+    private Inventory _inventory;
+
+    private bool holdingPickup = false;
+
+
+
     public override void _Ready()
     {
         Input.MouseMode = Input.MouseModeEnum.Captured;
         var terrain = GetTree().Root.FindChild("Terrain", true, false);
+
+        _gui = GetParent().GetNode<Gui>("GUI");
 
         if (terrain != null)
         {
@@ -47,13 +60,14 @@ public partial class Character : CharacterBody3D
             }
         }
 
-        // Create crosshair UI
-        CreateCrosshair();
-        
+
+        // Optionally, store crosshair as a field if you want to show/hide it later
+        // _crosshair = crosshair;
+
         // Create hold position for picked up items
         _holdPosition = new Node3D();
         _holdPosition.Name = "HoldPosition";
-        var camera = GetNode<Camera3D>("Camera3D");
+        camera = GetNode<Camera3D>("Camera3D");
         camera.AddChild(_holdPosition);
         // Position it in front of the camera
         _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
@@ -63,31 +77,28 @@ public partial class Character : CharacterBody3D
         _currentToolIndex = 0;
         SetupToolLabel();
         UpdateToolLabel();
+
+        _inventory = _gui.GetNode<Inventory>("Inventory");
+
     }
 
     private void SetupToolLabel()
     {
-        // Find or create a CanvasLayer for GUI
-        CanvasLayer canvasLayer = null;
-        try { canvasLayer = GetParent().GetNode<CanvasLayer>("CanvasLayer"); } catch { }
-        if (canvasLayer == null)
+        // Add the tool label directly to the GUI node (inherits from CanvasLayer)
+        if (_gui != null)
         {
-            canvasLayer = new CanvasLayer();
-            canvasLayer.Name = "CanvasLayer";
-            GetParent().AddChild(canvasLayer);
-        }
-        // Create or find the label
-        _toolLabel = canvasLayer.GetNodeOrNull<Label>("ToolLabel");
-        if (_toolLabel == null)
-        {
-            _toolLabel = new Label();
-            _toolLabel.Name = "ToolLabel";
-            _toolLabel.Position = new Vector2(12, 12);
-            _toolLabel.SizeFlagsHorizontal = (Control.SizeFlags)Control.SizeFlags.ExpandFill;
-            _toolLabel.SizeFlagsVertical = (Control.SizeFlags)Control.SizeFlags.ExpandFill;
-            _toolLabel.AddThemeColorOverride("font_color", new Color(1,1,1));
-            _toolLabel.AddThemeFontSizeOverride("font_size", 24);
-            canvasLayer.AddChild(_toolLabel);
+            _toolLabel = _gui.GetNodeOrNull<Label>("ToolLabel");
+            if (_toolLabel == null)
+            {
+                _toolLabel = new Label();
+                _toolLabel.Name = "ToolLabel";
+                _toolLabel.Position = new Vector2(12, 12);
+                _toolLabel.SizeFlagsHorizontal = (Control.SizeFlags)Control.SizeFlags.ExpandFill;
+                _toolLabel.SizeFlagsVertical = (Control.SizeFlags)Control.SizeFlags.ExpandFill;
+                _toolLabel.AddThemeColorOverride("font_color", new Color(1, 1, 1));
+                _toolLabel.AddThemeFontSizeOverride("font_size", 24);
+                _gui.AddChild(_toolLabel);
+            }
         }
     }
 
@@ -133,6 +144,49 @@ public partial class Character : CharacterBody3D
         // Tool process for CreateNodeTool
         if (_tools.Count > 0)
             _tools[_currentToolIndex].OnProcess(delta);
+
+
+        // Handle F key for pickup with progress bar
+        if (Input.IsActionPressed("pickup"))
+        {
+            var progressBar = _gui.progressBar;
+            Node3D collider = PlayerObjectRay(5.0f) as Node3D;
+            if (collider == null)
+            {
+                progressBar.Visible = false;
+                progressBar.Value = 0;
+
+            }
+            else
+            {
+                progressBar.Visible = true;
+                progressBar.Value += (float)GetProcessDeltaTime() * (progressBar.MaxValue / 0.5f);
+                GD.Print(progressBar.Value);
+                if (progressBar.Value >= progressBar.MaxValue)
+                {
+                    progressBar.Value = 0;
+                    progressBar.Visible = false;
+                    if (collider is GameItem item)
+                    {
+                        GD.Print($"Item grabbed");
+                        item.InventoryPickup();
+                        InvItem invitem = new InvItem(new Vector2(3, 3));
+                        var boxTexture = GD.Load<Texture2D>("res://Textures/boxtex.png");
+                        var itemIcon = new TextureRect();
+                        itemIcon.Name = "ItemIcon";
+                        itemIcon.Texture = boxTexture;
+                        itemIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+                        invitem.AddChild(itemIcon);
+                        _inventory.AddChild(invitem);
+                    }
+                    else
+                    {
+                        GD.Print("No valid item to grab");
+                    }
+
+                }
+            }
+        }
     }
 
     public override void _Input(InputEvent @event)
@@ -222,7 +276,7 @@ public partial class Character : CharacterBody3D
             GD.Print("[DEBUG] E key (interact) pressed");
             if (_heldItem == null)
             {
-                TryPickupItem();
+                TryGrabItem();
             }
         }
         // Allow releasing the mouse with Escape
@@ -241,6 +295,12 @@ public partial class Character : CharacterBody3D
         {
             _isSprinting = false;
         }
+
+        if (Input.IsActionJustPressed("inventory"))
+        {
+            _gui.ToggleInventoryOpen();
+        }
+
     }
 
     public override void _PhysicsProcess(double delta)
@@ -288,15 +348,18 @@ public partial class Character : CharacterBody3D
         isOnFloor = IsOnFloor();
 
         // Handle mouse look
-        RotateY(-mouseDelta.X * MouseSensitivity);
-        GetNode<Camera3D>("Camera3D").RotateX(-mouseDelta.Y * MouseSensitivity);
-        mouseDelta = Vector2.Zero;
+        if (_gui is null || !_gui.InventoryOpen)
+        {
+            RotateY(-mouseDelta.X * MouseSensitivity);
+            camera.RotateX(-mouseDelta.Y * MouseSensitivity);
+            mouseDelta = Vector2.Zero;
 
-        // Clamp camera rotation
-        var camera = GetNode<Camera3D>("Camera3D");
-        var rotation = camera.RotationDegrees;
-        rotation.X = Mathf.Clamp(rotation.X, -90, 90);
-        camera.RotationDegrees = rotation;
+            // Clamp camera rotation
+            var rotation = camera.RotationDegrees;
+            rotation.X = Mathf.Clamp(rotation.X, -90, 90);
+            camera.RotationDegrees = rotation;
+        }
+
 
         // FOV adjustment for sprint
         float targetFov = _isSprinting ? _sprintFov : _baseFov;
@@ -358,112 +421,79 @@ public partial class Character : CharacterBody3D
         }
     }
 
-    private void CreateCrosshair()
-    {
-        // Find the CanvasLayer - it's a sibling of CharacterBody3D, child of Character
-        var canvasLayer = GetParent().GetNode<CanvasLayer>("CanvasLayer");
-        GD.Print($"Found CanvasLayer: {canvasLayer != null}");
-        
-        // Create the crosshair dot directly - no container needed
-        var crosshair = new ColorRect();
-        crosshair.Color = new Color(1.0f, 1.0f, 1.0f, 1.0f); 
-        crosshair.Size = new Vector2(6, 6); 
-        crosshair.Name = "Crosshair";
-        
-        // Position it at the center of the screen manually
-        // Set anchors to center
-        crosshair.AnchorLeft = 0.5f;
-        crosshair.AnchorRight = 0.5f;
-        crosshair.AnchorTop = 0.5f;
-        crosshair.AnchorBottom = 0.5f;
-        
-        // Offset by half the size to center the rectangle
-        crosshair.OffsetLeft = -3; // Half of 20
-        crosshair.OffsetTop = -3;  // Half of 20
-        crosshair.OffsetRight = 3;
-        crosshair.OffsetBottom = 3;
-        
-        // Add directly to canvas layer
-        canvasLayer.AddChild(crosshair);
-        
-        // Ensure it's drawn on top
-        crosshair.ZIndex = 100;
-        
-        GD.Print($"Crosshair created - Color: {crosshair.Color}, Size: {crosshair.Size}, Visible: {crosshair.Visible}");
-        GD.Print($"Crosshair anchors: L:{crosshair.AnchorLeft} R:{crosshair.AnchorRight} T:{crosshair.AnchorTop} B:{crosshair.AnchorBottom}");
-        GD.Print($"Crosshair offsets: L:{crosshair.OffsetLeft} R:{crosshair.OffsetRight} T:{crosshair.OffsetTop} B:{crosshair.OffsetBottom}");
-    }
-    
-    private void TryPickupItem()
+    private GodotObject PlayerObjectRay(float range = 5.0f)
     {
         var camera = GetNode<Camera3D>("Camera3D");
         var spaceState = GetWorld3D().DirectSpaceState;
-        // Raycast to find items to pickup
         var from = camera.GlobalTransform.Origin;
-        var to = from + camera.GlobalTransform.Basis.Z * -5.0f; // Shorter range for pickup
+        var to = from + camera.GlobalTransform.Basis.Z * -range;
         var query = PhysicsRayQueryParameters3D.Create(from, to);
         query.CollideWithAreas = false;
         query.CollideWithBodies = true;
         query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
         var result = spaceState.IntersectRay(query);
-        if (result.Count > 0)
+        if (result.Count > 0 && result.ContainsKey("collider"))
         {
-            var collider = result["collider"].AsGodotObject();
-            GD.Print($"[DEBUG] Raycast hit: {collider}");
-            // If the collider is a RigidBody3D, use it directly
-            RigidBody3D rigidBody = collider as RigidBody3D;
-            if (rigidBody == null)
+            return result["collider"].AsGodotObject();
+        }
+        return null;
+    }
+
+    private void TryGrabItem()
+    {
+        var collider = PlayerObjectRay(5.0f);
+        if (collider == null)
+        {
+            GD.Print("[DEBUG] No object hit by pickup raycast");
+            return;
+        }
+        GD.Print($"[DEBUG] Raycast hit: {collider}");
+        RigidBody3D rigidBody = collider as RigidBody3D;
+        if (rigidBody == null)
+        {
+            Node nodeToCheck = collider as Node;
+            while (nodeToCheck != null && rigidBody == null)
             {
-                // Otherwise, walk up the parent chain to find a RigidBody3D
-                Node nodeToCheck = collider as Node;
-                while (nodeToCheck != null && rigidBody == null)
+                rigidBody = nodeToCheck as RigidBody3D;
+                nodeToCheck = nodeToCheck.GetParent();
+            }
+        }
+        if (rigidBody != null)
+        {
+            GameItem pickupComponent = null;
+            foreach (var child in rigidBody.GetChildren())
+            {
+                if (child is GameItem pi)
                 {
-                    rigidBody = nodeToCheck as RigidBody3D;
-                    nodeToCheck = nodeToCheck.GetParent();
+                    pickupComponent = pi;
+                    break;
                 }
             }
-            if (rigidBody != null)
+            if (pickupComponent != null && pickupComponent.CanBePickedUp())
             {
-                // Find any PickupableItem child (not just by name)
-                PickupableItem pickupComponent = null;
-                foreach (var child in rigidBody.GetChildren())
+                float distance = GlobalPosition.DistanceTo(rigidBody.GlobalPosition);
+                GD.Print($"[DEBUG] Found PickupableItem '{pickupComponent.ItemName}' at distance {distance:F2}");
+                if (distance <= pickupComponent.PickupRange)
                 {
-                    if (child is PickupableItem pi)
-                    {
-                        pickupComponent = pi;
-                        break;
-                    }
-                }
-                if (pickupComponent != null && pickupComponent.CanBePickedUp())
-                {
-                    float distance = GlobalPosition.DistanceTo(rigidBody.GlobalPosition);
-                    GD.Print($"[DEBUG] Found PickupableItem '{pickupComponent.ItemName}' at distance {distance:F2}");
-                    if (distance <= pickupComponent.PickupRange)
-                    {
-                        PickupItem(rigidBody, pickupComponent);
-                    }
-                    else
-                    {
-                        GD.Print($"Item is too far away ({distance:F1}m). Get closer!");
-                    }
+                    PickupItem(rigidBody, pickupComponent);
                 }
                 else
                 {
-                    GD.Print("[DEBUG] This item cannot be picked up or no PickupableItem found!");
+                    GD.Print($"Item is too far away ({distance:F1}m). Get closer!");
                 }
             }
             else
             {
-                GD.Print("[DEBUG] No RigidBody3D found in parent chain of collider!");
+                GD.Print("[DEBUG] This item cannot be picked up or no PickupableItem found!");
             }
         }
         else
         {
-            GD.Print("[DEBUG] No object hit by pickup raycast");
+            GD.Print("[DEBUG] No RigidBody3D found in parent chain of collider!");
         }
     }
-    
-    private void PickupItem(RigidBody3D item, PickupableItem pickupComponent)
+
+    private void PickupItem(RigidBody3D item, GameItem pickupComponent)
     {
         _heldItem = item;
         _heldPickupableComponent = pickupComponent;

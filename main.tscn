@@ -3,7 +3,7 @@
 [ext_resource type="PackedScene" uid="uid://bk8ja346yxa6l" path="res://terrain.tscn" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://cutmcayiu5nn6" path="res://character.tscn" id="2_0xm2m"]
 [ext_resource type="Shader" uid="uid://c2sdmw22wybh6" path="res://sky.gdshader" id="3_1bvp3"]
-[ext_resource type="PackedScene" uid="uid://bn862mp3xkohi" path="res://box.tscn" id="3_h2yge"]
+[ext_resource type="PackedScene" uid="uid://d1835dbt3r5bu" path="res://GameItem.tscn" id="5_7mycd"]
 [ext_resource type="Script" uid="uid://ccahcvc6dmfry" path="res://NetworkManager.cs" id="5_lquwl"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
@@ -43,12 +43,11 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.33068, 4.21782)
 [node name="WorldEnvironment" type="WorldEnvironment" parent="."]
 environment = SubResource("Environment_0xm2m")
 
-[node name="Box" parent="." instance=ExtResource("3_h2yge")]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.032196, 3.71295, -1.47477)
-
 [node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
 transform = Transform3D(-0.911274, 0.374109, 0.172111, -0.127376, -0.653522, 0.746113, 0.391606, 0.65799, 0.643191, 0, 0, 0)
 light_energy = 0.592
 
 [node name="Node3D" type="Node3D" parent="."]
 script = ExtResource("5_lquwl")
+
+[node name="RigidBody3D" parent="." instance=ExtResource("5_7mycd")]

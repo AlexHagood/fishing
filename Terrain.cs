@@ -56,18 +56,6 @@ public partial class Terrain : Node3D
 
         CreateDebugLine(new Vector3(0, 0, 0), new Vector3(0, 10, 0));
 
-        var boxScene = GD.Load<PackedScene>("res://box.tscn");
-        var rng = new Random();
-        for (int i = 0; i < 100; i++)
-        {
-            float x = (float)((rng.NextDouble() - 0.5) * 2 * 100);
-            float y = 20f;
-            float z = (float)((rng.NextDouble() - 0.5) * 2 * 100);
-            var boxInstance = boxScene.Instantiate<Node3D>();
-            boxInstance.Position = new Vector3(x, y, z);
-            AddChild(boxInstance);
-        }
-
         // Now manually add to our terrain's node collection if desired
         nodes.AddRange(triangulatedNodes);
 
@@ -245,7 +233,6 @@ public partial class Terrain : Node3D
         if (addToScene)
             AddChild(meshInstance);
         
-        GD.Print($"Debug line created from {pointA} to {pointB} (length: {pointA.DistanceTo(pointB):F2})");
         
         return meshInstance;
     }
