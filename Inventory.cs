@@ -15,6 +15,8 @@ public partial class Inventory : Control
 
     InvTile[,] inventoryTiles;
 
+    InvItem[] inventoryItems;
+
     public override void _Ready()
     {
         inventoryTiles = new InvTile[(int)InventoryCapacity.X, (int)InventoryCapacity.Y];
@@ -23,10 +25,7 @@ public partial class Inventory : Control
 
         UpdateInventorySize();
         this.Visible = false;
-
-        var newitem = new InvItem(new Vector2(1, 3));
-        AddChild(newitem);
-        newitem.Position = new Vector2(300, 300);
+        
     }
     private void UpdateInventorySize()
     {
@@ -52,12 +51,41 @@ public partial class Inventory : Control
                 panel.SizeFlagsHorizontal = Control.SizeFlags.Expand;
                 panel.SizeFlagsVertical = Control.SizeFlags.Expand;
                 panel.CustomMinimumSize = new Vector2(inventoryTileSize, inventoryTileSize);
-                panel.Modulate = new Color(0.7f, 0.0f, 0.0f, 1f); // gray
                 gridContainer.AddChild(panel);
             }
         }
 
     }
+
+    public bool ForceFitItem(InvItem item)
+    {
+
+        for (int y = 0; y <= InventoryCapacity.Y - item.invSize.Y; y++)
+        {
+            for (int x = 0; x <= InventoryCapacity.X - item.invSize.X; x++)
+            {
+                var pos = new Vector2(x, y);
+                var fitTiles = CanFitItem(item, pos);
+                if (fitTiles.Count == item.invSize.X * item.invSize.Y)
+                {
+                    GD.Print($"Fitting item at position {pos}");
+                    foreach (var tile in fitTiles)
+                    {
+                        tile.item = item; // Use property to update color
+                    }
+                    item.invPos = pos;
+                    item._Inventory = this; // Set parent inventory
+                    item.itemTiles = fitTiles; // Track which tiles hold the item
+                    // Position item using grid tile's global position minus parent global position
+                    item.Position = inventoryTiles[x, y].Position + ((GridContainer)inventoryTiles[x, y].GetParent()).Position;
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    
 
     public List<InvTile> CanFitItem(InvItem item, Vector2 pos)
     {
@@ -100,6 +128,50 @@ public partial class Inventory : Control
         }
         return itemTiles;
     }
+
+    public void PlaceItem(InvItem item, Vector2 pos)
+    {
+        List<InvTile> tiles = CanFitItem(item, pos);
+        if (tiles.Count == item.invSize.X * item.invSize.Y)
+        {
+            foreach (var tile in item.itemTiles)
+            {
+                tile.item = null; // Clear previous item from tiles
+            }
+            item.itemTiles = tiles;
+            foreach (var tile in item.itemTiles)
+            {
+                tile.item = item; // Assign the item to the tile
+            }
+            item.invPos = pos;
+            item._Inventory = this; // Set parent inventory
+            // Position item using grid tile's global position minus parent global position
+            item.Position = inventoryTiles[(int)pos.X, (int)pos.Y].Position + ((GridContainer)inventoryTiles[(int)pos.X, (int)pos.Y].GetParent()).Position;
+        }
+        else
+        {
+            GD.Print("Item cannot fit in the selected position.");
+        }
+
+    }
+
+    public void RemoveItem(InvItem item)
+    {
+        if (item == null || item.itemTiles == null)
+        {
+            GD.Print("Item or item tiles are null, cannot remove.");
+            return;
+        }
+        foreach (var tile in item.itemTiles)
+        {
+            tile.item = null; // Clear the item from the tiles
+        }
+        item.itemTiles.Clear(); // Clear the list of tiles
+        item.invPos = Vector2.Zero; // Reset position
+        item._Inventory = null; // Clear parent inventory
+        item.QueueFree(); // Remove the item from the scene
+    }
+
 
 
 }

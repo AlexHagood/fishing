@@ -9,37 +9,38 @@ public partial class InvItem : Control
 	bool movedToTop = false;
 	Vector2 offset;
 	TextureRect dragIcon = null;
-	Inventory _parentInventory;
+	public Inventory _Inventory;
 	[Export]
 	public Vector2 invSize = new Vector2(2, 2);
 
 	public Vector2 invPos;
 
-	List<InvTile> itemTiles = new List<InvTile>();
+	public List<InvTile> itemTiles = new List<InvTile>();
 
-	TextureRect itemIcon;
+	public TextureRect itemIcon;
+
+	private Label _numberLabel;
+	private int _displayedNumber = -1;
+
+	public GameItem gameItem;
 
 	public InvItem()
 	{
-		itemIcon = GetNode<TextureRect>("ItemIcon");
-		if (itemIcon == null)
-		{
-			itemIcon = new TextureRect();
-			itemIcon.Name = "ItemIcon";
-			AddChild(itemIcon);
-		}
-		}
+		itemIcon = new TextureRect();
+		itemIcon.Name = "ItemIcon";
+		itemIcon.StretchMode = TextureRect.StretchModeEnum.Scale;
+		itemIcon.MouseFilter = Control.MouseFilterEnum.Pass;
+		AddChild(itemIcon);
+	}
 
 	public InvItem(Vector2 size)
 	{
 		invSize = size;
-		itemIcon = GetNode<TextureRect>("ItemIcon");
-		if (itemIcon == null)
-		{
-			itemIcon = new TextureRect();
-			itemIcon.Name = "ItemIcon";
-			AddChild(itemIcon);
-		}
+		itemIcon = new TextureRect();
+		itemIcon.Name = "ItemIcon";
+		itemIcon.StretchMode = TextureRect.StretchModeEnum.Scale;
+		itemIcon.MouseFilter = Control.MouseFilterEnum.Pass;
+		AddChild(itemIcon);
 	}
 
 
@@ -49,8 +50,9 @@ public partial class InvItem : Control
 		{
 			if (_mouseEvent.ButtonIndex == MouseButton.Left && _mouseEvent.Pressed)
 			{
+				GD.Print($"Clicked on item {Name}");
 				Vector2 mousePos = GetViewport().GetMousePosition();
-				mousePos -= _parentInventory.Position;
+				mousePos -= _Inventory.Position;
 				offset = mousePos - Position;
 				isDragging = true;
 				CreateDragIcon();
@@ -64,22 +66,26 @@ public partial class InvItem : Control
 
 	public override void _Ready()
 	{
-		_parentInventory = (Inventory)GetParent().GetParent();
-		this.Size = _parentInventory.inventoryTileSize * invSize;
+		this.Size = _Inventory.inventoryTileSize * invSize;
+		MouseFilter = Control.MouseFilterEnum.Stop; // Ensure we receive mouse events
+		if (itemIcon != null)
+			itemIcon.Size = this.Size; // Make icon fill the item
+		if (_numberLabel == null)
+			CreateNumberLabel();
 	}
 
 	public override void _Process(double delta)
 	{
-		if (_parentInventory != null)
+		if (_Inventory != null)
 		{
 			if (isDragging && dragIcon != null)
 			{
 				Vector2 mousePos = GetViewport().GetMousePosition();
-				if (_parentInventory != null)
-					mousePos -= _parentInventory.GlobalPosition;
+				if (_Inventory != null)
+					mousePos -= _Inventory.GlobalPosition;
 				Vector2 pos = mousePos - offset;
-				float _w = _parentInventory != null ? _parentInventory.Size.X - dragIcon.Size.X : Size.X - dragIcon.Size.X;
-				float _h = _parentInventory != null ? _parentInventory.Size.Y - dragIcon.Size.Y : Size.Y - dragIcon.Size.Y;
+				float _w = _Inventory != null ? _Inventory.Size.X - dragIcon.Size.X : Size.X - dragIcon.Size.X;
+				float _h = _Inventory != null ? _Inventory.Size.Y - dragIcon.Size.Y : Size.Y - dragIcon.Size.Y;
 				pos.X = Mathf.Clamp(pos.X, 0, _w);
 				pos.Y = Mathf.Clamp(pos.Y, 0, _h);
 				dragIcon.Position = pos;
@@ -100,10 +106,10 @@ public partial class InvItem : Control
 		dragIcon.Modulate = new Color(1, 1, 1, 0.5f); // 50% transparency
 		dragIcon.MouseFilter = Control.MouseFilterEnum.Ignore;
 		Vector2 mousePos = GetViewport().GetMousePosition();
-		if (_parentInventory != null)
+		if (_Inventory != null)
 		{
-			mousePos -= _parentInventory.GlobalPosition;
-			_parentInventory.AddChild(dragIcon);
+			mousePos -= _Inventory.GlobalPosition;
+			_Inventory.AddChild(dragIcon);
 		}
 		else
 		{
@@ -118,9 +124,9 @@ public partial class InvItem : Control
 			return;
 
 		// Use global coordinates for overlap detection
-		Vector2 itemGlobalPos = dragIcon.Position + _parentInventory.GlobalPosition;
+		Vector2 itemGlobalPos = dragIcon.Position + _Inventory.GlobalPosition;
 		InvTile targetPanel = null;
-		foreach (InvTile invtile in _parentInventory.gridContainer.GetChildren())
+		foreach (InvTile invtile in _Inventory.gridContainer.GetChildren())
 		{
 			Rect2 panelRect = new Rect2(invtile.GlobalPosition, invtile.Size);
 			if (panelRect.HasPoint(itemGlobalPos))
@@ -133,24 +139,7 @@ public partial class InvItem : Control
 
 		if (targetPanel != null)
 		{
-			List <InvTile> tiles = _parentInventory.CanFitItem(this, targetPanel.InvPos);
-			if (tiles.Count == invSize.X * invSize.Y)
-			{
-				foreach (var tile in itemTiles)
-				{
-					tile.item = null; // Assign the item to the tile
-				}
-				itemTiles = tiles;
-				foreach (var tile in itemTiles)
-				{
-					tile.item = this; // Assign the item to the tile
-				}
-				GlobalPosition = targetPanel.GlobalPosition;
-			}
-			else
-			{
-				GD.Print("Item cannot fit in the selected panel.");
-			}
+			_Inventory.PlaceItem(this, targetPanel.InvPos);
 		}
 		else
 		{
@@ -161,5 +150,63 @@ public partial class InvItem : Control
 		dragIcon = null;
 		isDragging = false;
 		movedToTop = false;
+	}
+
+	public void SetBindNumber(int number)
+	{
+		_displayedNumber = number;
+		if (_numberLabel == null)
+			CreateNumberLabel();
+		_numberLabel.Text = number > 0 ? number.ToString() : "";
+		_numberLabel.Visible = number > 0;
+	}
+
+	private void CreateNumberLabel()
+	{
+		_numberLabel = new Label();
+		_numberLabel.Name = "NumberLabel";
+		_numberLabel.Text = "";
+		_numberLabel.Visible = false;
+		// Remove invalid SizeFlags.None assignments
+		_numberLabel.SizeFlagsHorizontal = 0;
+		_numberLabel.SizeFlagsVertical = 0;
+		_numberLabel.AddThemeColorOverride("font_color", new Color(1, 1, 0)); // Yellow
+		_numberLabel.AddThemeFontSizeOverride("font_size", 18);
+		_numberLabel.HorizontalAlignment = HorizontalAlignment.Right;
+		_numberLabel.VerticalAlignment = VerticalAlignment.Top;
+		AddChild(_numberLabel);
+		// Position in top right
+		_numberLabel.AnchorRight = 1;
+		_numberLabel.AnchorTop = 0;
+		_numberLabel.OffsetRight = -4;
+		_numberLabel.OffsetTop = 4;
+	}
+
+	public void RemoveItem()
+	{
+		// Remove from inventory panel
+		if (GetParent() != null)
+		{
+			GetParent().RemoveChild(this);
+		}
+		// Clear tiles
+		if (itemTiles != null)
+		{
+			foreach (var tile in itemTiles)
+			{
+				tile.item = null;
+			}
+			itemTiles.Clear();
+			}
+		// Hide and reset state for reuse
+		Visible = false;
+		isDragging = false;
+		movedToTop = false;
+		_displayedNumber = -1;
+		if (_numberLabel != null)
+		{
+			_numberLabel.Text = "";
+			_numberLabel.Visible = false;
+		}
 	}
 }

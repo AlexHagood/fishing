@@ -17,8 +17,7 @@ public partial class Character : CharacterBody3D
     private float toolCheckTimer = 0f;
     
     // Pickup system
-    private RigidBody3D _heldItem;
-    private GameItem _heldPickupableComponent;
+    private GameItem _heldItem;
     private Node3D _holdPosition;
 
     private float _baseSpeed = 5.0f;
@@ -40,7 +39,9 @@ public partial class Character : CharacterBody3D
 
     private bool holdingPickup = false;
 
+    private int _currentHotbarSlot = 0; // 0 = no item, 1-6 = slots
 
+    private InvItem[] _hotbarItems = new InvItem[7]; // 1-6, 0 unused
 
     public override void _Ready()
     {
@@ -80,6 +81,8 @@ public partial class Character : CharacterBody3D
 
         _inventory = _gui.GetNode<Inventory>("Inventory");
 
+        UpdateHotbarHighlight(); // Initialize hotbar highlight
+        UpdateAllHotbarSlots();
     }
 
     private void SetupToolLabel()
@@ -106,6 +109,93 @@ public partial class Character : CharacterBody3D
     {
         if (_toolLabel != null && _tools.Count > 0)
             _toolLabel.Text = $"Tool: {_tools[_currentToolIndex].Name}";
+    }
+
+    private void UpdateHotbarHighlight()
+    {
+        var hotbar = _gui.GetNodeOrNull("Hotbar");
+        if (hotbar == null)
+        {
+            GD.PrintErr("[Hotbar] Hotbar node not found in GUI!");
+            return;
+        }
+        for (int i = 1; i <= 6; i++)
+        {
+            var panel = hotbar.GetNodeOrNull<Control>($"Slot{i}");
+            if (panel == null)
+            {
+                GD.PrintErr($"[Hotbar] Slot{i} not found in Hotbar!");
+                continue;
+            }
+            var style = new StyleBoxFlat();
+            if (i == _currentHotbarSlot)
+            {
+                style.BorderColor = new Color(1, 1, 0); // Yellow border
+                style.BorderWidthTop = 3;
+                style.BorderWidthBottom = 3;
+                style.BorderWidthLeft = 3;
+                style.BorderWidthRight = 3;
+                style.BgColor = new Color(0.2f, 0.2f, 0.0f, 0.2f); // Slight yellow background
+            }
+            else
+            {
+                style.BorderColor = new Color(0, 0, 0, 0); // No border
+                style.BorderWidthTop = 0;
+                style.BorderWidthBottom = 0;
+                style.BorderWidthLeft = 0;
+                style.BorderWidthRight = 0;
+                style.BgColor = new Color(0.1f, 1f, 0.3f, 0.3f); // Transparent green
+            }
+            panel.AddThemeStyleboxOverride("panel", style);
+        }
+    }
+
+    private void UpdateHotbarSlot(int slot)
+    {
+        var hotbar = _gui.GetNodeOrNull("Hotbar");
+        if (hotbar == null || slot < 1 || slot > 6) return;
+        var panel = hotbar.GetNodeOrNull<Control>($"Slot{slot}");
+        if (panel == null) return;
+        // Remove previous icon if any
+        foreach (Node child in panel.GetChildren())
+        {
+            if (child is TextureRect)
+                panel.RemoveChild(child);
+        }
+        var item = _hotbarItems[slot];
+        if (item != null && item.itemIcon != null && item.itemIcon.Texture != null)
+        {
+            var icon = new TextureRect();
+            icon.Texture = item.itemIcon.Texture;
+            icon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
+            icon.SizeFlagsHorizontal = Control.SizeFlags.ExpandFill;
+            icon.SizeFlagsVertical = Control.SizeFlags.ExpandFill;
+            icon.AnchorRight = 1;
+            icon.AnchorBottom = 1;
+            icon.OffsetLeft = 4;
+            icon.OffsetTop = 4;
+            icon.OffsetRight = -4;
+            icon.OffsetBottom = -4;
+            panel.AddChild(icon);
+        }
+    }
+
+    private void UpdateAllHotbarSlots()
+    {
+        for (int i = 1; i <= 6; i++)
+            UpdateHotbarSlot(i);
+    }
+
+    private void BindItemToHotbarSlot(InvItem item, int slot)
+    {
+        // Unbind from previous slot if needed
+        for (int i = 1; i <= 6; i++)
+        {
+            if (_hotbarItems[i] == item)
+                _hotbarItems[i] = null;
+        }
+        _hotbarItems[slot] = item;
+        UpdateHotbarSlot(slot);
     }
 
     public override void _Process(double delta)
@@ -153,15 +243,18 @@ public partial class Character : CharacterBody3D
             Node3D collider = PlayerObjectRay(5.0f) as Node3D;
             if (collider == null)
             {
-                progressBar.Visible = false;
-                progressBar.Value = 0;
+            var anim = (AnimationPlayer)_gui.progressBar.GetNode("AnimationPlayer");
+            if (!anim.IsPlaying() || anim.CurrentAnimation != "BadWiggle")
+            {
+                _gui.progressBar.Visible = false;
+                _gui.progressBar.Value = 0;
+            }
 
             }
             else
             {
                 progressBar.Visible = true;
                 progressBar.Value += (float)GetProcessDeltaTime() * (progressBar.MaxValue / 0.5f);
-                GD.Print(progressBar.Value);
                 if (progressBar.Value >= progressBar.MaxValue)
                 {
                     progressBar.Value = 0;
@@ -170,14 +263,18 @@ public partial class Character : CharacterBody3D
                     {
                         GD.Print($"Item grabbed");
                         item.InventoryPickup();
-                        InvItem invitem = new InvItem(new Vector2(3, 3));
+                        InvItem invitem = new InvItem(new Vector2(4, 4));
+                        invitem.gameItem = item; // Link the GameItem to the InvItem
                         var boxTexture = GD.Load<Texture2D>("res://Textures/boxtex.png");
-                        var itemIcon = new TextureRect();
-                        itemIcon.Name = "ItemIcon";
-                        itemIcon.Texture = boxTexture;
-                        itemIcon.StretchMode = TextureRect.StretchModeEnum.KeepAspectCentered;
-                        invitem.AddChild(itemIcon);
-                        _inventory.AddChild(invitem);
+                        invitem.itemIcon.Texture = boxTexture;
+                        if (_inventory.ForceFitItem(invitem))
+                        {
+                            _inventory.GetNode("InventoryPanel").AddChild(invitem);
+                            invitem.Visible = true; // Ensure item is visible after adding
+                            item.DisablePhys();
+                        }
+                        else { wiggleBar(); }
+                        
                     }
                     else
                     {
@@ -187,7 +284,33 @@ public partial class Character : CharacterBody3D
                 }
             }
         }
+        else
+        {
+            var anim = (AnimationPlayer)_gui.progressBar.GetNode("AnimationPlayer");
+            if (!anim.IsPlaying() || anim.CurrentAnimation != "BadWiggle")
+            {
+                _gui.progressBar.Visible = false;
+                _gui.progressBar.Value = 0;
+            }
+        }
     }
+
+    public void wiggleBar()
+    {
+        AnimationPlayer anim = (AnimationPlayer)_gui.progressBar.GetNode("AnimationPlayer");
+        if (anim.GetParent() is Control parentControl)
+            parentControl.Visible = true;
+
+        // Force progressBar visible while anim is playing
+        _gui.progressBar.Visible = true;
+        anim.Play("BadWiggle");
+        // Optionally hide after animation
+        anim.AnimationFinished += (Godot.StringName animName) => {
+            if (animName == "BadWiggle")
+                _gui.progressBar.Visible = false;
+        };
+    }
+
 
     public override void _Input(InputEvent @event)
     {
@@ -241,32 +364,52 @@ public partial class Character : CharacterBody3D
                     }
                 }
             }
-            // Tool switching with mouse wheel and tool scroll for CreateNodeTool and LinkerTool
+            // Hotbar scroll handler (replace old tool scroll)
             else if (@event is InputEventMouseButton mb && mb.Pressed && (mb.ButtonIndex == MouseButton.WheelUp || mb.ButtonIndex == MouseButton.WheelDown))
             {
-                if (_tools.Count > 0)
+                if (mb.ButtonIndex == MouseButton.WheelUp)
                 {
-                    float scrollDelta = (mb.ButtonIndex == MouseButton.WheelUp) ? 1.0f : -1.0f;
-                    // Only adjust distance if LMB is held and current tool is CreateNodeTool
-                    if (Input.IsMouseButtonPressed(MouseButton.Left))
+                    _currentHotbarSlot++;
+                    if (_currentHotbarSlot > 6) _currentHotbarSlot = 1;
+                }
+                else if (mb.ButtonIndex == MouseButton.WheelDown)
+                {
+                    _currentHotbarSlot--;
+                    if (_currentHotbarSlot < 1) _currentHotbarSlot = 6;
+                }
+                UpdateHotbarHighlight();
+
+                // Equip logic: show item in front of player and hold it
+                var invItem = _hotbarItems[_currentHotbarSlot];
+                if (invItem != null && invItem.gameItem != null)
+                {
+                    var gameItem = invItem.gameItem;
+                    // Make sure item is visible and enable physics
+                    gameItem.Visible = true;
+                    gameItem.Freeze = false;
+                    gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
+                    gameItem.GravityScale = 0;
+                    // Teleport in front of camera
+                    var camera = GetNode<Camera3D>("Camera3D");
+                    var frontPos = camera.GlobalTransform.Origin + camera.GlobalTransform.Basis.Z * -2.0f + new Vector3(0, -0.5f, 0);
+                    gameItem.GlobalPosition = frontPos;
+                    // Set as held item
+                    _heldItem = gameItem;
+                    gameItem.OnPickedUp();
+                    
+                    
+                    GD.Print($"Equipped item from hotbar: {gameItem.ItemName}");
+                }
+                else
+                {
+                    // Un-equip if slot is empty or switching to a different item
+                    if (_heldItem != null)
                     {
-                        if (_tools[_currentToolIndex] is PlayerTools.CreateNodeTool createNodeTool)
-                        {
-                            createNodeTool.OnScroll(scrollDelta);
-                            return;
-                        }
-                        if (_tools[_currentToolIndex] is PlayerTools.LinkerTool)
-                        {
-                            // Prevent tool switching while linking
-                            return;
-                        }
+                        _heldItem.Visible = false; // Hide the item from the world
+                        _heldItem.OnDropped();
+                        _heldItem = null;
+                        GD.Print("No item in this hotbar slot, unequipped.");
                     }
-                    // Only switch tools if LMB is not pressed
-                    if (mb.ButtonIndex == MouseButton.WheelUp)
-                        _currentToolIndex = (_currentToolIndex + 1) % _tools.Count;
-                    else if (mb.ButtonIndex == MouseButton.WheelDown)
-                        _currentToolIndex = (_currentToolIndex - 1 + _tools.Count) % _tools.Count;
-                    UpdateToolLabel();
                 }
             }
         }
@@ -301,6 +444,33 @@ public partial class Character : CharacterBody3D
             _gui.ToggleInventoryOpen();
         }
 
+        // Handle number key binds for hovered InvItem
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
+        {
+            int numberPressed = -1;
+            if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key9)
+                numberPressed = (int)(keyEvent.Keycode - Key.Key0);
+            else if (keyEvent.Keycode == Key.Key0)
+                numberPressed = 0;
+            if (numberPressed >= 1 && numberPressed <= 6)
+            {
+                // Find hovered InvItem
+                var mousePos = GetViewport().GetMousePosition();
+                foreach (Node child in _inventory.GetNode("InventoryPanel").GetChildren())
+                {
+                    if (child is InvItem invItem && invItem.Visible)
+                    {
+                        var rect = invItem.GetGlobalRect();
+                        if (rect.HasPoint(mousePos))
+                        {
+                            invItem.SetBindNumber(numberPressed);
+                            BindItemToHotbarSlot(invItem, numberPressed);
+                            break;
+                        }
+                    }
+                }
+            }
+        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -460,22 +630,14 @@ public partial class Character : CharacterBody3D
         }
         if (rigidBody != null)
         {
-            GameItem pickupComponent = null;
-            foreach (var child in rigidBody.GetChildren())
+            if (rigidBody is GameItem)
             {
-                if (child is GameItem pi)
-                {
-                    pickupComponent = pi;
-                    break;
-                }
-            }
-            if (pickupComponent != null && pickupComponent.CanBePickedUp())
-            {
+                var item = rigidBody as GameItem;
                 float distance = GlobalPosition.DistanceTo(rigidBody.GlobalPosition);
-                GD.Print($"[DEBUG] Found PickupableItem '{pickupComponent.ItemName}' at distance {distance:F2}");
-                if (distance <= pickupComponent.PickupRange)
+                GD.Print($"[DEBUG] Found PickupableItem '{item.ItemName}' at distance {distance:F2}");
+                if (distance <= item.PickupRange)
                 {
-                    PickupItem(rigidBody, pickupComponent);
+                    PickupItem(item);
                 }
                 else
                 {
@@ -493,29 +655,49 @@ public partial class Character : CharacterBody3D
         }
     }
 
-    private void PickupItem(RigidBody3D item, GameItem pickupComponent)
+    private void PickupItem(GameItem heldItem)
     {
-        _heldItem = item;
-        _heldPickupableComponent = pickupComponent;
+        _heldItem = heldItem;
         // Unfreeze and disable gravity for floaty effect
-        item.Freeze = false;
-        item.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
-        item.GravityScale = 0;
-        item.LinearVelocity = Vector3.Zero;
-        item.AngularVelocity = Vector3.Zero;
-        pickupComponent.OnPickedUp();
-        GD.Print($"Picked up: {pickupComponent.ItemName}");
+        heldItem.Freeze = false;
+        heldItem.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
+        heldItem.GravityScale = 0;
+        heldItem.LinearVelocity = Vector3.Zero;
+        heldItem.AngularVelocity = Vector3.Zero;
+        heldItem.OnPickedUp();
+        GD.Print($"Picked up: {heldItem.Name}");
     }
     
+    private void RemoveHeldItemFromInventory()
+    {
+        if (_heldItem != null && _heldItem.invItem != null)
+        {
+            var invPanel = _inventory.GetNode("InventoryPanel");
+            // Remove from inventory panel
+            if (_heldItem.invItem.GetParent() == invPanel)
+            {
+                invPanel.RemoveChild(_heldItem.invItem);
+                _heldItem.invItem.QueueFree();
+            }
+            // Remove from hotbar slots
+            for (int i = 1; i <= 6; i++)
+            {
+                if (_hotbarItems[i] == _heldItem.invItem)
+                    _hotbarItems[i] = null;
+            }
+            UpdateAllHotbarSlots();
+            _heldItem.invItem = null;
+        }
+    }
+
     private void DropHeldItem()
     {
         if (_heldItem == null) return;
-        // Restore gravity
         _heldItem.GravityScale = 1;
-        _heldPickupableComponent?.OnDropped();
-        GD.Print($"Dropped: {_heldPickupableComponent?.ItemName}");
+        _heldItem?.OnDropped();
+        RemoveHeldItemFromInventory();
+        GD.Print($"Dropped: {_heldItem.Name}");
         _heldItem = null;
-        _heldPickupableComponent = null;
     }
     
     private void ThrowHeldItem()
@@ -523,12 +705,12 @@ public partial class Character : CharacterBody3D
         if (_heldItem == null) return;
         var camera = GetNode<Camera3D>("Camera3D");
         var throwDirection = -camera.GlobalTransform.Basis.Z;
-        var throwForce = _heldPickupableComponent?.ThrowForce ?? 10.0f;
+        var throwForce = _heldItem?.ThrowForce ?? 10.0f;
         _heldItem.GravityScale = 1;
-        _heldPickupableComponent?.OnThrown(throwDirection, throwForce);
-        GD.Print($"Threw: {_heldPickupableComponent?.ItemName}");
+        _heldItem?.OnThrown(throwDirection, throwForce);
+        RemoveHeldItemFromInventory();
+        GD.Print($"Threw: {_heldItem?.ItemName}");
         _heldItem = null;
-        _heldPickupableComponent = null;
     }
 
     // Refactored node raising logic for ShovelTool

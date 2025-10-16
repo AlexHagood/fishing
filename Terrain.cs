@@ -47,9 +47,9 @@ public partial class Terrain : Node3D
         var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
         ForEachTriangle(triangulatedNodes, (nodeA, nodeB, nodeC) =>
         {
-            CreateDebugLine(nodeA.Position, nodeB.Position);
-            CreateDebugLine(nodeB.Position, nodeC.Position);
-            CreateDebugLine(nodeC.Position, nodeA.Position);
+            //CreateDebugLine(nodeA.Position, nodeB.Position);
+            //CreateDebugLine(nodeB.Position, nodeC.Position);
+            //CreateDebugLine(nodeC.Position, nodeA.Position);
             var mesh = new GroundMesh(nodeA, nodeB, nodeC);
             AddChild(mesh);
         });
