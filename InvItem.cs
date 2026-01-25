@@ -66,6 +66,7 @@ public partial class InvItem : Control
 
 	public override void _Ready()
 	{
+		
 		this.Size = _Inventory.inventoryTileSize * invSize;
 		MouseFilter = Control.MouseFilterEnum.Stop; // Ensure we receive mouse events
 		if (itemIcon != null)

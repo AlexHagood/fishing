@@ -36,8 +36,8 @@ sky = SubResource("Sky_7mycd")
 
 [node name="Terrain" parent="." instance=ExtResource("1_h2yge")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.82869, -2.08263, 2.5449)
-TerrainSize = Vector3(1000, 10, 1000)
-NodeCount = 1000
+TerrainSize = Vector3(100, 3, 100)
+NodeCount = 100
 
 [node name="Character" parent="." instance=ExtResource("2_0xm2m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.33068, 4.21782)

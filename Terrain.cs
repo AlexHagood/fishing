@@ -5,7 +5,7 @@ using System.Linq;
 [Tool]
 public partial class Terrain : Node3D
 {
-    [ExportToolButton("Click me!")]
+    [ExportToolButton("Generate")]
     public Callable ResetButton => Callable.From(Reset);
 
     private List<GraphNode> nodes;
@@ -30,36 +30,38 @@ public partial class Terrain : Node3D
         foreach (var child in GetChildren())
         {
             RemoveChild(child);
+            child.QueueFree();
         }
         nodes.Clear();
         _nodeCount = 0; // Reset node count
 
+        // Regenerate terrain
+        var generatedNodes = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
+        var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
+        ForEachTriangle(triangulatedNodes, (nodeA, nodeB, nodeC) =>
+        {
+            var mesh = new GroundMesh(nodeA, nodeB, nodeC);
+            AddChild(mesh);
+        });
+
         CreateDebugLine(Vector3.Zero, Vector3.Up * 10);
+        nodes.AddRange(triangulatedNodes);
 
-
-        GD.Print("Terrain reset complete - unified 3D Delaunay triangulation system ready!");
+        GD.Print($"Terrain regenerated: {triangulatedNodes.Count} nodes triangulated.");
     }
 
     public override void _Ready()
     {
         base._Ready();
-        var generatedNodes = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
-        var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
-        ForEachTriangle(triangulatedNodes, (nodeA, nodeB, nodeC) =>
+        
+        // Only regenerate in editor, never in game
+        if (!Engine.IsEditorHint())
         {
-            //CreateDebugLine(nodeA.Position, nodeB.Position);
-            //CreateDebugLine(nodeB.Position, nodeC.Position);
-            //CreateDebugLine(nodeC.Position, nodeA.Position);
-            var mesh = new GroundMesh(nodeA, nodeB, nodeC);
-            AddChild(mesh);
-        });
+            GD.Print("Terrain: Game mode - using pre-generated terrain from editor.");
+            return;
+        }
 
-        CreateDebugLine(new Vector3(0, 0, 0), new Vector3(0, 10, 0));
-
-        // Now manually add to our terrain's node collection if desired
-        nodes.AddRange(triangulatedNodes);
-
-        GD.Print($"Ready complete: {triangulatedNodes.Count} nodes generated and triangulated.");
+        GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
     }
 
     public List<GraphNode> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
