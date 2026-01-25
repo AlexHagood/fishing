@@ -2,14 +2,15 @@ using Godot;
 using System;
 using System.Linq;
 
+[Tool]
 public partial class GroundMesh : StaticBody3D
 {
     public MeshInstance3D MeshInstance;
     
     // References to the nodes that form this triangle
-    public GraphNode NodeA { get; private set; }
-    public GraphNode NodeB { get; private set; }
-    public GraphNode NodeC { get; private set; }
+    [Export] public GraphNode NodeA { get; set; }
+    [Export] public GraphNode NodeB { get; set; }
+    [Export] public GraphNode NodeC { get; set; }
     
     // Static grass material to avoid recreating for every instance
     private static StandardMaterial3D _grassMaterial;
@@ -133,10 +134,13 @@ public partial class GroundMesh : StaticBody3D
         AddChild(collisionShape);
         
         // Set owner for editor persistence if needed
-        var editedSceneRoot = GetTree()?.EditedSceneRoot;
-        if (editedSceneRoot != null)
+        if (Engine.IsEditorHint() && GetTree() != null)
         {
-            collisionShape.Owner = editedSceneRoot;
+            var editedSceneRoot = GetTree().EditedSceneRoot;
+            if (editedSceneRoot != null)
+            {
+                collisionShape.Owner = editedSceneRoot;
+            }
         }
         
     }
@@ -172,6 +176,12 @@ public partial class GroundMesh : StaticBody3D
             MeshInstance.MaterialOverride = CreateGrassMaterial();
             MeshInstance.Visible = true; // Ensure visibility at runtime
             AddChild(MeshInstance);
+            
+            // Allow the mesh instance to be saved to the scene file
+            if (Engine.IsEditorHint() && GetTree() != null)
+            {
+                MeshInstance.Owner = GetTree().EditedSceneRoot;
+            }
         }
         
         MeshInstance.Mesh = mesh;
@@ -196,6 +206,29 @@ public partial class GroundMesh : StaticBody3D
 
     public override void _Ready()
     {
+        // Find existing nodes if connections were lost
+        if (MeshInstance == null)
+        {
+            MeshInstance = GetNodeOrNull<MeshInstance3D>("MeshInstance3D");
+            // If still null, try finding by type
+            if (MeshInstance == null)
+            {
+               foreach(var child in GetChildren())
+               {
+                   if (child is MeshInstance3D mi)
+                   {
+                       MeshInstance = mi;
+                       break;
+                   }
+               }
+            }
+        }
+
+        // Re-establish connections if they were lost during reload
+        if (NodeA != null) NodeA.AddGroundMeshReference(this);
+        if (NodeB != null) NodeB.AddGroundMeshReference(this);
+        if (NodeC != null) NodeC.AddGroundMeshReference(this);
+
         // Only create collision shape if MeshInstance exists (not the case for parameterless constructor)
         if (MeshInstance != null && MeshInstance.Mesh != null)
         {

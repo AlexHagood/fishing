@@ -29,6 +29,10 @@ public partial class Terrain : Node3D
         GD.Print("Resetting terrain...");
         foreach (var child in GetChildren())
         {
+            // Don't delete the brush if it's a child of the terrain
+            if (child is TerrainBrush)
+                continue;
+
             RemoveChild(child);
             child.QueueFree();
         }
@@ -42,6 +46,12 @@ public partial class Terrain : Node3D
         {
             var mesh = new GroundMesh(nodeA, nodeB, nodeC);
             AddChild(mesh);
+            
+            // Allow the mesh to be saved to the scene file
+            if (Engine.IsEditorHint())
+            {
+                mesh.Owner = GetTree().EditedSceneRoot;
+            }
         });
 
         CreateDebugLine(Vector3.Zero, Vector3.Up * 10);
@@ -81,6 +91,13 @@ public partial class Terrain : Node3D
                 Position = new Vector3(x, y, z)
             };
             AddChild(node);
+            
+            // Allow the node to be saved to the scene file
+            if (Engine.IsEditorHint())
+            {
+                node.Owner = GetTree().EditedSceneRoot;
+            }
+            
             generatedNodes.Add(node);
         }
         

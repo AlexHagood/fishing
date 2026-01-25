@@ -311,6 +311,46 @@ public partial class Character : CharacterBody3D
         };
     }
 
+    private void SelectHotbarSlot(int slot)
+    {
+        if (slot < 1 || slot > 6) return;
+
+        // Unequip current item if any
+        if (_heldItem != null)
+        {
+            _heldItem.Visible = false;
+            _heldItem.OnDropped();
+            _heldItem = null;
+        }
+
+        _currentHotbarSlot = slot;
+        UpdateHotbarHighlight();
+
+        var invItem = _hotbarItems[_currentHotbarSlot];
+        if (invItem != null && invItem.gameItem != null)
+        {
+            var gameItem = invItem.gameItem;
+            // Make sure item is visible and enable physics
+            gameItem.Visible = true;
+            gameItem.Freeze = false;
+            gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
+            gameItem.GravityScale = 0;
+            // Teleport in front of camera
+            var camera = GetNode<Camera3D>("Camera3D");
+            var frontPos = camera.GlobalTransform.Origin + camera.GlobalTransform.Basis.Z * -2.0f + new Vector3(0, -0.5f, 0);
+            gameItem.GlobalPosition = frontPos;
+            // Set as held item
+            _heldItem = gameItem;
+            gameItem.OnPickedUp();
+            
+            GD.Print($"Equipped item from hotbar: {gameItem.ItemName}");
+        }
+        else
+        {
+            GD.Print("No item in this hotbar slot.");
+        }
+    }
+
 
     public override void _Input(InputEvent @event)
     {
@@ -367,50 +407,18 @@ public partial class Character : CharacterBody3D
             // Hotbar scroll handler (replace old tool scroll)
             else if (@event is InputEventMouseButton mb && mb.Pressed && (mb.ButtonIndex == MouseButton.WheelUp || mb.ButtonIndex == MouseButton.WheelDown))
             {
+                int newSlot = _currentHotbarSlot;
                 if (mb.ButtonIndex == MouseButton.WheelUp)
                 {
-                    _currentHotbarSlot++;
-                    if (_currentHotbarSlot > 6) _currentHotbarSlot = 1;
+                    newSlot++;
+                    if (newSlot > 6) newSlot = 1;
                 }
                 else if (mb.ButtonIndex == MouseButton.WheelDown)
                 {
-                    _currentHotbarSlot--;
-                    if (_currentHotbarSlot < 1) _currentHotbarSlot = 6;
+                    newSlot--;
+                    if (newSlot < 1) newSlot = 6;
                 }
-                UpdateHotbarHighlight();
-
-                // Equip logic: show item in front of player and hold it
-                var invItem = _hotbarItems[_currentHotbarSlot];
-                if (invItem != null && invItem.gameItem != null)
-                {
-                    var gameItem = invItem.gameItem;
-                    // Make sure item is visible and enable physics
-                    gameItem.Visible = true;
-                    gameItem.Freeze = false;
-                    gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
-                    gameItem.GravityScale = 0;
-                    // Teleport in front of camera
-                    var camera = GetNode<Camera3D>("Camera3D");
-                    var frontPos = camera.GlobalTransform.Origin + camera.GlobalTransform.Basis.Z * -2.0f + new Vector3(0, -0.5f, 0);
-                    gameItem.GlobalPosition = frontPos;
-                    // Set as held item
-                    _heldItem = gameItem;
-                    gameItem.OnPickedUp();
-                    
-                    
-                    GD.Print($"Equipped item from hotbar: {gameItem.ItemName}");
-                }
-                else
-                {
-                    // Un-equip if slot is empty or switching to a different item
-                    if (_heldItem != null)
-                    {
-                        _heldItem.Visible = false; // Hide the item from the world
-                        _heldItem.OnDropped();
-                        _heldItem = null;
-                        GD.Print("No item in this hotbar slot, unequipped.");
-                    }
-                }
+                SelectHotbarSlot(newSlot);
             }
         }
         // Handle E key for pickup
@@ -454,20 +462,27 @@ public partial class Character : CharacterBody3D
                 numberPressed = 0;
             if (numberPressed >= 1 && numberPressed <= 6)
             {
-                // Find hovered InvItem
-                var mousePos = GetViewport().GetMousePosition();
-                foreach (Node child in _inventory.GetNode("InventoryPanel").GetChildren())
+                if (_gui.InventoryOpen)
                 {
-                    if (child is InvItem invItem && invItem.Visible)
+                    // Find hovered InvItem
+                    var mousePos = GetViewport().GetMousePosition();
+                    foreach (Node child in _inventory.GetNode("InventoryPanel").GetChildren())
                     {
-                        var rect = invItem.GetGlobalRect();
-                        if (rect.HasPoint(mousePos))
+                        if (child is InvItem invItem && invItem.Visible)
                         {
-                            invItem.SetBindNumber(numberPressed);
-                            BindItemToHotbarSlot(invItem, numberPressed);
-                            break;
+                            var rect = invItem.GetGlobalRect();
+                            if (rect.HasPoint(mousePos))
+                            {
+                                invItem.SetBindNumber(numberPressed);
+                                BindItemToHotbarSlot(invItem, numberPressed);
+                                break;
+                            }
                         }
                     }
+                }
+                else
+                {
+                    SelectHotbarSlot(numberPressed);
                 }
             }
         }

@@ -24,6 +24,10 @@ window/size/viewport_height=1080
 
 project/assembly_name="Glop 3"
 
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/TerrainTools/plugin.cfg")
+
 [input]
 
 fwd={

@@ -1,6 +1,7 @@
 using Godot;
 using System.Collections.Generic;
 
+[Tool]
 [GlobalClass]
 public partial class GraphNode : StaticBody3D
 {
@@ -13,40 +14,33 @@ public partial class GraphNode : StaticBody3D
     public List<GroundMesh> ConnectedGroundMeshes { get; private set; }
     public Terrain ParentTerrain { get; set; }
     
-    // Custom position setter to update ground meshes when position changes
-    private Vector3 _position;
-    public new Vector3 Position
+    public override void _Notification(int what)
     {
-        get => _position;
-        set
+        if (what == NotificationTransformChanged)
         {
-            var oldPosition = _position;
-            _position = value;
-            base.Position = value; // Update the actual Node3D position
-            
-            // Update all connected ground meshes when this node moves
-            if (ConnectedGroundMeshes != null && ConnectedGroundMeshes.Count > 0)
+            UpdateConnectedMeshes();
+        }
+    }
+
+    private void UpdateConnectedMeshes()
+    {
+        // Update all connected ground meshes when this node moves
+        if (ConnectedGroundMeshes != null && ConnectedGroundMeshes.Count > 0)
+        {
+            foreach (var groundMesh in ConnectedGroundMeshes)
             {
-                GD.Print($"GraphNode {Name}: Updating {ConnectedGroundMeshes.Count} connected ground meshes");
-                
-                foreach (var groundMesh in ConnectedGroundMeshes)
+                if (groundMesh != null && IsInstanceValid(groundMesh))
                 {
-                    if (groundMesh != null && IsInstanceValid(groundMesh))
+                    try 
                     {
-                        try 
-                        {
-                            // Call the efficient transform-based update method
-                            groundMesh.UpdateMeshGeometry();
-                            GD.Print($"Updated ground mesh geometry for node {Name}");
-                        }
-                        catch (System.Exception ex)
-                        {
-                            GD.PrintErr($"Error updating ground mesh for node {Name}: {ex.Message}");
-                        }
+                        groundMesh.UpdateMeshGeometry();
+                    }
+                    catch (System.Exception ex)
+                    {
+                        GD.PrintErr($"Error updating ground mesh for node {Name}: {ex.Message}");
                     }
                 }
             }
-            
         }
     }
 
@@ -55,15 +49,13 @@ public partial class GraphNode : StaticBody3D
         Name = "GraphNode";
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
-        _position = Vector3.Zero;
         SetupMeshInstance();
     }
 
     public GraphNode(Vector3 position)
     {
         Name = "GraphNode";
-        _position = position;
-        base.Position = position;
+        Position = position;
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
         SetupMeshInstance();
@@ -74,15 +66,13 @@ public partial class GraphNode : StaticBody3D
         Name = nodeName;
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
-        _position = Vector3.Zero;
         SetupMeshInstance();
     }
 
     public GraphNode(Vector3 position, string nodeName = "GraphNode")
     {
         Name = nodeName;
-        _position = position;
-        base.Position = position;
+        Position = position;
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
         SetupMeshInstance();
@@ -145,11 +135,8 @@ public partial class GraphNode : StaticBody3D
 
     public override void _Ready()
     {
-        // Initialize position from base Position for existing nodes
-        if (_position == Vector3.Zero)
-        {
-            _position = base.Position;
-        }
+        // Enable notification for transform changes
+        SetNotifyTransform(true);
         
         // Ensure MeshInstance is properly set up and visible when the node enters the scene tree
         if (MeshInstance != null)
@@ -159,6 +146,23 @@ public partial class GraphNode : StaticBody3D
         else
         {
             GD.Print($"GraphNode {Name} _Ready: MeshInstance is null!");
+        }
+
+        // Set owner of children so they are saved to the scene file
+        if (Engine.IsEditorHint())
+        {
+            var tree = GetTree();
+            if (tree != null)
+            {
+                var root = tree.EditedSceneRoot;
+                if (root != null)
+                {
+                    foreach (var child in GetChildren())
+                    {
+                        child.Owner = root;
+                    }
+                }
+            }
         }
     }
 
