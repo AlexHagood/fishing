@@ -23,6 +23,12 @@ group_uniforms layers;
 uniform float layer_scale: hint_range(0., 60.) = 20.;
 uniform float layer_scale_step: hint_range(0., 40.) = 10.;
 uniform int layers_count: hint_range(0, 12) = 3;
+// Day sky colors and blend
+group_uniforms day;
+uniform vec3 day_horizon_color: source_color = vec3(0.85, 0.9, 1.0);
+uniform vec3 day_zenith_color: source_color = vec3(0.4, 0.6, 0.9);
+uniform vec3 day_ground_color: source_color = vec3(0.6, 0.55, 0.5);
+uniform float day_blend: hint_range(0.0, 1.0) = 0.0;
 // Hue credit:
 // The MIT License
 // Copyright © 2024 DigvijaysinhGohil
@@ -84,7 +90,8 @@ vec2 voronoi(in vec3 x){
 	return vec2(sqrt(res), id);
 }
 void sky() {
-	COLOR = sky_color;
+	// Build night sky into `night_color` (start from base sky color)
+	vec3 night_color = sky_color;
 
 	// Add moon
 	vec3 moon_dir = normalize(moon_direction);
@@ -93,13 +100,13 @@ void sky() {
 	float moon_mask = 1.0 - smoothstep(moon_size - moon_softness, moon_size, moon_distance);
 
 	// Create moon with sharp edges and controlled brightness
-	COLOR = mix(COLOR, moon_color, moon_mask);
+	night_color = mix(night_color, moon_color, moon_mask);
 
 	// Add ambient lighting from moon
 	float moon_ambient = max(0.0, moon_dot * 0.5 + 0.5) * moon_ambient_strength;
 	vec3 moon_ambient_color = moon_color * moon_ambient * 0.1;
 
-	// Add stars
+	// Add stars layers on top of the night color
 	for (int i = 0; i < layers_count; i++) {
 		vec3 pos = EYEDIR * (layer_scale + float(i) * layer_scale_step);
 		vec2 layer = voronoi(pos);
@@ -114,12 +121,31 @@ void sky() {
 			float star = smoothstep(star_intensity, 0., layer.x);
 		#endif
 
-		vec3 star_color = star * hue((COLOR + star_base_color), rand.y * star_hue_offset, 1);
+		vec3 star_color = star * hue((night_color + star_base_color), rand.y * star_hue_offset, 1);
 
 		// Reduce star visibility near moon to avoid overlap
 		float moon_proximity = smoothstep(moon_size * 2.0, moon_size * 4.0, acos(dot(EYEDIR, moon_dir)));
 		star_color *= moon_proximity;
 
-		COLOR += star_color;
+	night_color += star_color;
 	}
+
+	// Create a procedural day sky gradient
+	vec3 dir = normalize(EYEDIR);
+	float elevation = dir.y; // -1 (down) to 1 (up)
+	
+	// Sky gradient: horizon -> zenith
+	float sky_gradient = clamp(elevation, 0.0, 1.0);
+	sky_gradient = smoothstep(0.0, 0.5, sky_gradient); // Smoother gradient
+	vec3 day_sky = mix(day_horizon_color, day_zenith_color, sky_gradient);
+	
+	// Ground color below horizon
+	if (elevation < 0.0) {
+		float ground_mix = smoothstep(-0.3, 0.0, elevation);
+		day_sky = mix(day_ground_color, day_horizon_color, ground_mix);
+	}
+	
+	// Final color: blend between night shader and day sky
+	vec3 final_color = mix(night_color, day_sky, clamp(day_blend, 0.0, 1.0));
+	COLOR = final_color;
 }
