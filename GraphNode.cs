@@ -18,7 +18,11 @@ public partial class GraphNode : StaticBody3D
     {
         if (what == NotificationTransformChanged)
         {
-            UpdateConnectedMeshes();
+            // Only update meshes if we're in the scene tree
+            if (IsInsideTree())
+            {
+                UpdateConnectedMeshes();
+            }
         }
     }
 
@@ -49,7 +53,6 @@ public partial class GraphNode : StaticBody3D
         Name = "GraphNode";
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
-        SetupMeshInstance();
     }
 
     public GraphNode(Vector3 position)
@@ -58,7 +61,6 @@ public partial class GraphNode : StaticBody3D
         Position = position;
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
-        SetupMeshInstance();
     }
 
     public GraphNode(string nodeName)
@@ -66,7 +68,6 @@ public partial class GraphNode : StaticBody3D
         Name = nodeName;
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
-        SetupMeshInstance();
     }
 
     public GraphNode(Vector3 position, string nodeName = "GraphNode")
@@ -75,7 +76,6 @@ public partial class GraphNode : StaticBody3D
         Position = position;
         Connections = new List<GraphNode>();
         ConnectedGroundMeshes = new List<GroundMesh>();
-        SetupMeshInstance();
     }
     
     // Method to add a ground mesh reference
@@ -95,7 +95,12 @@ public partial class GraphNode : StaticBody3D
 
     private void SetupMeshInstance()
     {
+        // Only create if it doesn't exist
+        if (MeshInstance != null)
+            return;
+            
         MeshInstance = new MeshInstance3D();
+        MeshInstance.Name = "MeshInstance3D";
         MeshInstance.Position = Vector3.Zero; // Ensure mesh is centered at node origin
         AddChild(MeshInstance);
         
@@ -116,12 +121,16 @@ public partial class GraphNode : StaticBody3D
         // Ensure the MeshInstance starts visible
         MeshInstance.Visible = true;
         
-        // Add collision shape for click detection
-        var collisionShape = new CollisionShape3D();
-        var sphereShape = new SphereShape3D();
-        sphereShape.Radius = 0.1f; // Same as mesh radius
-        collisionShape.Shape = sphereShape;
-        AddChild(collisionShape);
+        // Only add collision shape if one doesn't exist
+        if (GetNodeOrNull<CollisionShape3D>("CollisionShape3D") == null)
+        {
+            var collisionShape = new CollisionShape3D();
+            collisionShape.Name = "CollisionShape3D";
+            var sphereShape = new SphereShape3D();
+            sphereShape.Radius = 0.1f; // Same as mesh radius
+            collisionShape.Shape = sphereShape;
+            AddChild(collisionShape);
+        }
     }
 
     public void Connect(GraphNode otherNode)
@@ -138,10 +147,23 @@ public partial class GraphNode : StaticBody3D
         // Enable notification for transform changes
         SetNotifyTransform(true);
         
+        // Set up mesh and collision if not already present (important for Tool mode)
+        SetupMeshInstance();
+        
+        // Try to get existing MeshInstance if it was created in editor
+        if (MeshInstance == null)
+        {
+            MeshInstance = GetNodeOrNull<MeshInstance3D>("MeshInstance3D");
+        }
+        
         // Ensure MeshInstance is properly set up and visible when the node enters the scene tree
         if (MeshInstance != null)
         {
             MeshInstance.Visible = true;
+            if (material == null && MeshInstance.MaterialOverride is StandardMaterial3D mat)
+            {
+                material = mat;
+            }
         }
         else
         {

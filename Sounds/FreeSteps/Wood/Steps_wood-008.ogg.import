@@ -3,12 +3,11 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://m06e2h4g4kp2"
-path="res://.godot/imported/Steps_wood-008.ogg-c7d8c88168c9fd3a9e0ccc13d0c99f92.oggvorbisstr"
+valid=false
 
 [deps]
 
 source_file="res://Sounds/FreeSteps/Wood/Steps_wood-008.ogg"
-dest_files=["res://.godot/imported/Steps_wood-008.ogg-c7d8c88168c9fd3a9e0ccc13d0c99f92.oggvorbisstr"]
 
 [params]
 

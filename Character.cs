@@ -13,11 +13,8 @@ public partial class Character : CharacterBody3D
     private bool isOnFloor = false;
     private Vector2 mouseDelta = Vector2.Zero;
 
-    private System.Collections.Generic.List<GraphNode> toolNodes = new System.Collections.Generic.List<GraphNode>();
-    private float toolCheckTimer = 0f;
-    
-    // Pickup system - can hold both GameItem (RigidBody3D) and ToolItem (Node3D)
-    private Node3D _heldItem;
+    // Pickup system - GameItem implements IPickupable and is a Node3D
+    private GameItem _heldItem;
     private Node3D _holdPosition;
 
     private float _baseSpeed = 5.0f;
@@ -25,11 +22,6 @@ public partial class Character : CharacterBody3D
     private float _baseFov = 70.0f;
     private float _sprintFov = 80.0f;
     private bool _isSprinting = false;
-
-    // Tool system
-    private List<PlayerTools.PlayerTool> _tools = new List<PlayerTools.PlayerTool>();
-    private int _currentToolIndex = 0;
-    private Label _toolLabel;
 
     private Camera3D camera;
     private Camera3D cameraBack;
@@ -68,21 +60,6 @@ public partial class Character : CharacterBody3D
 
         _gui = GetParent().GetNode<Gui>("GUI");
 
-        if (terrain != null)
-        {
-            foreach (var child in terrain.GetChildren())
-            {
-                if (child is GraphNode node)
-                {
-                    toolNodes.Add(node);
-                }
-            }
-        }
-
-
-        // Optionally, store crosshair as a field if you want to show/hide it later
-        // _crosshair = crosshair;
-
         // Create hold position for picked up items
         _holdPosition = new Node3D();
         _holdPosition.Name = "HoldPosition";
@@ -96,42 +73,10 @@ public partial class Character : CharacterBody3D
         camera.Current = true;
         cameraBack.Current = false;
 
-        // Tool system setup
-        _tools = PlayerTools.GetDefaultTools(this);
-        _currentToolIndex = 0;
-        SetupToolLabel();
-        UpdateToolLabel();
-
         _inventory = _gui.GetNode<Inventory>("Inventory");
 
         UpdateHotbarHighlight(); // Initialize hotbar highlight
         UpdateAllHotbarSlots();
-    }
-
-    private void SetupToolLabel()
-    {
-        // Add the tool label directly to the GUI node (inherits from CanvasLayer)
-        if (_gui != null)
-        {
-            _toolLabel = _gui.GetNodeOrNull<Label>("ToolLabel");
-            if (_toolLabel == null)
-            {
-                _toolLabel = new Label();
-                _toolLabel.Name = "ToolLabel";
-                _toolLabel.Position = new Vector2(12, 12);
-                _toolLabel.SizeFlagsHorizontal = (Control.SizeFlags)Control.SizeFlags.ExpandFill;
-                _toolLabel.SizeFlagsVertical = (Control.SizeFlags)Control.SizeFlags.ExpandFill;
-                _toolLabel.AddThemeColorOverride("font_color", new Color(1, 1, 1));
-                _toolLabel.AddThemeFontSizeOverride("font_size", 24);
-                _gui.AddChild(_toolLabel);
-            }
-        }
-    }
-
-    private void UpdateToolLabel()
-    {
-        if (_toolLabel != null && _tools.Count > 0)
-            _toolLabel.Text = $"Tool: {_tools[_currentToolIndex].Name}";
     }
 
     private void UpdateHotbarHighlight()
@@ -223,17 +168,6 @@ public partial class Character : CharacterBody3D
 
     public override void _Process(double delta)
     {
-        toolCheckTimer += (float)delta;
-        if (toolCheckTimer >= 0.1f)
-        {
-            toolCheckTimer = 0f;
-            foreach (var node in toolNodes)
-            {
-                if (node == null) continue;
-                float distance = GlobalTransform.Origin.DistanceTo(node.GlobalTransform.Origin);
-                node.Visible = distance <= 40f;
-            }
-        }
         // Floaty physics hold for picked up item (only for GameItem, not ToolItem)
         if (_heldItem != null && _holdPosition != null && _heldItem is GameItem gameItem && !(_heldItem is ToolItem))
         {
@@ -254,10 +188,6 @@ public partial class Character : CharacterBody3D
             float angularDamp = 6.0f; // Damping factor for spin
             gameItem.AngularVelocity *= Mathf.Exp(-angularDamp * (float)delta);
         }
-        // Tool process for CreateNodeTool
-        if (_tools.Count > 0)
-            _tools[_currentToolIndex].OnProcess(delta);
-
 
         // Handle F key for pickup with progress bar
         if (Input.IsActionPressed("pickup"))
@@ -265,17 +195,12 @@ public partial class Character : CharacterBody3D
             var progressBar = _gui.progressBar;
             var rayHit = PlayerObjectRay(5.0f);
             
-            // Find ToolItem or GameItem in the parent chain
-            Node3D pickupableItem = null;
+            // Find GameItem (includes ToolItem) in the parent chain
+            GameItem pickupableItem = null;
             Node nodeToCheck = rayHit as Node;
             while (nodeToCheck != null && pickupableItem == null)
             {
-                if (nodeToCheck is ToolItem toolItem)
-                {
-                    pickupableItem = toolItem;
-                    break;
-                }
-                else if (nodeToCheck is GameItem gItem)
+                if (nodeToCheck is GameItem gItem)
                 {
                     pickupableItem = gItem;
                     break;
@@ -301,44 +226,29 @@ public partial class Character : CharacterBody3D
                     progressBar.Value = 0;
                     progressBar.Visible = false;
                     
-                    // Handle both GameItem and ToolItem
-                    if (pickupableItem is ToolItem toolItem)
+                    // Add to inventory - works for both GameItem and ToolItem
+                    GD.Print($"Item grabbed: {pickupableItem.ItemName}");
+                    pickupableItem.InventoryPickup();
+                    
+                    if (pickupableItem.ItemDef == null)
                     {
-                        GD.Print($"Tool item grabbed");
-                        InvItem invitem = new InvItem(toolItem.InvSize);
-                        invitem.gameItem = toolItem; // Link the ToolItem to the InvItem
-                        var boxTexture = GD.Load<Texture2D>(toolItem.InvTexture.ResourcePath);
-                        invitem.itemIcon.Texture = boxTexture;
-                        if (_inventory.ForceFitItem(invitem))
-                        {
-                            _inventory.GetNode("InventoryPanel").AddChild(invitem);
-                            invitem.Visible = true; // Ensure item is visible after adding
-                            toolItem.DisablePhys();
-                        }
-                        else { wiggleBar(); }
+                        GD.PrintErr($"GameItem {pickupableItem.Name} has no ItemDefinition!");
+                        return;
                     }
-                    else if (pickupableItem is GameItem item)
+                    
+                    InvItem invitem = new InvItem(pickupableItem.ItemDef);
+                    invitem.gameItem = pickupableItem;
+                    
+                    if (_inventory.ForceFitItem(invitem))
                     {
-                        GD.Print($"Item grabbed");
-                        item.InventoryPickup();
-                        InvItem invitem = new InvItem(item.InvSize);
-                        invitem.gameItem = item; // Link the GameItem to the InvItem
-                        var boxTexture = GD.Load<Texture2D>(item.InvTexture.ResourcePath);
-                        invitem.itemIcon.Texture = boxTexture;
-                        if (_inventory.ForceFitItem(invitem))
-                        {
-                            _inventory.GetNode("InventoryPanel").AddChild(invitem);
-                            invitem.Visible = true; // Ensure item is visible after adding
-                            item.DisablePhys();
-                        }
-                        else { wiggleBar(); }
-                        
+                        _inventory.GetNode("InventoryPanel").AddChild(invitem);
+                        invitem.Visible = true;
+                        pickupableItem.DisablePhys();
                     }
-                    else
-                    {
-                        GD.Print("No valid item to grab");
+                    else 
+                    { 
+                        wiggleBar(); 
                     }
-
                 }
             }
         }
@@ -384,13 +294,9 @@ public partial class Character : CharacterBody3D
                     GetParent().AddChild(_heldItem);
                 }
                 toolItem.OnUnequip();
-                toolItem.DisablePhys();
-            }
-            else if (_heldItem is GameItem gameItem)
-            {
-                gameItem.DisablePhys();
             }
             
+            _heldItem.DisablePhys();
             _heldItem.Visible = false;
             _heldItem = null;
         }
@@ -401,20 +307,26 @@ public partial class Character : CharacterBody3D
         var invItem = _hotbarItems[_currentHotbarSlot];
         if (invItem != null && invItem.gameItem != null)
         {
-            var item = invItem.gameItem;
+            var item = invItem.gameItem as GameItem;
+            if (item == null)
+            {
+                GD.PrintErr("InvItem.gameItem is not a GameItem!");
+                return;
+            }
+            
             // Make sure item is visible
             item.Visible = true;
             _heldItem = item;
             
-            // Handle ToolItem (Node3D)
+            // Ensure the invItem link is set
+            item.invItem = invItem;
+            
+            // Handle ToolItem
             if (item is ToolItem toolItem)
             {
-                 // Ensure the invItem link is set
-                 toolItem.invItem = invItem;
-                 
                  GD.Print($"[DEBUG] Equip ToolItem: {item.Name} Type: {item.GetType()}");
                  
-                 // Static hold
+                 // Static hold - reparent to hold position
                  if (item.GetParent() != null)
                      item.GetParent().RemoveChild(item);
                  
@@ -431,35 +343,29 @@ public partial class Character : CharacterBody3D
                  item.Position = toolItem.HoldPosition;
                  item.Scale = toolItem.HoldScale;
                  
-                 // Disable physics on child rigid body if it exists
-                 if (toolItem._physicsBody != null)
-                 {
-                     toolItem._physicsBody.Freeze = true;
-                     toolItem._physicsBody.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
-                     toolItem._physicsBody.CollisionLayer = 0;
-                     toolItem._physicsBody.CollisionMask = 0;
-                 }
+                 // Disable physics - ToolItem IS a RigidBody3D now
+                 toolItem.Freeze = true;
+                 toolItem.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
+                 toolItem.CollisionLayer = 0;
+                 toolItem.CollisionMask = 0;
                  
                  toolItem.OnEquip();
                  GD.Print($"Equipped tool from hotbar: {toolItem.ItemName}");
             }
-            // Handle GameItem (RigidBody3D)
-            else if (item is GameItem gameItem)
+            // Handle regular GameItem (not a tool)
+            else
             {
-                 // Ensure the invItem link is set
-                 gameItem.invItem = invItem;
-                 
                  GD.Print($"[DEBUG] Equip GameItem: {item.Name} Type: {item.GetType()}");
                  
-                 gameItem.Freeze = false;
-                 gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
-                 gameItem.GravityScale = 0;
+                 item.Freeze = false;
+                 item.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
+                 item.GravityScale = 0;
                  // Teleport in front of camera
-                 var camera = GetNode<Camera3D>("Camera3D");
-                 var frontPos = camera.GlobalTransform.Origin + camera.GlobalTransform.Basis.Z * -2.0f + new Vector3(0, -0.5f, 0);
-                 gameItem.GlobalPosition = frontPos;
-                 gameItem.OnPickedUp();
-                 GD.Print($"Equipped item from hotbar: {gameItem.ItemName}");
+                 var cam = GetNode<Camera3D>("Camera3D");
+                 var frontPos = cam.GlobalTransform.Origin + cam.GlobalTransform.Basis.Z * -2.0f + new Vector3(0, -0.5f, 0);
+                 item.GlobalPosition = frontPos;
+                 item.OnPickedUp();
+                 GD.Print($"Equipped item from hotbar: {item.ItemName}");
             }
         }
         else
@@ -491,15 +397,6 @@ public partial class Character : CharacterBody3D
                         else
                             ThrowHeldItem();
                     }
-                    else if (_tools.Count > 0)
-                    {
-                        _tools[_currentToolIndex].OnPrimaryAction();
-                    }
-                }
-                else // LMB released
-                {
-                    if (_tools.Count > 0)
-                        _tools[_currentToolIndex].OnPrimaryRelease();
                 }
             }
             // Handle right mouse button (RMB)
@@ -514,20 +411,9 @@ public partial class Character : CharacterBody3D
                         else
                             DropHeldItem();
                     }
-                    else if (_tools.Count > 0 && _tools[_currentToolIndex] is PlayerTools.ShovelTool shovel)
-                    {
-                        shovel.OnSecondaryAction();
-                    }
-                }
-                else // RMB released
-                {
-                    if (_tools.Count > 0 && _tools[_currentToolIndex] is PlayerTools.ShovelTool shovel)
-                    {
-                        shovel.OnSecondaryRelease();
-                    }
                 }
             }
-            // Hotbar scroll handler (replace old tool scroll)
+            // Hotbar scroll handler
             else if (@event is InputEventMouseButton mb && mb.Pressed && (mb.ButtonIndex == MouseButton.WheelUp || mb.ButtonIndex == MouseButton.WheelDown))
             {
                 int newSlot = _currentHotbarSlot;
@@ -862,9 +748,16 @@ public partial class Character : CharacterBody3D
     {
         GD.Print($"[DEBUG] PickupItem called with {pickedItem.Name} of type {pickedItem.GetType().Name}");
         
-        _heldItem = pickedItem;
+        // Must be a GameItem (or ToolItem which inherits from GameItem)
+        if (pickedItem is not GameItem gameItem)
+        {
+            GD.PrintErr($"Cannot pickup {pickedItem.Name} - not a GameItem!");
+            return;
+        }
+        
+        _heldItem = gameItem;
 
-        if (pickedItem is ToolItem toolItem)
+        if (gameItem is ToolItem toolItem)
         {
              GD.Print($"[DEBUG] Item is ToolItem. Equipping.");
              // Static hold for tools
@@ -887,22 +780,19 @@ public partial class Character : CharacterBody3D
                 pickedItem.Scale = toolItem.HoldScale;
              }
              
-             // Disable physics on child rigid body if it exists
-             if (toolItem._physicsBody != null)
-             {
-                 toolItem._physicsBody.Freeze = true;
-                 toolItem._physicsBody.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
-                 toolItem._physicsBody.LinearVelocity = Vector3.Zero;
-                 toolItem._physicsBody.AngularVelocity = Vector3.Zero;
-                 toolItem._physicsBody.CollisionLayer = 0;
-                 toolItem._physicsBody.CollisionMask = 0;
-             }
+             // Disable physics - ToolItem IS a RigidBody3D now
+             toolItem.Freeze = true;
+             toolItem.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
+             toolItem.LinearVelocity = Vector3.Zero;
+             toolItem.AngularVelocity = Vector3.Zero;
+             toolItem.CollisionLayer = 0;
+             toolItem.CollisionMask = 0;
              
              toolItem.OnEquip();
              toolItem.OnPickedUp();
              GD.Print($"Picked up tool: {toolItem.ItemName}");
         }
-        else if (pickedItem is GameItem gameItem)
+        else
         {
             GD.Print($"[DEBUG] Item is standard GameItem. Floating.");
             // Unfreeze and disable gravity for floaty effect

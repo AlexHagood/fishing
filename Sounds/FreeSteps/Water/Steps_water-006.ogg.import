@@ -3,12 +3,11 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bx0c8vauqutxf"
-path="res://.godot/imported/Steps_water-006.ogg-e16b4a06f0163c80eada4a390e2d6281.oggvorbisstr"
+valid=false
 
 [deps]
 
 source_file="res://Sounds/FreeSteps/Water/Steps_water-006.ogg"
-dest_files=["res://.godot/imported/Steps_water-006.ogg-e16b4a06f0163c80eada4a390e2d6281.oggvorbisstr"]
 
 [params]
 

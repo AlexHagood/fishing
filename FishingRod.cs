@@ -27,6 +27,7 @@ public partial class FishingRod : ToolItem
     
     public override void OnEquip()
     {
+        base.OnEquip();
         GD.Print("Fishing Rod equipped");
         
         // Enable bobber physics when equipped
@@ -38,16 +39,17 @@ public partial class FishingRod : ToolItem
             _bobber.CollisionMask = 1;
         }
         
-        // Ensure joint is active
-        if (_joint != null && _physicsBody != null)
+        // Ensure joint is active - 'this' is now the RigidBody3D
+        if (_joint != null)
         {
-            _joint.NodeA = _physicsBody.GetPath();
+            _joint.NodeA = GetPath();
             _joint.NodeB = _bobber.GetPath();
         }
     }
     
     public override void OnUnequip()
     {
+        base.OnUnequip();
         GD.Print("Fishing Rod unequipped");
         
         // Freeze bobber when unequipped

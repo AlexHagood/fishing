@@ -1,24 +1,61 @@
 using Godot;
 
 [GlobalClass]
-public partial class GameItem : RigidBody3D
+public partial class GameItem : RigidBody3D, IPickupable
 {
-    [Export] public bool IsPickupable { get; set; } = true;
-    [Export] public float PickupRange { get; set; } = 3.0f;
-    [Export] public float ThrowForce { get; set; } = 10.0f;
-    [Export] public string ItemName { get; set; } = "Item";
-
-    [Export] public Vector2 InvSize { get; set; } = new Vector2(2, 2);
-
-    [Export] public Texture2D InvTexture { get; set; }
+    [Export] public ItemDefinition ItemDef { get; set; }
+    
+    // Properties exposed via IPickupable - now reference ItemDef
+    public bool IsPickupable 
+    { 
+        get => ItemDef?.IsPickupable ?? true;
+        set { if (ItemDef != null) ItemDef.IsPickupable = value; }
+    }
+    
+    public float PickupRange 
+    { 
+        get => ItemDef?.PickupRange ?? 3.0f;
+        set { if (ItemDef != null) ItemDef.PickupRange = value; }
+    }
+    
+    public float ThrowForce 
+    { 
+        get => ItemDef?.ThrowForce ?? 10.0f;
+        set { if (ItemDef != null) ItemDef.ThrowForce = value; }
+    }
+    
+    public string ItemName 
+    { 
+        get => ItemDef?.ItemName ?? "Item";
+        set { if (ItemDef != null) ItemDef.ItemName = value; }
+    }
+    
+    public Vector2 InvSize 
+    { 
+        get => ItemDef?.InvSize ?? new Vector2(2, 2);
+        set { if (ItemDef != null) ItemDef.InvSize = value; }
+    }
+    
+    public Texture2D InvTexture 
+    { 
+        get => ItemDef?.InvTexture;
+        set { if (ItemDef != null) ItemDef.InvTexture = value; }
+    }
 
     public InvItem invItem { get; set; }
 
     public override void _Ready()
     {
-        if (InvTexture == null)
+        // Fallback if no ItemDef is assigned
+        if (ItemDef == null)
         {
-            InvTexture = GD.Load<Texture2D>("res://icon.png"); // Godot's default pink/black placeholder
+            GD.PrintErr($"GameItem '{Name}' has no ItemDefinition assigned! Creating default.");
+            ItemDef = new ItemDefinition();
+        }
+        
+        if (ItemDef.InvTexture == null)
+        {
+            ItemDef.InvTexture = GD.Load<Texture2D>("res://icon.png");
         }
     }
     

@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3 uid="uid://b2vxqp8a1n45s"]
+
+[ext_resource type="Script" path="res://ItemDefinition.cs" id="1_pickaxe_def"]
+[ext_resource type="Texture2D" uid="uid://bqkp6n0rvol73" path="res://Textures/pickaxe.png" id="2_pickaxe_tex"]
+
+[resource]
+script = ExtResource("1_pickaxe_def")
+ItemName = "Pickaxe"
+InvTexture = ExtResource("2_pickaxe_tex")
+InvSize = Vector2(2, 3)
+MaxStackSize = 1
+IsPickupable = true
+PickupRange = 3.0
+ThrowForce = 10.0
+WorldScenePath = "res://pickaxe.tscn"
+IsTool = true
+HoldPosition = Vector3(0, 1, 0)
+HoldRotation = Vector3(0, 0, 0)
+HoldScale = Vector3(1, 1, 1)

@@ -3,12 +3,11 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bld3g0eybk373"
-path="res://.godot/imported/Steps_snow-012.ogg-7556603605dce87b99ec95c1870115f8.oggvorbisstr"
+valid=false
 
 [deps]
 
 source_file="res://Sounds/FreeSteps/Snow/Steps_snow-012.ogg"
-dest_files=["res://.godot/imported/Steps_snow-012.ogg-7556603605dce87b99ec95c1870115f8.oggvorbisstr"]
 
 [params]
 

@@ -3,12 +3,11 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://dn42fc5aatxku"
-path="res://.godot/imported/Steps_floor-013.ogg-c68ba094d24cce17e637c9999bd9e8a6.oggvorbisstr"
+valid=false
 
 [deps]
 
 source_file="res://Sounds/FreeSteps/Floor/Steps_floor-013.ogg"
-dest_files=["res://.godot/imported/Steps_floor-013.ogg-c68ba094d24cce17e637c9999bd9e8a6.oggvorbisstr"]
 
 [params]
 

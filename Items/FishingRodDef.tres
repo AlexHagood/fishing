@@ -1,0 +1,19 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3 uid="uid://cnmr7y5kx8j2f"]
+
+[ext_resource type="Script" path="res://ItemDefinition.cs" id="1_rod_def"]
+[ext_resource type="Texture2D" uid="uid://b31bomn1xak2y" path="res://Textures/rod.png" id="2_rod_tex"]
+
+[resource]
+script = ExtResource("1_rod_def")
+ItemName = "Fishing Rod"
+InvTexture = ExtResource("2_rod_tex")
+InvSize = Vector2(1, 4)
+MaxStackSize = 1
+IsPickupable = true
+PickupRange = 3.0
+ThrowForce = 10.0
+WorldScenePath = "res://FishingRod.tscn"
+IsTool = true
+HoldPosition = Vector3(0, 0, 0)
+HoldRotation = Vector3(0, 0, 0)
+HoldScale = Vector3(1, 1, 1)

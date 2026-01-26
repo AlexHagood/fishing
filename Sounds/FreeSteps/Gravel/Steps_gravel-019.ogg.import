@@ -3,12 +3,11 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://djrait6uj2oc6"
-path="res://.godot/imported/Steps_gravel-019.ogg-7cc2db0b4bed6a48896db5712d04f00b.oggvorbisstr"
+valid=false
 
 [deps]
 
 source_file="res://Sounds/FreeSteps/Gravel/Steps_gravel-019.ogg"
-dest_files=["res://.godot/imported/Steps_gravel-019.ogg-7cc2db0b4bed6a48896db5712d04f00b.oggvorbisstr"]
 
 [params]
 

@@ -10,38 +10,58 @@ public partial class InvItem : Control
 	Vector2 offset;
 	TextureRect dragIcon = null;
 	public Inventory _Inventory;
-	[Export]
-	public Vector2 invSize = new Vector2(2, 2);
-
+	
+	// Item definition (required)
+	public ItemDefinition itemDef;
+	
+	// Stack count for stackable items
+	public int stackCount = 1;
+	
+	public Vector2 invSize => itemDef?.InvSize ?? new Vector2(2, 2);
 	public Vector2 invPos;
 
 	public List<InvTile> itemTiles = new List<InvTile>();
 
 	public TextureRect itemIcon;
 
-	private Label _numberLabel;
+	private Label _numberLabel; // Hotbar bind number (1-6) - should exist in scene
+	private Label _stackLabel; // Stack count - should exist in scene
 	private int _displayedNumber = -1;
 
-	// Can hold either a GameItem (RigidBody3D) or a ToolItem (Node3D)
-	public Node3D gameItem;
+	// Reference to world instance (if spawned) - can be null for stacked items
+	public GameItem gameItem;
 
 	public InvItem()
 	{
-		itemIcon = new TextureRect();
-		itemIcon.Name = "ItemIcon";
-		itemIcon.StretchMode = TextureRect.StretchModeEnum.Scale;
-		itemIcon.MouseFilter = Control.MouseFilterEnum.Pass;
-		AddChild(itemIcon);
+		// ItemIcon should be created in the editor, but fallback for code-created items
+		itemIcon = GetNodeOrNull<TextureRect>("ItemIcon");
+		if (itemIcon == null)
+		{
+			GD.PrintErr("InvItem: ItemIcon not found! Should be created in editor.");
+			itemIcon = new TextureRect();
+			itemIcon.Name = "ItemIcon";
+			itemIcon.StretchMode = TextureRect.StretchModeEnum.Scale;
+			itemIcon.MouseFilter = Control.MouseFilterEnum.Pass;
+			AddChild(itemIcon);
+		}
 	}
 
-	public InvItem(Vector2 size)
+	public InvItem(ItemDefinition def, int count = 1)
 	{
-		invSize = size;
-		itemIcon = new TextureRect();
-		itemIcon.Name = "ItemIcon";
-		itemIcon.StretchMode = TextureRect.StretchModeEnum.Scale;
-		itemIcon.MouseFilter = Control.MouseFilterEnum.Pass;
-		AddChild(itemIcon);
+		itemDef = def;
+		stackCount = count;
+		
+		// ItemIcon should be created in the editor
+		itemIcon = GetNodeOrNull<TextureRect>("ItemIcon");
+		if (itemIcon == null)
+		{
+			GD.PrintErr("InvItem: ItemIcon not found! Should be created in editor.");
+			itemIcon = new TextureRect();
+			itemIcon.Name = "ItemIcon";
+			itemIcon.StretchMode = TextureRect.StretchModeEnum.Scale;
+			itemIcon.MouseFilter = Control.MouseFilterEnum.Pass;
+			AddChild(itemIcon);
+		}
 	}
 
 
@@ -77,13 +97,21 @@ public partial class InvItem : Control
 
 	public override void _Ready()
 	{
-		
 		this.Size = _Inventory.inventoryTileSize * invSize;
 		MouseFilter = Control.MouseFilterEnum.Stop; // Ensure we receive mouse events
-		if (itemIcon != null)
-			itemIcon.Size = this.Size; // Make icon fill the item
-		if (_numberLabel == null)
-			CreateNumberLabel();
+		
+		// Get references to editor-created nodes
+		_numberLabel = GetNodeOrNull<Label>("NumberLabel");
+		_stackLabel = GetNodeOrNull<Label>("StackLabel");
+		
+		// Set icon texture from item definition
+		if (itemIcon != null && itemDef != null)
+		{
+			itemIcon.Texture = itemDef.InvTexture;
+			itemIcon.Size = this.Size;
+		}
+			
+		UpdateStackLabel();
 	}
 
 	public override void _Process(double delta)
@@ -179,31 +207,28 @@ public partial class InvItem : Control
 	public void SetBindNumber(int number)
 	{
 		_displayedNumber = number;
-		if (_numberLabel == null)
-			CreateNumberLabel();
-		_numberLabel.Text = number > 0 ? number.ToString() : "";
-		_numberLabel.Visible = number > 0;
+		if (_numberLabel != null)
+		{
+			_numberLabel.Text = number > 0 ? number.ToString() : "";
+			_numberLabel.Visible = number > 0;
+		}
 	}
 
-	private void CreateNumberLabel()
+	private void UpdateStackLabel()
 	{
-		_numberLabel = new Label();
-		_numberLabel.Name = "NumberLabel";
-		_numberLabel.Text = "";
-		_numberLabel.Visible = false;
-		// Remove invalid SizeFlags.None assignments
-		_numberLabel.SizeFlagsHorizontal = 0;
-		_numberLabel.SizeFlagsVertical = 0;
-		_numberLabel.AddThemeColorOverride("font_color", new Color(1, 1, 0)); // Yellow
-		_numberLabel.AddThemeFontSizeOverride("font_size", 18);
-		_numberLabel.HorizontalAlignment = HorizontalAlignment.Right;
-		_numberLabel.VerticalAlignment = VerticalAlignment.Top;
-		AddChild(_numberLabel);
-		// Position in top right
-		_numberLabel.AnchorRight = 1;
-		_numberLabel.AnchorTop = 0;
-		_numberLabel.OffsetRight = -4;
-		_numberLabel.OffsetTop = 4;
+		if (_stackLabel == null || itemDef == null)
+			return;
+			
+		// Only show stack count if item is stackable and count > 1
+		if (itemDef.MaxStackSize > 1 && stackCount > 1)
+		{
+			_stackLabel.Text = stackCount.ToString();
+			_stackLabel.Visible = true;
+		}
+		else
+		{
+			_stackLabel.Visible = false;
+		}
 	}
 
 	public void RemoveItem()

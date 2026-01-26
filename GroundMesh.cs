@@ -134,12 +134,16 @@ public partial class GroundMesh : StaticBody3D
         AddChild(collisionShape);
         
         // Set owner for editor persistence if needed
-        if (Engine.IsEditorHint() && GetTree() != null)
+        if (Engine.IsEditorHint() && IsInsideTree())
         {
-            var editedSceneRoot = GetTree().EditedSceneRoot;
-            if (editedSceneRoot != null)
+            var tree = GetTree();
+            if (tree != null)
             {
-                collisionShape.Owner = editedSceneRoot;
+                var editedSceneRoot = tree.EditedSceneRoot;
+                if (editedSceneRoot != null)
+                {
+                    collisionShape.Owner = editedSceneRoot;
+                }
             }
         }
         
@@ -178,9 +182,13 @@ public partial class GroundMesh : StaticBody3D
             AddChild(MeshInstance);
             
             // Allow the mesh instance to be saved to the scene file
-            if (Engine.IsEditorHint() && GetTree() != null)
+            if (Engine.IsEditorHint() && IsInsideTree())
             {
-                MeshInstance.Owner = GetTree().EditedSceneRoot;
+                var tree = GetTree();
+                if (tree != null)
+                {
+                    MeshInstance.Owner = tree.EditedSceneRoot;
+                }
             }
         }
         
@@ -236,10 +244,17 @@ public partial class GroundMesh : StaticBody3D
             UpdateCollisionShape();
             
             // Set owners for persistence in editor only - now that scene tree is available
-            var editedSceneRoot = GetTree()?.EditedSceneRoot;
-            if (editedSceneRoot != null)
+            if (IsInsideTree())
             {
-                MeshInstance.Owner = editedSceneRoot;
+                var tree = GetTree();
+                if (tree != null)
+                {
+                    var editedSceneRoot = tree.EditedSceneRoot;
+                    if (editedSceneRoot != null)
+                    {
+                        MeshInstance.Owner = editedSceneRoot;
+                    }
+                }
             }
         }
     }
