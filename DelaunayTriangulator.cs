@@ -80,8 +80,9 @@ public static class DelaunayTriangulator
     /// Uses Triangle.NET library for robust and correct Delaunay triangulation
     /// </summary>
     /// <param name="nodes">List of GraphNodes to triangulate</param>
+    /// <param name="quality">Quality options for mesh refinement (null for basic triangulation)</param>
     /// <returns>List of triangles as index triplets</returns>
-    public static List<Triangle> Triangulate2D(List<GraphNode> nodes)
+    public static List<Triangle> Triangulate2D(List<GraphNode> nodes, TriangleNet.Meshing.ConstraintOptions quality = null)
     {
         if (nodes == null || nodes.Count < 3)
             return new List<Triangle>();
@@ -99,8 +100,27 @@ public static class DelaunayTriangulator
                 polygon.Add(new Vertex(node.Position.X, node.Position.Z) { ID = i });
             }
 
-            // Perform basic Delaunay triangulation
-            var mesh = polygon.Triangulate();
+            // Perform Delaunay triangulation with optional quality refinement
+            TriangleNet.Mesh mesh;
+            if (quality != null)
+            {
+                // Quality mesh refinement - creates more uniform triangles
+                var options = new TriangleNet.Meshing.ConstraintOptions() 
+                { 
+                    ConformingDelaunay = true  // Ensures true Delaunay triangulation
+                };
+                var qualityOptions = new TriangleNet.Meshing.QualityOptions()
+                {
+                    MinimumAngle = 20.0,  // Minimum angle in degrees (20-30 works well)
+                    MaximumArea = -1.0    // No maximum area constraint
+                };
+                mesh = (TriangleNet.Mesh)polygon.Triangulate(options, qualityOptions);
+            }
+            else
+            {
+                // Basic Delaunay triangulation
+                mesh = (TriangleNet.Mesh)polygon.Triangulate();
+            }
 
             // Convert Triangle.NET result to our Triangle structs
             var result = new List<Triangle>();
@@ -129,6 +149,95 @@ public static class DelaunayTriangulator
             
             return new List<Triangle>();
         }
+    }
+
+    /// <summary>
+    /// Applies Lloyd's relaxation algorithm to improve mesh quality.
+    /// Moves each point toward the centroid of its Voronoi cell, which tends to
+    /// create more uniform triangles with better angles.
+    /// </summary>
+    /// <param name="nodes">List of GraphNodes to relax</param>
+    /// <param name="iterations">Number of relaxation iterations</param>
+    /// <param name="origin">Terrain origin (for boundary constraints)</param>
+    /// <param name="size">Terrain size (for boundary constraints)</param>
+    /// <returns>The same list of nodes with updated positions</returns>
+    public static List<GraphNode> ApplyLloydsRelaxation(
+        List<GraphNode> nodes, 
+        int iterations, 
+        Vector3 origin, 
+        Vector3 size)
+    {
+        if (nodes == null || nodes.Count < 3 || iterations <= 0)
+            return nodes;
+
+        // Define bounds for clamping
+        float minX = origin.X - size.X * 0.5f;
+        float maxX = origin.X + size.X * 0.5f;
+        float minZ = origin.Z - size.Z * 0.5f;
+        float maxZ = origin.Z + size.Z * 0.5f;
+
+        for (int iter = 0; iter < iterations; iter++)
+        {
+            // Triangulate current positions to get Voronoi diagram (dual of Delaunay)
+            var triangles = Triangulate2D(nodes);
+            
+            // Build adjacency information for each node
+            var nodeNeighbors = new List<HashSet<int>>();
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                nodeNeighbors.Add(new HashSet<int>());
+            }
+            
+            // Collect neighbors from triangles
+            foreach (var tri in triangles)
+            {
+                nodeNeighbors[tri.A].Add(tri.B);
+                nodeNeighbors[tri.A].Add(tri.C);
+                nodeNeighbors[tri.B].Add(tri.A);
+                nodeNeighbors[tri.B].Add(tri.C);
+                nodeNeighbors[tri.C].Add(tri.A);
+                nodeNeighbors[tri.C].Add(tri.B);
+            }
+
+            // Calculate new positions (centroid of neighbors approximates Voronoi cell centroid)
+            var newPositions = new Vector3[nodes.Count];
+            
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                var neighbors = nodeNeighbors[i];
+                if (neighbors.Count == 0)
+                {
+                    newPositions[i] = nodes[i].Position;
+                    continue;
+                }
+
+                // Calculate centroid of neighboring points
+                Vector3 centroid = Vector3.Zero;
+                foreach (var neighborIdx in neighbors)
+                {
+                    centroid += nodes[neighborIdx].Position;
+                }
+                centroid /= neighbors.Count;
+
+                // Preserve Y coordinate (height) - only relax in XZ plane
+                centroid.Y = nodes[i].Position.Y;
+
+                // Clamp to bounds
+                centroid.X = Mathf.Clamp(centroid.X, minX, maxX);
+                centroid.Z = Mathf.Clamp(centroid.Z, minZ, maxZ);
+
+                newPositions[i] = centroid;
+            }
+
+            // Update node positions
+            for (int i = 0; i < nodes.Count; i++)
+            {
+                nodes[i].Position = newPositions[i];
+            }
+        }
+
+        GD.Print($"Lloyd's relaxation: {iterations} iterations completed for {nodes.Count} nodes");
+        return nodes;
     }
 }
 

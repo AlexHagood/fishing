@@ -285,17 +285,45 @@ public partial class GroundMesh : StaticBody3D
     }
     
     // Generate UV coordinates based on world position to maintain consistent scale
+    // Uses triplanar-style projection to prevent stretching on any triangle orientation
     private Vector2[] GenerateUVs(Vector3[] vertices)
     {
         var uvs = new Vector2[vertices.Length];
         
+        // Calculate the triangle's normal to determine the best projection plane
+        Vector3 edge1 = vertices[1] - vertices[0];
+        Vector3 edge2 = vertices[2] - vertices[0];
+        Vector3 normal = edge1.Cross(edge2).Normalized();
+        
+        // Determine which axis to use for projection based on the normal
+        // Use the axis that the normal is most aligned with
+        float absX = Mathf.Abs(normal.X);
+        float absY = Mathf.Abs(normal.Y);
+        float absZ = Mathf.Abs(normal.Z);
+        
+        // Define a consistent texture scale
+        const float textureScale = 2.0f; // Controls texture tiling frequency
+        
         for (int i = 0; i < vertices.Length; i++)
         {
-            // Use world XZ coordinates for UV mapping with consistent scale
-            // Scale down by texture scale factor to match material settings
-            float u = vertices[i].X / 2.0f; // Divide by the UV scale we set in material
-            float v = vertices[i].Z / 2.0f;
-            uvs[i] = new Vector2(u, v);
+            Vector3 pos = vertices[i];
+            
+            // Project based on dominant normal direction to minimize distortion
+            if (absY >= absX && absY >= absZ)
+            {
+                // Normal mostly pointing up/down - use XZ projection (most common for terrain)
+                uvs[i] = new Vector2(pos.X / textureScale, pos.Z / textureScale);
+            }
+            else if (absX >= absY && absX >= absZ)
+            {
+                // Normal mostly pointing left/right - use YZ projection
+                uvs[i] = new Vector2(pos.Y / textureScale, pos.Z / textureScale);
+            }
+            else
+            {
+                // Normal mostly pointing forward/back - use XY projection
+                uvs[i] = new Vector2(pos.X / textureScale, pos.Y / textureScale);
+            }
         }
         
         return uvs;

@@ -41,6 +41,19 @@ public partial class Terrain : Node3D
 
         // Regenerate terrain
         var generatedNodes = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
+        
+        // Apply Lloyd's relaxation to improve triangle quality
+        if (RelaxationIterations > 0)
+        {
+            generatedNodes = DelaunayTriangulator.ApplyLloydsRelaxation(
+                generatedNodes, 
+                RelaxationIterations, 
+                TerrainOrigin, 
+                TerrainSize
+            );
+            GD.Print($"Applied {RelaxationIterations} iterations of Lloyd's relaxation.");
+        }
+        
         var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
         ForEachTriangle(triangulatedNodes, (nodeA, nodeB, nodeC) =>
         {
@@ -74,11 +87,15 @@ public partial class Terrain : Node3D
         GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
     }
 
+    [Export(PropertyHint.Range, "0,10")]
+    public int RelaxationIterations = 2; // Number of Lloyd's relaxation iterations to improve triangle quality
+
     public List<GraphNode> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
     {
         var generatedNodes = new List<GraphNode>();
         var rng = seed == 0 ? new Random() : new Random(seed);
         
+        // Generate random points
         for (int i = 0; i < count; i++)
         {
             // Center the spread around the start location
@@ -101,7 +118,7 @@ public partial class Terrain : Node3D
             generatedNodes.Add(node);
         }
         
-        GD.Print($"{count} nodes generated centered at {startLocation} with spread {spread}.");
+        GD.Print($"{count} nodes generated with random distribution at {startLocation} with spread {spread}.");
         return generatedNodes;
     }
 
@@ -258,7 +275,6 @@ public partial class Terrain : Node3D
 
     public void CrackPanel(GraphNode node, GroundMesh groundMesh)
     {
-
         var line1 = CreateDebugLine(node.Position, groundMesh.NodeA.Position, true);
         var line2 = CreateDebugLine(node.Position, groundMesh.NodeB.Position, true);
         var line3 = CreateDebugLine(node.Position, groundMesh.NodeC.Position, true);
@@ -273,15 +289,43 @@ public partial class Terrain : Node3D
 
         groundMesh.QueueFree(); // Remove the old mesh
 
-        GroundMesh groundMesh1 = new GroundMesh(node, groundMesh.NodeA, groundMesh.NodeB);
-        GroundMesh groundMesh2 = new GroundMesh(node, groundMesh.NodeB, groundMesh.NodeC);
-        GroundMesh groundMesh3 = new GroundMesh(node, groundMesh.NodeC, groundMesh.NodeA);
+        // Create new triangles with correct winding order (counter-clockwise when viewed from above)
+        // Original was (A, B, C), so we maintain the same winding direction
+        GroundMesh groundMesh1 = new GroundMesh(groundMesh.NodeA, groundMesh.NodeB, node);
+        GroundMesh groundMesh2 = new GroundMesh(groundMesh.NodeB, groundMesh.NodeC, node);
+        GroundMesh groundMesh3 = new GroundMesh(groundMesh.NodeC, groundMesh.NodeA, node);
 
         AddChild(groundMesh1);
         AddChild(groundMesh2);
         AddChild(groundMesh3);
 
-        GD.Print($"Panel Cracked");
+        // Set owners for persistence in editor
+        if (Engine.IsEditorHint() && IsInsideTree())
+        {
+            var editedRoot = GetTree().EditedSceneRoot;
+            if (editedRoot != null)
+            {
+                groundMesh1.Owner = editedRoot;
+                groundMesh2.Owner = editedRoot;
+                groundMesh3.Owner = editedRoot;
+                
+                // Also set owners for their children (MeshInstance, CollisionShape)
+                SetOwnerRecursive(groundMesh1, editedRoot);
+                SetOwnerRecursive(groundMesh2, editedRoot);
+                SetOwnerRecursive(groundMesh3, editedRoot);
+            }
+        }
+
+        GD.Print($"Panel Cracked: 3 new meshes created");
+    }
+    
+    private void SetOwnerRecursive(Node node, Node owner)
+    {
+        foreach (Node child in node.GetChildren())
+        {
+            child.Owner = owner;
+            SetOwnerRecursive(child, owner);
+        }
     }
 
 }

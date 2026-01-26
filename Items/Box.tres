@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3 uid="uid://b421afksh50fd"]
+
+[ext_resource type="Texture2D" uid="uid://d3bx36gr43nl4" path="res://Textures/boxtex.png" id="1_j8d2o"]
+[ext_resource type="Script" uid="uid://bgxtartc8pdk3" path="res://ItemDefinition.cs" id="2_1xo3o"]
+
+[resource]
+script = ExtResource("2_1xo3o")
+ItemName = "Box"
+InvTexture = ExtResource("1_j8d2o")
+InvSize = Vector2(4, 4)
+metadata/_custom_type_script = "uid://bgxtartc8pdk3"

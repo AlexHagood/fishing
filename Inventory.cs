@@ -59,7 +59,8 @@ public partial class Inventory : Control
 
     public bool ForceFitItem(InvItem item)
     {
-
+        GD.Print($"[ForceFitItem] Attempting to fit item: {item.itemDef?.ItemName ?? "Unknown"} (size: {item.invSize})");
+        
         for (int y = 0; y <= InventoryCapacity.Y - item.invSize.Y; y++)
         {
             for (int x = 0; x <= InventoryCapacity.X - item.invSize.X; x++)
@@ -68,7 +69,7 @@ public partial class Inventory : Control
                 var fitTiles = CanFitItem(item, pos);
                 if (fitTiles.Count == item.invSize.X * item.invSize.Y)
                 {
-                    GD.Print($"Fitting item at position {pos}");
+                    GD.Print($"[ForceFitItem] Successfully fitting item at position {pos}");
                     foreach (var tile in fitTiles)
                     {
                         tile.item = item; // Use property to update color
@@ -82,6 +83,7 @@ public partial class Inventory : Control
                 }
             }
         }
+        GD.PrintErr($"[ForceFitItem] Failed to fit item: {item.itemDef?.ItemName ?? "Unknown"}");
         return false;
     }
 
@@ -89,15 +91,14 @@ public partial class Inventory : Control
 
     public List<InvTile> CanFitItem(InvItem item, Vector2 pos)
     {
-        GD.Print("test");
         if (pos.X < 0 || pos.X >= InventoryCapacity.X || pos.Y < 0 || pos.Y >= InventoryCapacity.Y)
         {
-            GD.Print($"Position out of bounds: {pos}");
+            GD.Print($"[CanFitItem] Position out of bounds: {pos}");
             return [];
         }
         if (pos.X + item.invSize.X > InventoryCapacity.X || pos.Y + item.invSize.Y > InventoryCapacity.Y)
         {
-            GD.Print($"Item overflows inventory");
+            GD.Print($"[CanFitItem] Item overflows inventory at {pos}, size {item.invSize}");
             return [];
         }
         List<InvTile> itemTiles = new List<InvTile>();
@@ -105,27 +106,24 @@ public partial class Inventory : Control
         {
             for (int x = 0; x < item.invSize.X; x++)
             {
-                GD.Print($"Checking tile at position {pos + new Vector2(pos.X + x, pos.Y + y)}");
-                InvTile checktile = inventoryTiles[(int)(pos.X + x), (int)(pos.Y + y)];
-                if (checktile.item == item || checktile.item == null)
+                int checkX = (int)(pos.X + x);
+                int checkY = (int)(pos.Y + y);
+                InvTile checktile = inventoryTiles[checkX, checkY];
+                
+                // Allow placement if tile is empty OR if it's the same item being repositioned
+                if (checktile.item == null || checktile.item == item)
                 {
                     itemTiles.Add(checktile);
                 }
                 else
                 {
-                    GD.Print($"Tile at position {pos + new Vector2(x, y)} is occupied by another item");
+                    // Tile is occupied by a DIFFERENT item
+                    GD.Print($"[CanFitItem] Tile at ({checkX},{checkY}) occupied by: {checktile.item.itemDef?.ItemName ?? "Unknown"} (checking for {item.itemDef?.ItemName ?? "Unknown"})");
                     return [];
-
                 }
             }
         }
 
-        var tile = inventoryTiles[(int)pos.X, (int)pos.Y];
-        if (tile == null)
-        {
-            GD.Print($"Tile at position {pos} is null");
-            return [];
-        }
         return itemTiles;
     }
 
@@ -134,10 +132,16 @@ public partial class Inventory : Control
         List<InvTile> tiles = CanFitItem(item, pos);
         if (tiles.Count == item.invSize.X * item.invSize.Y)
         {
-            foreach (var tile in item.itemTiles)
+            // Clear previous tiles if item was already placed
+            if (item.itemTiles != null && item.itemTiles.Count > 0)
             {
-                tile.item = null; // Clear previous item from tiles
+                foreach (var tile in item.itemTiles)
+                {
+                    if (tile != null)
+                        tile.item = null; // Clear previous item from tiles
+                }
             }
+            
             item.itemTiles = tiles;
             foreach (var tile in item.itemTiles)
             {
@@ -147,12 +151,13 @@ public partial class Inventory : Control
             item._Inventory = this; // Set parent inventory
             // Position item using grid tile's global position minus parent global position
             item.Position = inventoryTiles[(int)pos.X, (int)pos.Y].Position + ((GridContainer)inventoryTiles[(int)pos.X, (int)pos.Y].GetParent()).Position;
+            
+            GD.Print($"[PlaceItem] Placed {item.itemDef?.ItemName ?? "Unknown"} at position {pos}");
         }
         else
         {
-            GD.Print("Item cannot fit in the selected position.");
+            GD.Print($"[PlaceItem] Item {item.itemDef?.ItemName ?? "Unknown"} cannot fit at position {pos}");
         }
-
     }
 
     public void RemoveItem(InvItem item)

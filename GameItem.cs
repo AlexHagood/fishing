@@ -77,8 +77,11 @@ public partial class GameItem : RigidBody3D, IPickupable
     public virtual void OnDropped()
     {
         // Re-enable physics when dropped
-        this.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
         this.Freeze = false;
+        this.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
+        this.GravityScale = 1.0f;
+        this.CollisionLayer = 1;
+        this.CollisionMask = 1;
         GD.Print($"Dropped {ItemName}");
     }
 
@@ -86,8 +89,11 @@ public partial class GameItem : RigidBody3D, IPickupable
     {
         GD.Print("Throwing");
         // Re-enable physics and apply force
-        this.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
         this.Freeze = false;
+        this.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
+        this.GravityScale = 1.0f;
+        this.CollisionLayer = 1;
+        this.CollisionMask = 1;
         this.ApplyImpulse(throwDirection * force);
         GD.Print($"Threw {ItemName} with force {force}");
     }
@@ -103,8 +109,9 @@ public partial class GameItem : RigidBody3D, IPickupable
 
     public void EnablePhys()
     {
-        this.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
         this.Freeze = false;
+        this.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
+        this.GravityScale = 1.0f;
         this.Visible = true;
         this.CollisionLayer = 1; // Set to appropriate layer
         this.CollisionMask = 1; // Set to appropriate mask

@@ -1,0 +1,10 @@
+{
+	"servers": {
+		"godot": {
+			"type": "stdio",
+			"command": "/home/alex/dev/godot-mcp/build/index.js",
+			"args": []
+		}
+	},
+	"inputs": []
+}
