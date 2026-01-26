@@ -1,8 +1,8 @@
 [gd_scene load_steps=7 format=3 uid="uid://bnltlhxo8hu34"]
 
-[ext_resource type="Shader" uid="uid://c2sdmw22wybh6" path="res://sky.gdshader" id="1_d2u4w"]
-[ext_resource type="Script" uid="uid://cxvg0nbbx5kjj" path="res://DayNightCycle.cs" id="1_script"]
-[ext_resource type="Texture2D" uid="uid://dwrsrbe5ylt12" path="res://kloppenheim_06_puresky_4k.exr" id="2_daytex"]
+[ext_resource type="Shader" uid="uid://c2sdmw22wybh6" path="res://Environment/Sky/sky.gdshader" id="1_d2u4w"]
+[ext_resource type="Script" path="res://Environment/Sky/DayNightCycle.cs" id="1_script"]
+[ext_resource type="Texture2D" uid="uid://dwrsrbe5ylt12" path="res://Environment/Sky/kloppenheim_06_puresky_4k.exr" id="2_daytex"]
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
 shader = ExtResource("1_d2u4w")

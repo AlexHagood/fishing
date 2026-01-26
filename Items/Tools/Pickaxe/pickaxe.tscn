@@ -1,6 +1,6 @@
 [gd_scene load_steps=6 format=4 uid="uid://cksydhl1w3gte"]
 
-[ext_resource type="Script" uid="uid://d03jcg7oaxuc7" path="res://Pickaxe.cs" id="2_script"]
+[ext_resource type="Script" uid="uid://d03jcg7oaxuc7" path="res://Items/Tools/Pickaxe/Pickaxe.cs" id="2_script"]
 [ext_resource type="Texture2D" uid="uid://bqkp6n0rvol73" path="res://Textures/pickaxe.png" id="3_jerxx"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_dg77c"]

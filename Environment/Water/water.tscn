@@ -1,6 +1,6 @@
 [gd_scene load_steps=9 format=3 uid="uid://dp7c2svp2ouk"]
 
-[ext_resource type="Script" uid="uid://brv0whwiag0kr" path="res://Water.cs" id="1_7wcun"]
+[ext_resource type="Script" uid="uid://brv0whwiag0kr" path="res://Environment/Water/Water.cs" id="1_7wcun"]
 [ext_resource type="AudioStream" uid="uid://cwhenookrpddq" path="res://Sounds/splash.mp3" id="2_splash"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_5vw27"]

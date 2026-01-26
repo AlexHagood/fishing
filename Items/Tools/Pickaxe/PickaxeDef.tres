@@ -1,6 +1,6 @@
 [gd_resource type="Resource" script_class="ItemDefinition" load_steps=3 format=3 uid="uid://b2vxqp8a1n45s"]
 
-[ext_resource type="Script" path="res://ItemDefinition.cs" id="1_pickaxe_def"]
+[ext_resource type="Script" uid="uid://bgxtartc8pdk3" path="res://Items/ItemDefinition.cs" id="1_pickaxe_def"]
 [ext_resource type="Texture2D" uid="uid://bqkp6n0rvol73" path="res://Textures/pickaxe.png" id="2_pickaxe_tex"]
 
 [resource]

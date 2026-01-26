@@ -124,23 +124,6 @@ public partial class Water : Node3D
 		// For objects to float half-submerged, buoyancy should be ~1.0
 		float gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity", 9.8);
 		float buoyantForce = buoyancy * gravity * body.Mass * submersionRatio;
-		float actualGravityForce = gravity * body.Mass * body.GravityScale;
-		
-		// Debug output
-		GD.Print($"=== {body.Name} Physics Debug ===");
-		GD.Print($"  Buoyancy: {buoyancy}");
-		GD.Print($"  Mass: {body.Mass} kg");
-		GD.Print($"  GravityScale: {body.GravityScale}");
-		GD.Print($"  Water Surface Y: {_waterSurfaceY}");
-		GD.Print($"  Object Center Y: {objectCenterY:F2}");
-		GD.Print($"  Object Radius: {objectRadius:F2}");
-		GD.Print($"  Depth Below Surface: {depthBelowSurface:F2}");
-		GD.Print($"  Submersion Ratio: {submersionRatio:F2}");
-		GD.Print($"  Gravity Force: {actualGravityForce:F2} N (down)");
-		GD.Print($"  Buoyant Force: {buoyantForce:F2} N (up)");
-		GD.Print($"  Net Vertical Force: {buoyantForce - actualGravityForce:F2} N");
-		GD.Print($"  Linear Velocity: {body.LinearVelocity}");
-		GD.Print($"  Freeze: {body.Freeze}");
 		
 		// Apply upward buoyancy force
 		body.ApplyCentralForce(Vector3.Up * buoyantForce);

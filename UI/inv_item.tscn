@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://dsi1xslh3qkr6"]
 
-[ext_resource type="Script" uid="uid://c7cyfrwu1bwq3" path="res://InvItem.cs" id="1_ev4ms"]
+[ext_resource type="Script" uid="uid://c7cyfrwu1bwq3" path="res://UI/InvItem.cs" id="1_ev4ms"]
 
 [sub_resource type="PlaceholderTexture2D" id="PlaceholderTexture2D_psafj"]
 

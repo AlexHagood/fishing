@@ -3,15 +3,15 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://dwrsrbe5ylt12"
-path="res://.godot/imported/kloppenheim_06_puresky_4k.exr-088954e4146a89cbcd1e01a7efd5903c.ctex"
+path="res://.godot/imported/kloppenheim_06_puresky_4k.exr-e61169f2a604fc36f9ff383db94c57a1.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://kloppenheim_06_puresky_4k.exr"
-dest_files=["res://.godot/imported/kloppenheim_06_puresky_4k.exr-088954e4146a89cbcd1e01a7efd5903c.ctex"]
+source_file="res://Environment/Sky/kloppenheim_06_puresky_4k.exr"
+dest_files=["res://.godot/imported/kloppenheim_06_puresky_4k.exr-e61169f2a604fc36f9ff383db94c57a1.ctex"]
 
 [params]
 
