@@ -414,6 +414,9 @@ public partial class TerrainEditorPlugin : EditorPlugin
 
         if (morphedCount > 0)
         {
+            // Mark the scene as modified so Godot knows to save changes
+            EditorInterface.Singleton.MarkSceneAsUnsaved();
+            
             // Mark terrain as modified for undo/redo
             var ur = GetUndoRedo();
             // Note: For proper undo/redo, we'd need to store previous positions
@@ -488,6 +491,9 @@ public partial class TerrainEditorPlugin : EditorPlugin
             
             // Crack the panel
             _currentTerrain.CrackPanel(newNode, groundMesh);
+            
+            // Mark the scene as modified
+            EditorInterface.Singleton.MarkSceneAsUnsaved();
             
             GD.Print($"Panel cracked successfully");
         }

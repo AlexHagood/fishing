@@ -72,6 +72,14 @@ public partial class Terrain : Node3D
         CreateDebugLine(Vector3.Zero, Vector3.Up * 10);
         nodes.AddRange(triangulatedNodes);
 
+        // Mark the scene as unsaved in the editor
+        if (Engine.IsEditorHint())
+        {
+#if TOOLS
+            Godot.EditorInterface.Singleton.MarkSceneAsUnsaved();
+#endif
+        }
+
         GD.Print($"Terrain regenerated: {triangulatedNodes.Count} nodes triangulated.");
     }
 
