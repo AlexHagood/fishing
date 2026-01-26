@@ -26,7 +26,7 @@ points = PackedVector3Array(0.038084112, 1.5070094, 0.010035753, -0.03200934, -1
 
 [node name="Rod" type="RigidBody3D"]
 
-[node name="Bobber" type="RigidBody3D" parent="."]
+[node name="Bobber" type="RigidBody3D" parent="." groups=["buoyant"]]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.483363, 0)
 mass = 0.2
 lock_rotation = true

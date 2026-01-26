@@ -8,5 +8,5 @@ script = ExtResource("2_1xo3o")
 ItemName = "Box"
 InvTexture = ExtResource("1_j8d2o")
 InvSize = Vector2(4, 4)
-Buoyancy = 1.5
+Buoyancy = 1.1
 metadata/_custom_type_script = "uid://bgxtartc8pdk3"

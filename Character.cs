@@ -54,8 +54,8 @@ public partial class Character : CharacterBody3D
         // Setup walking sounds
         _walkSoundPlayer = new AudioStreamPlayer();
         AddChild(_walkSoundPlayer);
-        _step1Sound = GD.Load<AudioStream>("res://Sounds/Step1.ogg");
-        _step2Sound = GD.Load<AudioStream>("res://Sounds/Step2.ogg");
+        _step1Sound = GD.Load<AudioStream>("Sounds/Step1.ogg");
+        _step2Sound = GD.Load<AudioStream>("Sounds/Step2.ogg");
         var terrain = GetTree().Root.FindChild("Terrain", true, false);
 
         _gui = GetParent().GetNode<Gui>("GUI");

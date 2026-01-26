@@ -1,0 +1,36 @@
+[gd_scene load_steps=5 format=3 uid="uid://dujcvf0s26th5"]
+
+[ext_resource type="Shader" uid="uid://c2sdmw22wybh6" path="res://sky.gdshader" id="1_d2u4w"]
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_lquwl"]
+shader = ExtResource("1_d2u4w")
+shader_parameter/sky_color = Color(0.03, 0.05, 0.11, 1)
+shader_parameter/moon_color = Color(0.9, 0.95, 0.85, 1)
+shader_parameter/moon_size = 0.08
+shader_parameter/moon_softness = 0.017
+shader_parameter/moon_direction = Vector3(0.3, 0.6, 0.2)
+shader_parameter/moon_ambient_strength = 0.12
+shader_parameter/star_base_color = Color(0.8, 1, 0.3, 1)
+shader_parameter/star_hue_offset = 0.6
+shader_parameter/star_intensity = 0.08
+shader_parameter/star_twinkle_speed = 1.2
+shader_parameter/star_twinkle_intensity = 0.2
+shader_parameter/layer_scale = 20.0
+shader_parameter/layer_scale_step = 10.0
+shader_parameter/layers_count = 3
+
+[sub_resource type="Sky" id="Sky_7mycd"]
+sky_material = SubResource("ShaderMaterial_lquwl")
+
+[sub_resource type="Environment" id="Environment_0xm2m"]
+background_mode = 2
+sky = SubResource("Sky_7mycd")
+
+[node name="SkyBox" type="Node3D"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+environment = SubResource("Environment_0xm2m")
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(-0.9112739, 0.37410915, 0.17211103, -0.12737599, -0.6535222, 0.7461127, 0.39160594, 0.65799016, 0.6431902, 0, 0, 0)
+light_energy = 0.592

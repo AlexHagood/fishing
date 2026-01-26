@@ -197,8 +197,19 @@ public partial class FishingRod : ToolItem
             Vector3 direction = toRod.Normalized();
             float extension = distance - _currentLength;
             
+            // Separate horizontal and vertical components for different handling
+            Vector3 horizontalDirection = new Vector3(direction.X, 0, direction.Z).Normalized();
+            float verticalComponent = direction.Y;
+            
+            // Emphasize horizontal force, reduce vertical (prevents jumping out of water)
+            float horizontalMultiplier = 1.5f; // Pull harder horizontally
+            float verticalMultiplier = 0.3f;   // Pull gently upward (let buoyancy do the work)
+            
+            // Reconstruct the direction with adjusted components
+            Vector3 adjustedDirection = (horizontalDirection * horizontalMultiplier + Vector3.Up * verticalComponent * verticalMultiplier).Normalized();
+            
             // Spring force (Hooke's law)
-            Vector3 springForce = direction * extension * SpringStiffness;
+            Vector3 springForce = adjustedDirection * extension * SpringStiffness;
             
             // Damping force (opposite to velocity)
             Vector3 dampingForce = -_bobber.LinearVelocity * SpringDamping;

@@ -60,10 +60,12 @@ public partial class Terrain : Node3D
             var mesh = new GroundMesh(nodeA, nodeB, nodeC);
             AddChild(mesh);
             
-            // Allow the mesh to be saved to the scene file
+            // In editor mode, set owner so terrain persists to scene file for game mode
+            // Important: Owner must be set AFTER AddChild and AFTER the GroundMesh has created its children
             if (Engine.IsEditorHint())
             {
-                mesh.Owner = GetTree().EditedSceneRoot;
+                // We need to defer this to ensure the mesh instance and collision shape are created first
+                CallDeferred(nameof(SetMeshOwner), mesh);
             }
         });
 
@@ -71,6 +73,22 @@ public partial class Terrain : Node3D
         nodes.AddRange(triangulatedNodes);
 
         GD.Print($"Terrain regenerated: {triangulatedNodes.Count} nodes triangulated.");
+    }
+
+    private void SetMeshOwner(GroundMesh mesh)
+    {
+        if (!Engine.IsEditorHint() || !IsInsideTree())
+            return;
+            
+        var editedSceneRoot = GetTree().EditedSceneRoot;
+        if (editedSceneRoot == null)
+            return;
+            
+        // Set owner for the GroundMesh itself
+        mesh.Owner = editedSceneRoot;
+        
+        // DO NOT set owner for children (MeshInstance3D, CollisionShape3D)
+        // They will be recreated in _Ready() and don't need to persist separately
     }
 
     public override void _Ready()

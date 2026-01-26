@@ -54,8 +54,15 @@ public partial class GroundMesh : StaticBody3D
     // Efficient method to update mesh vertices without recreating the entire mesh
     public void UpdateMeshGeometry()
     {
-        if (NodeA == null || NodeB == null || NodeC == null || MeshInstance == null)
+        if (NodeA == null || NodeB == null || NodeC == null)
             return;
+        
+        // If MeshInstance doesn't exist yet, create it
+        if (MeshInstance == null)
+        {
+            CreateMeshFromNodes();
+            return;
+        }
             
         // Update position to triangle centroid
         Position = (NodeA.Position + NodeB.Position + NodeC.Position) / 3;
@@ -133,19 +140,8 @@ public partial class GroundMesh : StaticBody3D
         collisionShape.Shape = shape;
         AddChild(collisionShape);
         
-        // Set owner for editor persistence if needed
-        if (Engine.IsEditorHint() && IsInsideTree())
-        {
-            var tree = GetTree();
-            if (tree != null)
-            {
-                var editedSceneRoot = tree.EditedSceneRoot;
-                if (editedSceneRoot != null)
-                {
-                    collisionShape.Owner = editedSceneRoot;
-                }
-            }
-        }
+        // DO NOT set Owner - we want these to be regenerated, not persisted to the scene file
+        // Setting Owner causes them to be saved with auto-generated IDs that break on reload
         
     }
     
@@ -181,15 +177,8 @@ public partial class GroundMesh : StaticBody3D
             MeshInstance.Visible = true; // Ensure visibility at runtime
             AddChild(MeshInstance);
             
-            // Allow the mesh instance to be saved to the scene file
-            if (Engine.IsEditorHint() && IsInsideTree())
-            {
-                var tree = GetTree();
-                if (tree != null)
-                {
-                    MeshInstance.Owner = tree.EditedSceneRoot;
-                }
-            }
+            // DO NOT set Owner - we want these to be regenerated, not persisted to the scene file
+            // Setting Owner causes them to be saved with auto-generated IDs that break on reload
         }
         
         MeshInstance.Mesh = mesh;
@@ -214,48 +203,37 @@ public partial class GroundMesh : StaticBody3D
 
     public override void _Ready()
     {
-        // Find existing nodes if connections were lost
-        if (MeshInstance == null)
-        {
-            MeshInstance = GetNodeOrNull<MeshInstance3D>("MeshInstance3D");
-            // If still null, try finding by type
-            if (MeshInstance == null)
-            {
-               foreach(var child in GetChildren())
-               {
-                   if (child is MeshInstance3D mi)
-                   {
-                       MeshInstance = mi;
-                       break;
-                   }
-               }
-            }
-        }
-
         // Re-establish connections if they were lost during reload
         if (NodeA != null) NodeA.AddGroundMeshReference(this);
         if (NodeB != null) NodeB.AddGroundMeshReference(this);
         if (NodeC != null) NodeC.AddGroundMeshReference(this);
 
-        // Only create collision shape if MeshInstance exists (not the case for parameterless constructor)
-        if (MeshInstance != null && MeshInstance.Mesh != null)
+        // If we have node references but no mesh instance, we were loaded from scene file
+        // and need to recreate the visual mesh and collision
+        if (NodeA != null && NodeB != null && NodeC != null)
         {
-            // Use the new UpdateCollisionShape method for consistency
-            UpdateCollisionShape();
-            
-            // Set owners for persistence in editor only - now that scene tree is available
-            if (IsInsideTree())
+            // Check if mesh instance already exists (shouldn't if loaded from file)
+            if (MeshInstance == null)
             {
-                var tree = GetTree();
-                if (tree != null)
+                // Try to find existing mesh instance first
+                foreach(var child in GetChildren())
                 {
-                    var editedSceneRoot = tree.EditedSceneRoot;
-                    if (editedSceneRoot != null)
+                    if (child is MeshInstance3D mi)
                     {
-                        MeshInstance.Owner = editedSceneRoot;
+                        MeshInstance = mi;
+                        break;
                     }
                 }
             }
+            
+            // If still no mesh instance, create the mesh from scratch
+            if (MeshInstance == null)
+            {
+                CreateMeshFromNodes();
+            }
+            
+            // Always ensure collision shape exists and matches geometry
+            UpdateCollisionShape();
         }
     }
     
