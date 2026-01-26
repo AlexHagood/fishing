@@ -27,7 +27,7 @@ public partial class GameItem : RigidBody3D
         return IsPickupable && this != null;
     }
 
-    public void OnPickedUp()
+    public virtual void OnPickedUp()
     {
         // Disable physics when picked up
         this.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
@@ -37,7 +37,7 @@ public partial class GameItem : RigidBody3D
         GD.Print($"Picked up {ItemName}");
     }
 
-    public void OnDropped()
+    public virtual void OnDropped()
     {
         // Re-enable physics when dropped
         this.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
@@ -45,7 +45,7 @@ public partial class GameItem : RigidBody3D
         GD.Print($"Dropped {ItemName}");
     }
 
-    public void OnThrown(Vector3 throwDirection, float force)
+    public virtual void OnThrown(Vector3 throwDirection, float force)
     {
         GD.Print("Throwing");
         // Re-enable physics and apply force

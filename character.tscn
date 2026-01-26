@@ -1,4 +1,4 @@
-[gd_scene load_steps=10 format=3 uid="uid://cutmcayiu5nn6"]
+[gd_scene load_steps=11 format=3 uid="uid://cutmcayiu5nn6"]
 
 [ext_resource type="Script" uid="uid://bgnxns4qvc8ol" path="res://Character.cs" id="1_glpr6"]
 [ext_resource type="Script" uid="uid://brdkkae6sg15t" path="res://Gui.cs" id="2_wa5vi"]
@@ -6,6 +6,8 @@
 [ext_resource type="PackedScene" uid="uid://kb4bqlnq5k0a" path="res://inventory.tscn" id="4_wfnr8"]
 
 [sub_resource type="CapsuleShape3D" id="CapsuleShape3D_vu45j"]
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_wfnr8"]
 
 [sub_resource type="Animation" id="Animation_wfnr8"]
 resource_name = "BadWiggle"
@@ -56,6 +58,12 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.46114e-05, 0.946008, -0.325
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="CharacterBody3D"]
 shape = SubResource("CapsuleShape3D_vu45j")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="CharacterBody3D"]
+mesh = SubResource("CapsuleMesh_wfnr8")
+
+[node name="CameraBack" type="Camera3D" parent="CharacterBody3D"]
+transform = Transform3D(0.9816792, -0.06302737, 0.17981564, 0.018174775, 0.97037834, 0.24090564, -0.18967286, -0.23322392, 0.9537457, 1.1176255, 1.3653519, 1.2294537)
 
 [node name="GUI" type="CanvasLayer" parent="."]
 script = ExtResource("2_wa5vi")

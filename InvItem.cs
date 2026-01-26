@@ -22,7 +22,8 @@ public partial class InvItem : Control
 	private Label _numberLabel;
 	private int _displayedNumber = -1;
 
-	public GameItem gameItem;
+	// Can hold either a GameItem (RigidBody3D) or a ToolItem (Node3D)
+	public Node3D gameItem;
 
 	public InvItem()
 	{
@@ -44,6 +45,15 @@ public partial class InvItem : Control
 	}
 
 
+	private void PlaySound(string path)
+	{
+		var player = new AudioStreamPlayer();
+		player.Stream = GD.Load<AudioStream>(path);
+		GetTree().Root.AddChild(player);
+		player.Play();
+		player.Finished += () => player.QueueFree();
+	}
+
 	public override void _GuiInput(InputEvent _event)
 	{
 		if (_event is InputEventMouseButton _mouseEvent)
@@ -51,6 +61,7 @@ public partial class InvItem : Control
 			if (_mouseEvent.ButtonIndex == MouseButton.Left && _mouseEvent.Pressed)
 			{
 				GD.Print($"Clicked on item {Name}");
+				PlaySound("res://Sounds/pickup.ogg");
 				Vector2 mousePos = GetViewport().GetMousePosition();
 				mousePos -= _Inventory.Position;
 				offset = mousePos - Position;
@@ -106,6 +117,17 @@ public partial class InvItem : Control
 		dragIcon.Size = itemIcon.Size;
 		dragIcon.Modulate = new Color(1, 1, 1, 0.5f); // 50% transparency
 		dragIcon.MouseFilter = Control.MouseFilterEnum.Ignore;
+
+		if (OS.IsDebugBuild())
+		{
+			var dot = new ColorRect();
+			dot.Color = new Color(1, 0, 1); // Pink
+			dot.Size = new Vector2(4, 4);
+			dot.Position = new Vector2(32, 32) - dot.Size / 2;
+			dot.MouseFilter = Control.MouseFilterEnum.Ignore;
+			dragIcon.AddChild(dot);
+		}
+
 		Vector2 mousePos = GetViewport().GetMousePosition();
 		if (_Inventory != null)
 		{
@@ -125,7 +147,7 @@ public partial class InvItem : Control
 			return;
 
 		// Use global coordinates for overlap detection
-		Vector2 itemGlobalPos = dragIcon.Position + _Inventory.GlobalPosition;
+		Vector2 itemGlobalPos = dragIcon.GlobalPosition + new Vector2(32, 32);
 		InvTile targetPanel = null;
 		foreach (InvTile invtile in _Inventory.gridContainer.GetChildren())
 		{
@@ -141,6 +163,7 @@ public partial class InvItem : Control
 		if (targetPanel != null)
 		{
 			_Inventory.PlaceItem(this, targetPanel.InvPos);
+			PlaySound("res://Sounds/drop.ogg");
 		}
 		else
 		{

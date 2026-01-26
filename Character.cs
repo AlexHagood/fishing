@@ -16,8 +16,8 @@ public partial class Character : CharacterBody3D
     private System.Collections.Generic.List<GraphNode> toolNodes = new System.Collections.Generic.List<GraphNode>();
     private float toolCheckTimer = 0f;
     
-    // Pickup system
-    private GameItem _heldItem;
+    // Pickup system - can hold both GameItem (RigidBody3D) and ToolItem (Node3D)
+    private Node3D _heldItem;
     private Node3D _holdPosition;
 
     private float _baseSpeed = 5.0f;
@@ -32,6 +32,8 @@ public partial class Character : CharacterBody3D
     private Label _toolLabel;
 
     private Camera3D camera;
+    private Camera3D cameraBack;
+    private bool isThirdPerson = false;
 
     private Gui _gui;
 
@@ -43,9 +45,25 @@ public partial class Character : CharacterBody3D
 
     private InvItem[] _hotbarItems = new InvItem[7]; // 1-6, 0 unused
 
+    // Walking sound effects
+    private AudioStreamPlayer _walkSoundPlayer;
+    private AudioStream _step1Sound;
+    private AudioStream _step2Sound;
+    private bool _wasMoving = false;
+    private float _stepTimer = 0f;
+    private float _baseStepInterval = 0.4f; // Base time between footsteps when walking
+    private float _sprintStepInterval = 0.3f; // Faster footsteps when sprinting
+    private bool _nextStepIsStep1 = true;
+
     public override void _Ready()
     {
         Input.MouseMode = Input.MouseModeEnum.Captured;
+        
+        // Setup walking sounds
+        _walkSoundPlayer = new AudioStreamPlayer();
+        AddChild(_walkSoundPlayer);
+        _step1Sound = GD.Load<AudioStream>("res://Sounds/Step1.ogg");
+        _step2Sound = GD.Load<AudioStream>("res://Sounds/Step2.ogg");
         var terrain = GetTree().Root.FindChild("Terrain", true, false);
 
         _gui = GetParent().GetNode<Gui>("GUI");
@@ -69,9 +87,14 @@ public partial class Character : CharacterBody3D
         _holdPosition = new Node3D();
         _holdPosition.Name = "HoldPosition";
         camera = GetNode<Camera3D>("Camera3D");
+        cameraBack = GetNode<Camera3D>("CameraBack");
         camera.AddChild(_holdPosition);
         // Position it in front of the camera
         _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
+        
+        // Start with first person camera active
+        camera.Current = true;
+        cameraBack.Current = false;
 
         // Tool system setup
         _tools = PlayerTools.GetDefaultTools(this);
@@ -211,25 +234,25 @@ public partial class Character : CharacterBody3D
                 node.Visible = distance <= 40f;
             }
         }
-        // Floaty physics hold for picked up item
-        if (_heldItem != null && _holdPosition != null)
+        // Floaty physics hold for picked up item (only for GameItem, not ToolItem)
+        if (_heldItem != null && _holdPosition != null && _heldItem is GameItem gameItem && !(_heldItem is ToolItem))
         {
             // Unfreeze and disable gravity while held
-            _heldItem.Freeze = false;
-            _heldItem.FreezeMode = RigidBody3D.FreezeModeEnum.Static; // Default for rigid
-            _heldItem.GravityScale = 0;
+            gameItem.Freeze = false;
+            gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Static; // Default for rigid
+            gameItem.GravityScale = 0;
             // Calculate force toward hold position
             Vector3 target = _holdPosition.GlobalPosition;
             Vector3 toTarget = target - _heldItem.GlobalPosition;
-            Vector3 velocity = _heldItem.LinearVelocity;
+            Vector3 velocity = gameItem.LinearVelocity;
             float followStrength = 8.0f; // Less aggressive
             float damp = 4.0f; // Less aggressive
             Vector3 desiredVelocity = toTarget * followStrength;
             Vector3 force = (desiredVelocity - velocity) * damp;
-            _heldItem.ApplyCentralForce(force);
+            gameItem.ApplyCentralForce(force);
             // --- Angular velocity damping ---
             float angularDamp = 6.0f; // Damping factor for spin
-            _heldItem.AngularVelocity *= Mathf.Exp(-angularDamp * (float)delta);
+            gameItem.AngularVelocity *= Mathf.Exp(-angularDamp * (float)delta);
         }
         // Tool process for CreateNodeTool
         if (_tools.Count > 0)
@@ -240,16 +263,34 @@ public partial class Character : CharacterBody3D
         if (Input.IsActionPressed("pickup"))
         {
             var progressBar = _gui.progressBar;
-            Node3D collider = PlayerObjectRay(5.0f) as Node3D;
-            if (collider == null)
+            var rayHit = PlayerObjectRay(5.0f);
+            
+            // Find ToolItem or GameItem in the parent chain
+            Node3D pickupableItem = null;
+            Node nodeToCheck = rayHit as Node;
+            while (nodeToCheck != null && pickupableItem == null)
             {
-            var anim = (AnimationPlayer)_gui.progressBar.GetNode("AnimationPlayer");
-            if (!anim.IsPlaying() || anim.CurrentAnimation != "BadWiggle")
-            {
-                _gui.progressBar.Visible = false;
-                _gui.progressBar.Value = 0;
+                if (nodeToCheck is ToolItem toolItem)
+                {
+                    pickupableItem = toolItem;
+                    break;
+                }
+                else if (nodeToCheck is GameItem gItem)
+                {
+                    pickupableItem = gItem;
+                    break;
+                }
+                nodeToCheck = nodeToCheck.GetParent();
             }
-
+            
+            if (pickupableItem == null)
+            {
+                var anim = (AnimationPlayer)_gui.progressBar.GetNode("AnimationPlayer");
+                if (!anim.IsPlaying() || anim.CurrentAnimation != "BadWiggle")
+                {
+                    _gui.progressBar.Visible = false;
+                    _gui.progressBar.Value = 0;
+                }
             }
             else
             {
@@ -259,13 +300,30 @@ public partial class Character : CharacterBody3D
                 {
                     progressBar.Value = 0;
                     progressBar.Visible = false;
-                    if (collider is GameItem item)
+                    
+                    // Handle both GameItem and ToolItem
+                    if (pickupableItem is ToolItem toolItem)
+                    {
+                        GD.Print($"Tool item grabbed");
+                        InvItem invitem = new InvItem(toolItem.InvSize);
+                        invitem.gameItem = toolItem; // Link the ToolItem to the InvItem
+                        var boxTexture = GD.Load<Texture2D>(toolItem.InvTexture.ResourcePath);
+                        invitem.itemIcon.Texture = boxTexture;
+                        if (_inventory.ForceFitItem(invitem))
+                        {
+                            _inventory.GetNode("InventoryPanel").AddChild(invitem);
+                            invitem.Visible = true; // Ensure item is visible after adding
+                            toolItem.DisablePhys();
+                        }
+                        else { wiggleBar(); }
+                    }
+                    else if (pickupableItem is GameItem item)
                     {
                         GD.Print($"Item grabbed");
                         item.InventoryPickup();
-                        InvItem invitem = new InvItem(new Vector2(4, 4));
+                        InvItem invitem = new InvItem(item.InvSize);
                         invitem.gameItem = item; // Link the GameItem to the InvItem
-                        var boxTexture = GD.Load<Texture2D>("res://Textures/boxtex.png");
+                        var boxTexture = GD.Load<Texture2D>(item.InvTexture.ResourcePath);
                         invitem.itemIcon.Texture = boxTexture;
                         if (_inventory.ForceFitItem(invitem))
                         {
@@ -318,8 +376,22 @@ public partial class Character : CharacterBody3D
         // Unequip current item if any
         if (_heldItem != null)
         {
+            if (_heldItem is ToolItem toolItem)
+            {
+                if (_heldItem.GetParent() == _holdPosition)
+                {
+                    _holdPosition.RemoveChild(_heldItem);
+                    GetParent().AddChild(_heldItem);
+                }
+                toolItem.OnUnequip();
+                toolItem.DisablePhys();
+            }
+            else if (_heldItem is GameItem gameItem)
+            {
+                gameItem.DisablePhys();
+            }
+            
             _heldItem.Visible = false;
-            _heldItem.OnDropped();
             _heldItem = null;
         }
 
@@ -329,21 +401,66 @@ public partial class Character : CharacterBody3D
         var invItem = _hotbarItems[_currentHotbarSlot];
         if (invItem != null && invItem.gameItem != null)
         {
-            var gameItem = invItem.gameItem;
-            // Make sure item is visible and enable physics
-            gameItem.Visible = true;
-            gameItem.Freeze = false;
-            gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
-            gameItem.GravityScale = 0;
-            // Teleport in front of camera
-            var camera = GetNode<Camera3D>("Camera3D");
-            var frontPos = camera.GlobalTransform.Origin + camera.GlobalTransform.Basis.Z * -2.0f + new Vector3(0, -0.5f, 0);
-            gameItem.GlobalPosition = frontPos;
-            // Set as held item
-            _heldItem = gameItem;
-            gameItem.OnPickedUp();
+            var item = invItem.gameItem;
+            // Make sure item is visible
+            item.Visible = true;
+            _heldItem = item;
             
-            GD.Print($"Equipped item from hotbar: {gameItem.ItemName}");
+            // Handle ToolItem (Node3D)
+            if (item is ToolItem toolItem)
+            {
+                 // Ensure the invItem link is set
+                 toolItem.invItem = invItem;
+                 
+                 GD.Print($"[DEBUG] Equip ToolItem: {item.Name} Type: {item.GetType()}");
+                 
+                 // Static hold
+                 if (item.GetParent() != null)
+                     item.GetParent().RemoveChild(item);
+                 
+                 // Verify hold position
+                 if (_holdPosition == null)
+                 {
+                     camera = GetNode<Camera3D>("Camera3D");
+                     _holdPosition = camera.GetNodeOrNull<Node3D>("HoldPosition");
+                 }
+
+                 _holdPosition.AddChild(item);
+                 item.Transform = Transform3D.Identity;
+                 item.RotationDegrees = toolItem.HoldRotation;
+                 item.Position = toolItem.HoldPosition;
+                 item.Scale = toolItem.HoldScale;
+                 
+                 // Disable physics on child rigid body if it exists
+                 if (toolItem._physicsBody != null)
+                 {
+                     toolItem._physicsBody.Freeze = true;
+                     toolItem._physicsBody.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
+                     toolItem._physicsBody.CollisionLayer = 0;
+                     toolItem._physicsBody.CollisionMask = 0;
+                 }
+                 
+                 toolItem.OnEquip();
+                 GD.Print($"Equipped tool from hotbar: {toolItem.ItemName}");
+            }
+            // Handle GameItem (RigidBody3D)
+            else if (item is GameItem gameItem)
+            {
+                 // Ensure the invItem link is set
+                 gameItem.invItem = invItem;
+                 
+                 GD.Print($"[DEBUG] Equip GameItem: {item.Name} Type: {item.GetType()}");
+                 
+                 gameItem.Freeze = false;
+                 gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Kinematic;
+                 gameItem.GravityScale = 0;
+                 // Teleport in front of camera
+                 var camera = GetNode<Camera3D>("Camera3D");
+                 var frontPos = camera.GlobalTransform.Origin + camera.GlobalTransform.Basis.Z * -2.0f + new Vector3(0, -0.5f, 0);
+                 gameItem.GlobalPosition = frontPos;
+                 gameItem.OnPickedUp();
+                 GD.Print($"Equipped item from hotbar: {gameItem.ItemName}");
+            }
         }
         else
         {
@@ -369,7 +486,10 @@ public partial class Character : CharacterBody3D
                 {
                     if (_heldItem != null)
                     {
-                        ThrowHeldItem();
+                        if (_heldItem is ToolItem toolItem)
+                            toolItem.OnPrimaryFire();
+                        else
+                            ThrowHeldItem();
                     }
                     else if (_tools.Count > 0)
                     {
@@ -389,7 +509,10 @@ public partial class Character : CharacterBody3D
                 {
                     if (_heldItem != null)
                     {
-                        DropHeldItem();
+                        if (_heldItem is ToolItem toolItem)
+                            toolItem.OnSecondaryFire();
+                        else
+                            DropHeldItem();
                     }
                     else if (_tools.Count > 0 && _tools[_currentToolIndex] is PlayerTools.ShovelTool shovel)
                     {
@@ -437,6 +560,13 @@ public partial class Character : CharacterBody3D
                 ? Input.MouseModeEnum.Visible
                 : Input.MouseModeEnum.Captured;
         }
+        
+        // Camera toggle input
+        if (Input.IsActionJustPressed("camera"))
+        {
+            ToggleCamera();
+        }
+        
         // Sprint input handling
         if (Input.IsActionPressed("sprint"))
         {
@@ -450,6 +580,15 @@ public partial class Character : CharacterBody3D
         if (Input.IsActionJustPressed("inventory"))
         {
             _gui.ToggleInventoryOpen();
+        }
+
+        // Handle Q key to drop tool items
+        if (Input.IsActionJustPressed("drop"))
+        {
+            if (_heldItem != null && _heldItem is ToolItem)
+            {
+                DropToolItem();
+            }
         }
 
         // Handle number key binds for hovered InvItem
@@ -536,19 +675,50 @@ public partial class Character : CharacterBody3D
         if (_gui is null || !_gui.InventoryOpen)
         {
             RotateY(-mouseDelta.X * MouseSensitivity);
-            camera.RotateX(-mouseDelta.Y * MouseSensitivity);
+            
+            // Apply vertical rotation to the active camera
+            Camera3D activeCamera = isThirdPerson ? cameraBack : camera;
+            activeCamera.RotateX(-mouseDelta.Y * MouseSensitivity);
             mouseDelta = Vector2.Zero;
 
             // Clamp camera rotation
-            var rotation = camera.RotationDegrees;
+            var rotation = activeCamera.RotationDegrees;
             rotation.X = Mathf.Clamp(rotation.X, -90, 90);
-            camera.RotationDegrees = rotation;
+            activeCamera.RotationDegrees = rotation;
         }
 
 
-        // FOV adjustment for sprint
+        // FOV adjustment for sprint (only for first person camera)
         float targetFov = _isSprinting ? _sprintFov : _baseFov;
         camera.Fov = Mathf.Lerp(camera.Fov, targetFov, 8.0f * (float)delta);
+
+        // Handle walking sound effects
+        bool isMoving = direction.LengthSquared() > 0.01f && isOnFloor;
+        if (isMoving)
+        {
+            float currentStepInterval = _isSprinting ? _sprintStepInterval : _baseStepInterval;
+            _stepTimer += (float)delta;
+            if (_stepTimer >= currentStepInterval)
+            {
+                // Play alternating footstep sounds
+                if (_nextStepIsStep1)
+                {
+                    _walkSoundPlayer.Stream = _step1Sound;
+                }
+                else
+                {
+                    _walkSoundPlayer.Stream = _step2Sound;
+                }
+                _walkSoundPlayer.Play();
+                _nextStepIsStep1 = !_nextStepIsStep1;
+                _stepTimer = 0f;
+            }
+        }
+        else
+        {
+            _stepTimer = 0f; // Reset timer when not moving
+        }
+        _wasMoving = isMoving;
     }
 
     private void RaycastForNode()
@@ -633,98 +803,276 @@ public partial class Character : CharacterBody3D
             return;
         }
         GD.Print($"[DEBUG] Raycast hit: {collider}");
-        RigidBody3D rigidBody = collider as RigidBody3D;
-        if (rigidBody == null)
+        
+        // Check for ToolItem (Node3D) or GameItem (RigidBody3D)
+        Node3D pickupableNode = null;
+        Node nodeToCheck = collider as Node;
+        
+        while (nodeToCheck != null && pickupableNode == null)
         {
-            Node nodeToCheck = collider as Node;
-            while (nodeToCheck != null && rigidBody == null)
+            if (nodeToCheck is ToolItem toolItem && toolItem.CanBePickedUp())
             {
-                rigidBody = nodeToCheck as RigidBody3D;
-                nodeToCheck = nodeToCheck.GetParent();
+                pickupableNode = toolItem;
+                break;
             }
-        }
-        if (rigidBody != null)
-        {
-            if (rigidBody is GameItem)
+            else if (nodeToCheck is GameItem gameItem && gameItem.CanBePickedUp())
             {
-                var item = rigidBody as GameItem;
-                float distance = GlobalPosition.DistanceTo(rigidBody.GlobalPosition);
-                GD.Print($"[DEBUG] Found PickupableItem '{item.ItemName}' at distance {distance:F2}");
-                if (distance <= item.PickupRange)
+                pickupableNode = gameItem;
+                break;
+            }
+            nodeToCheck = nodeToCheck.GetParent();
+        }
+        
+        if (pickupableNode != null)
+        {
+            float distance = GlobalPosition.DistanceTo(pickupableNode.GlobalPosition);
+            
+            if (pickupableNode is ToolItem toolItem)
+            {
+                GD.Print($"[DEBUG] Found ToolItem '{toolItem.ItemName}' at distance {distance:F2}");
+                if (distance <= toolItem.PickupRange)
                 {
-                    PickupItem(item);
+                    PickupItem(toolItem);
                 }
                 else
                 {
                     GD.Print($"Item is too far away ({distance:F1}m). Get closer!");
                 }
             }
-            else
+            else if (pickupableNode is GameItem gameItem)
             {
-                GD.Print("[DEBUG] This item cannot be picked up or no PickupableItem found!");
+                GD.Print($"[DEBUG] Found GameItem '{gameItem.ItemName}' at distance {distance:F2}");
+                if (distance <= gameItem.PickupRange)
+                {
+                    PickupItem(gameItem);
+                }
+                else
+                {
+                    GD.Print($"Item is too far away ({distance:F1}m). Get closer!");
+                }
             }
         }
         else
         {
-            GD.Print("[DEBUG] No RigidBody3D found in parent chain of collider!");
+            GD.Print("[DEBUG] No pickupable item found in parent chain of collider!");
         }
     }
 
-    private void PickupItem(GameItem heldItem)
+    private void PickupItem(Node3D pickedItem)
     {
-        _heldItem = heldItem;
-        // Unfreeze and disable gravity for floaty effect
-        heldItem.Freeze = false;
-        heldItem.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
-        heldItem.GravityScale = 0;
-        heldItem.LinearVelocity = Vector3.Zero;
-        heldItem.AngularVelocity = Vector3.Zero;
-        heldItem.OnPickedUp();
-        GD.Print($"Picked up: {heldItem.Name}");
+        GD.Print($"[DEBUG] PickupItem called with {pickedItem.Name} of type {pickedItem.GetType().Name}");
+        
+        _heldItem = pickedItem;
+
+        if (pickedItem is ToolItem toolItem)
+        {
+             GD.Print($"[DEBUG] Item is ToolItem. Equipping.");
+             // Static hold for tools
+             if (pickedItem.GetParent() != null)
+                 pickedItem.GetParent().RemoveChild(pickedItem);
+             
+             if (_holdPosition == null)
+             {
+                  // Sanity check, though _Ready should create it
+                  camera = GetNode<Camera3D>("Camera3D");
+                  _holdPosition = camera.GetNodeOrNull<Node3D>("HoldPosition");
+             }
+             
+             if (_holdPosition != null)
+             {
+                _holdPosition.AddChild(pickedItem);
+                pickedItem.Transform = Transform3D.Identity;
+                pickedItem.RotationDegrees = toolItem.HoldRotation;
+                pickedItem.Position = toolItem.HoldPosition;
+                pickedItem.Scale = toolItem.HoldScale;
+             }
+             
+             // Disable physics on child rigid body if it exists
+             if (toolItem._physicsBody != null)
+             {
+                 toolItem._physicsBody.Freeze = true;
+                 toolItem._physicsBody.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
+                 toolItem._physicsBody.LinearVelocity = Vector3.Zero;
+                 toolItem._physicsBody.AngularVelocity = Vector3.Zero;
+                 toolItem._physicsBody.CollisionLayer = 0;
+                 toolItem._physicsBody.CollisionMask = 0;
+             }
+             
+             toolItem.OnEquip();
+             toolItem.OnPickedUp();
+             GD.Print($"Picked up tool: {toolItem.ItemName}");
+        }
+        else if (pickedItem is GameItem gameItem)
+        {
+            GD.Print($"[DEBUG] Item is standard GameItem. Floating.");
+            // Unfreeze and disable gravity for floaty effect
+            gameItem.Freeze = false;
+            gameItem.FreezeMode = RigidBody3D.FreezeModeEnum.Static;
+            gameItem.GravityScale = 0;
+            gameItem.LinearVelocity = Vector3.Zero;
+            gameItem.AngularVelocity = Vector3.Zero;
+            gameItem.OnPickedUp();
+            GD.Print($"Picked up: {gameItem.ItemName}");
+        }
     }
     
     private void RemoveHeldItemFromInventory()
     {
-        if (_heldItem != null && _heldItem.invItem != null)
+        if (_heldItem == null) return;
+
+        // Find which hotbar slot contains this item
+        InvItem itemToRemove = null;
+        int slotToRemove = -1;
+        
+        for (int i = 1; i <= 6; i++)
         {
+            if (_hotbarItems[i] != null && _hotbarItems[i].gameItem == _heldItem)
+            {
+                itemToRemove = _hotbarItems[i];
+                slotToRemove = i;
+                break;
+            }
+        }
+        
+        // Also check the invItem link if it exists
+        if (itemToRemove == null)
+        {
+            if (_heldItem is ToolItem toolItem && toolItem.invItem != null)
+            {
+                itemToRemove = toolItem.invItem;
+            }
+            else if (_heldItem is GameItem gameItem && gameItem.invItem != null)
+            {
+                itemToRemove = gameItem.invItem;
+            }
+        }
+        
+        if (itemToRemove != null)
+        {
+            // Clear the tiles that this item occupies
+            if (itemToRemove.itemTiles != null)
+            {
+                foreach (var tile in itemToRemove.itemTiles)
+                {
+                    if (tile != null)
+                        tile.item = null;
+                }
+                itemToRemove.itemTiles.Clear();
+            }
+            
             var invPanel = _inventory.GetNode("InventoryPanel");
             // Remove from inventory panel
-            if (_heldItem.invItem.GetParent() == invPanel)
+            if (itemToRemove.GetParent() == invPanel)
             {
-                invPanel.RemoveChild(_heldItem.invItem);
-                _heldItem.invItem.QueueFree();
+                invPanel.RemoveChild(itemToRemove);
+                itemToRemove.QueueFree();
             }
-            // Remove from hotbar slots
-            for (int i = 1; i <= 6; i++)
+            
+            // Clear the invItem link
+            if (_heldItem is ToolItem toolItem2)
             {
-                if (_hotbarItems[i] == _heldItem.invItem)
-                    _hotbarItems[i] = null;
+                toolItem2.invItem = null;
             }
-            UpdateAllHotbarSlots();
-            _heldItem.invItem = null;
+            else if (_heldItem is GameItem gameItem2)
+            {
+                gameItem2.invItem = null;
+            }
+        }
+        
+        // Remove from hotbar slot
+        if (slotToRemove >= 1 && slotToRemove <= 6)
+        {
+            _hotbarItems[slotToRemove] = null;
+            UpdateHotbarSlot(slotToRemove);
+        }
+        
+        // If current hotbar slot matches, clear it
+        if (_currentHotbarSlot >= 1 && _currentHotbarSlot <= 6 && 
+            _hotbarItems[_currentHotbarSlot] == null)
+        {
+            UpdateHotbarHighlight();
         }
     }
 
     private void DropHeldItem()
     {
         if (_heldItem == null) return;
-        _heldItem.GravityScale = 1;
-        _heldItem?.OnDropped();
+        
+        if (_heldItem is ToolItem toolItem)
+        {
+             if (_heldItem.GetParent() == _holdPosition)
+             {
+                 _holdPosition.RemoveChild(_heldItem);
+                 GetParent().AddChild(_heldItem);
+                 _heldItem.GlobalPosition = _holdPosition.GlobalPosition;
+             }
+             toolItem.OnDropped();
+             RemoveHeldItemFromInventory();
+             GD.Print($"Dropped tool: {toolItem.ItemName}");
+        }
+        else if (_heldItem is GameItem gameItem)
+        {
+            gameItem.GravityScale = 1;
+            gameItem.OnDropped();
+            RemoveHeldItemFromInventory();
+            GD.Print($"Dropped: {gameItem.ItemName}");
+        }
+        
+        _heldItem = null;
+    }
+
+    private void DropToolItem()
+    {
+        if (_heldItem == null || !(_heldItem is ToolItem)) return;
+        
+        var toolItem = _heldItem as ToolItem;
+        
+        // Remove from hold position and add to world
+        if (_heldItem.GetParent() == _holdPosition)
+        {
+            _holdPosition.RemoveChild(_heldItem);
+            GetParent().AddChild(_heldItem);
+        }
+        
+        // Position it in front of the player
+        var camera = GetNode<Camera3D>("Camera3D");
+        var dropPosition = camera.GlobalTransform.Origin + camera.GlobalTransform.Basis.Z * -1.5f;
+        _heldItem.GlobalPosition = dropPosition;
+        
+        // Call unequip and dropped
+        toolItem.OnUnequip();
+        toolItem.OnDropped();
+        
+        // Remove from inventory
         RemoveHeldItemFromInventory();
-        GD.Print($"Dropped: {_heldItem.Name}");
+        
+        GD.Print($"Dropped tool: {toolItem.ItemName}");
         _heldItem = null;
     }
     
     private void ThrowHeldItem()
     {
         if (_heldItem == null) return;
+        
         var camera = GetNode<Camera3D>("Camera3D");
         var throwDirection = -camera.GlobalTransform.Basis.Z;
-        var throwForce = _heldItem?.ThrowForce ?? 10.0f;
-        _heldItem.GravityScale = 1;
-        _heldItem?.OnThrown(throwDirection, throwForce);
-        RemoveHeldItemFromInventory();
-        GD.Print($"Threw: {_heldItem?.ItemName}");
+        
+        if (_heldItem is ToolItem toolItem)
+        {
+            var throwForce = toolItem.ThrowForce;
+            toolItem.OnThrown(throwDirection, throwForce);
+            RemoveHeldItemFromInventory();
+            GD.Print($"Threw tool: {toolItem.ItemName}");
+        }
+        else if (_heldItem is GameItem gameItem)
+        {
+            var throwForce = gameItem.ThrowForce;
+            gameItem.GravityScale = 1;
+            gameItem.OnThrown(throwDirection, throwForce);
+            RemoveHeldItemFromInventory();
+            GD.Print($"Threw: {gameItem.ItemName}");
+        }
+        
         _heldItem = null;
     }
 
@@ -762,6 +1110,26 @@ public partial class Character : CharacterBody3D
         else
         {
             GD.Print("[TOOL: Shovel] No object hit by raycast");
+        }
+    }
+    
+    private void ToggleCamera()
+    {
+        isThirdPerson = !isThirdPerson;
+        
+        if (isThirdPerson)
+        {
+            // Switch to third person
+            camera.Current = false;
+            cameraBack.Current = true;
+            GD.Print("Switched to third person camera");
+        }
+        else
+        {
+            // Switch to first person
+            cameraBack.Current = false;
+            camera.Current = true;
+            GD.Print("Switched to first person camera");
         }
     }
 }
