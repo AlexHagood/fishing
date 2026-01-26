@@ -17,6 +17,9 @@ public partial class ItemDefinition : Resource
     [Export] public float PickupRange { get; set; } = 3.0f;
     [Export] public float ThrowForce { get; set; } = 10.0f;
     
+    [ExportGroup("Physics")]
+    [Export] public float Buoyancy { get; set; } = 1.0f; // >1.0 floats, <1.0 sinks, 1.0 neutral
+    
     [ExportGroup("World Representation")]
     [Export] public string WorldScenePath { get; set; } = ""; // Path to the 3D scene for this item
     

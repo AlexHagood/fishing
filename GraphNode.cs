@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 [Tool]
 [GlobalClass]
-public partial class GraphNode : StaticBody3D
+public partial class GraphNode : Node3D
 {
     public List<GraphNode> Connections { get; private set; }
     public MeshInstance3D MeshInstance;
@@ -121,16 +121,7 @@ public partial class GraphNode : StaticBody3D
         // Ensure the MeshInstance starts visible
         MeshInstance.Visible = true;
         
-        // Only add collision shape if one doesn't exist
-        if (GetNodeOrNull<CollisionShape3D>("CollisionShape3D") == null)
-        {
-            var collisionShape = new CollisionShape3D();
-            collisionShape.Name = "CollisionShape3D";
-            var sphereShape = new SphereShape3D();
-            sphereShape.Radius = 0.1f; // Same as mesh radius
-            collisionShape.Shape = sphereShape;
-            AddChild(collisionShape);
-        }
+        // GraphNode doesn't need collision - only the GroundMesh triangles do
     }
 
     public void Connect(GraphNode otherNode)

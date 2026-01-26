@@ -1,15 +1,7 @@
-[gd_scene load_steps=8 format=3 uid="uid://d1835dbt3r5bu"]
+[gd_scene load_steps=6 format=3 uid="uid://d1835dbt3r5bu"]
 
 [ext_resource type="Script" uid="uid://crkghn5almypb" path="res://GameItem.cs" id="1_st5j7"]
-[ext_resource type="Texture2D" uid="uid://d3bx36gr43nl4" path="res://Textures/boxtex.png" id="2_ybiyu"]
-[ext_resource type="Script" uid="uid://bgxtartc8pdk3" path="res://ItemDefinition.cs" id="3_oh4qt"]
-
-[sub_resource type="Resource" id="Resource_joexe"]
-script = ExtResource("3_oh4qt")
-ItemName = "Box"
-InvTexture = ExtResource("2_ybiyu")
-InvSize = Vector2(4, 4)
-metadata/_custom_type_script = "uid://bgxtartc8pdk3"
+[ext_resource type="Resource" uid="uid://b421afksh50fd" path="res://Items/Box.tres" id="2_2i6rn"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ttk8k"]
 
@@ -21,7 +13,7 @@ points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, 
 
 [node name="Box" type="RigidBody3D"]
 script = ExtResource("1_st5j7")
-ItemDef = SubResource("Resource_joexe")
+ItemDef = ExtResource("2_2i6rn")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_ttk8k")
