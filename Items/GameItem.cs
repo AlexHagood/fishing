@@ -5,6 +5,8 @@ public partial class GameItem : RigidBody3D, IPickupable
 {
     [Export] public ItemDefinition ItemDef { get; set; }
     
+    public const string HintF = "Pickup";
+    public const string HintE = "Grab";
     // Properties exposed via IPickupable - now reference ItemDef
     public bool IsPickupable 
     { 

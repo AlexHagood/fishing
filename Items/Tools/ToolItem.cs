@@ -2,6 +2,9 @@ using Godot;
 
 public partial class ToolItem : GameItem
 {
+
+    public new const string HintF = "Pickup";
+
     // Tool-specific hold properties - can be overridden or use ItemDef values
     public Vector3 HoldPosition 
     { 

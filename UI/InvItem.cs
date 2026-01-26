@@ -80,11 +80,14 @@ public partial class InvItem : Control
 		{
 			if (_mouseEvent.ButtonIndex == MouseButton.Left && _mouseEvent.Pressed)
 			{
-				GD.Print($"Clicked on item {Name}");
+				GD.Print($"[InvItem] Clicked on item {itemDef?.ItemName ?? Name}");
 				PlaySound("res://Sounds/pickup.ogg");
-				Vector2 mousePos = GetViewport().GetMousePosition();
-				mousePos -= _Inventory.Position;
-				offset = mousePos - Position;
+				
+				// Use GlobalPosition for proper coordinate calculation
+				Vector2 mousePos = GetGlobalMousePosition();
+				Vector2 itemGlobalPos = GlobalPosition;
+				offset = mousePos - itemGlobalPos;
+				
 				isDragging = true;
 				CreateDragIcon();
 			}
@@ -97,8 +100,21 @@ public partial class InvItem : Control
 
 	public override void _Ready()
 	{
+		// Check if inventory is set
+		if (_Inventory == null)
+		{
+			GD.PrintErr($"InvItem {Name}: _Inventory is null! Item needs to be added to inventory before _Ready is called.");
+			return;
+		}
+		
 		this.Size = _Inventory.inventoryTileSize * invSize;
 		MouseFilter = Control.MouseFilterEnum.Stop; // Ensure we receive mouse events
+		
+		// Ensure itemIcon passes through mouse events
+		if (itemIcon != null)
+		{
+			itemIcon.MouseFilter = Control.MouseFilterEnum.Pass;
+		}
 		
 		// Get references to editor-created nodes
 		_numberLabel = GetNodeOrNull<Label>("NumberLabel");
@@ -109,6 +125,12 @@ public partial class InvItem : Control
 		{
 			itemIcon.Texture = itemDef.InvTexture;
 			itemIcon.Size = this.Size;
+			
+			GD.Print($"[InvItem._Ready] Set texture for {itemDef.ItemName}, Size: {this.Size}, Texture: {itemDef.InvTexture?.ResourcePath ?? "null"}, Position: {Position}, Visible: {Visible}");
+		}
+		else
+		{
+			GD.PrintErr($"[InvItem._Ready] Missing itemIcon ({itemIcon != null}) or itemDef ({itemDef != null})");
 		}
 			
 		UpdateStackLabel();

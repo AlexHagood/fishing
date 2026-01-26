@@ -196,6 +196,9 @@ public partial class Character : CharacterBody3D
             }
         }
 
+        // Update button hints based on what the player is looking at
+        UpdateButtonHints();
+
         // Handle F key for pickup with progress bar (inventory pickup)
         if (Input.IsActionPressed("pickup"))
         {
@@ -249,15 +252,22 @@ public partial class Character : CharacterBody3D
                         
                         InvItem invitem = new InvItem(gameItem.ItemDef);
                         invitem.gameItem = gameItem;
+                        invitem._Inventory = _inventory; // Set inventory reference BEFORE adding as child
                         
+                        // Add item to inventory (triggers _Ready which now has _Inventory set)
+                        _inventory.AddChild(invitem);
+                        
+                        // Then try to fit it in the grid
                         if (_inventory.ForceFitItem(invitem))
                         {
-                            _inventory.GetNode("InventoryPanel").AddChild(invitem);
                             invitem.Visible = true;
                             pickupableItem.DisablePhys();
                         }
                         else 
                         { 
+                            // Remove the item if it doesn't fit
+                            _inventory.RemoveChild(invitem);
+                            invitem.QueueFree();
                             wiggleBar(); 
                         }
                     }
@@ -651,6 +661,85 @@ public partial class Character : CharacterBody3D
         return null;
     }
 
+    private void UpdateButtonHints()
+    {
+        if (_gui.buttonHints == null)
+            return;
+
+        // Default: hide all hints
+        _gui.buttonHints.VisibleE = false;
+        _gui.buttonHints.VisibleF = false;
+
+        // Check what the player is looking at
+        var collider = PlayerObjectRay(5.0f);
+        if (collider == null)
+            return;
+
+        // Look for hint properties in the parent chain
+        Node nodeToCheck = collider as Node;
+        while (nodeToCheck != null)
+        {
+            bool foundHint = false;
+
+            // Check for ContainerItem first (most specific)
+            if (nodeToCheck is ContainerItem)
+            {
+                _gui.buttonHints.HintE = ContainerItem.HintE;
+                _gui.buttonHints.HintF = ContainerItem.HintF;
+                _gui.buttonHints.VisibleE = true;
+                _gui.buttonHints.VisibleF = true;
+                foundHint = true;
+            }
+            // Check for ToolItem (more specific than GameItem)
+            else if (nodeToCheck is ToolItem)
+            {
+                _gui.buttonHints.HintF = ToolItem.HintF;
+                _gui.buttonHints.VisibleF = true;
+                foundHint = true;
+            }
+            // Check for GameItem (has const HintE and HintF)
+            else if (nodeToCheck is GameItem)
+            {
+                _gui.buttonHints.HintE = GameItem.HintE;
+                _gui.buttonHints.HintF = GameItem.HintF;
+                _gui.buttonHints.VisibleE = true;
+                _gui.buttonHints.VisibleF = true;
+                foundHint = true;
+            }
+            // Check for metadata (for custom objects)
+            else
+            {
+                if (nodeToCheck.HasMeta("HintE"))
+                {
+                    string hintText = nodeToCheck.GetMeta("HintE").AsString();
+                    if (!string.IsNullOrEmpty(hintText))
+                    {
+                        _gui.buttonHints.HintE = hintText;
+                        _gui.buttonHints.VisibleE = true;
+                        foundHint = true;
+                    }
+                }
+
+                if (nodeToCheck.HasMeta("HintF"))
+                {
+                    string hintText = nodeToCheck.GetMeta("HintF").AsString();
+                    if (!string.IsNullOrEmpty(hintText))
+                    {
+                        _gui.buttonHints.HintF = hintText;
+                        _gui.buttonHints.VisibleF = true;
+                        foundHint = true;
+                    }
+                }
+            }
+
+            // If we found a hint, stop checking
+            if (foundHint)
+                break;
+
+            nodeToCheck = nodeToCheck.GetParent();
+        }
+    }
+
     private void TryGrabNonToolItem()
     {
         var collider = PlayerObjectRay(5.0f);
@@ -668,6 +757,21 @@ public partial class Character : CharacterBody3D
         {
             if (nodeToCheck is IPickupable p && p.CanBePickedUp())
             {
+                // Check if it's a ContainerItem - open it instead of picking up
+                if (nodeToCheck is ContainerItem container)
+                {
+                    GD.Print($"[DEBUG] Found container item '{container.ItemName}', opening it");
+                    if (_gui != null)
+                    {
+                        _gui.OpenContainer(container);
+                    }
+                    else
+                    {
+                        GD.PrintErr("[Character] GUI reference is null, cannot open container!");
+                    }
+                    return;
+                }
+                
                 // Skip tools - they require F key
                 if (nodeToCheck is GameItem gItem && gItem.ItemDef?.IsTool == true)
                 {

@@ -86,6 +86,9 @@ public partial class GroundMesh : StaticBody3D
         var worldPositions = new Vector3[] { NodeA.Position, NodeB.Position, NodeC.Position };
         var uvs = GenerateUVs(worldPositions);
         
+        // Calculate the normal for this triangle
+        var normals = CalculateNormals(vertices);
+        
         // Clear existing surfaces and add updated one
         arrayMesh.ClearSurfaces();
         
@@ -93,6 +96,7 @@ public partial class GroundMesh : StaticBody3D
         arrays.Resize((int)ArrayMesh.ArrayType.Max);
         arrays[(int)ArrayMesh.ArrayType.Vertex] = vertices;
         arrays[(int)ArrayMesh.ArrayType.Index] = indices;
+        arrays[(int)ArrayMesh.ArrayType.Normal] = normals;
         arrays[(int)ArrayMesh.ArrayType.TexUV] = uvs;
         
         arrayMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
@@ -162,10 +166,14 @@ public partial class GroundMesh : StaticBody3D
         var worldPositions = new Vector3[] { NodeA.Position, NodeB.Position, NodeC.Position };
         var uvs = GenerateUVs(worldPositions);
 
+        // Calculate the normal for this triangle
+        var normals = CalculateNormals(vertices);
+
         var arrays = new Godot.Collections.Array();
         arrays.Resize((int)ArrayMesh.ArrayType.Max); // Resize to match the maximum value of ArrayType
         arrays[(int)ArrayMesh.ArrayType.Vertex] = vertices;
         arrays[(int)ArrayMesh.ArrayType.Index] = indices;
+        arrays[(int)ArrayMesh.ArrayType.Normal] = normals;
         arrays[(int)ArrayMesh.ArrayType.TexUV] = uvs; // Add UV coordinates
 
         mesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, arrays);
@@ -251,7 +259,7 @@ public partial class GroundMesh : StaticBody3D
         Vector3 ac = c - a;
         Vector3 normal = ab.Cross(ac);
 
-        // In Godot, +Y is up. If the normal points DOWN, swap to make it point UP
+        // COPILOT, DO NOT CHANGE THIS. Y > 0 IS CORRECT.
         if (normal.Y > 0)
         {
             // Swap b and c to flip the winding order so normal points up
@@ -260,6 +268,21 @@ public partial class GroundMesh : StaticBody3D
             vertices[2] = temp;
         }
         return vertices;
+    }
+    
+    // Calculate normals for the triangle - all three vertices share the same face normal
+    private Vector3[] CalculateNormals(Vector3[] vertices)
+    {
+        if (vertices.Length != 3)
+            throw new ArgumentException("Exactly 3 vertices are required.");
+
+        // Calculate the face normal using cross product (reversed order to flip direction)
+        Vector3 edge1 = vertices[1] - vertices[0];
+        Vector3 edge2 = vertices[2] - vertices[0];
+        Vector3 normal = edge2.Cross(edge1).Normalized(); // Flipped: edge2 x edge1 instead of edge1 x edge2
+        
+        // All three vertices of the triangle share the same normal (flat shading)
+        return new Vector3[] { normal, normal, normal };
     }
     
     // Generate UV coordinates based on world position to maintain consistent scale

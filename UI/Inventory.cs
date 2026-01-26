@@ -3,13 +3,11 @@ using System;
 using System.Collections.Generic;
 public partial class Inventory : Control
 {
-    private Panel _inventoryPanel;
-
     public GridContainer gridContainer;
 
     private Vector2 InventorySize = new Vector2(600, 400);
 
-    private Vector2 InventoryCapacity = new Vector2(8, 4);
+    public Vector2 InventoryCapacity { get; set; } = new Vector2(8, 4);
 
     public int inventoryTileSize = 64;
 
@@ -17,26 +15,49 @@ public partial class Inventory : Control
 
     InvItem[] inventoryItems;
 
+    // Constructor to allow setting capacity
+    public Inventory() : base()
+    {
+    }
+
+    public Inventory(Vector2 capacity) : base()
+    {
+        InventoryCapacity = capacity;
+    }
+
     public override void _Ready()
     {
         inventoryTiles = new InvTile[(int)InventoryCapacity.X, (int)InventoryCapacity.Y];
-        _inventoryPanel = GetNode<Panel>("InventoryPanel");
-        gridContainer = _inventoryPanel.GetNode<GridContainer>("GridContainer");
+        
+        // Get or create GridContainer
+        gridContainer = GetNodeOrNull<GridContainer>("GridContainer");
+        if (gridContainer == null)
+        {
+            GD.Print("[Inventory._Ready] GridContainer not found in scene, creating programmatically");
+            gridContainer = new GridContainer();
+            gridContainer.Name = "GridContainer";
+            AddChild(gridContainer);
+        }
 
         UpdateInventorySize();
-        this.Visible = false;
+        // Don't manage visibility here anymore - parent UIWindow handles it
         
     }
     private void UpdateInventorySize()
     {
-        // Center the inventory panel in the middle of the viewport
-        var viewportSize = GetViewport().GetVisibleRect().Size;
-        InventorySize = viewportSize * 0.8f;
-        var invpos = (viewportSize - InventorySize) / 2;
-        this.Position = invpos;
+        // Calculate size dynamically based on grid capacity and tile size
+        InventorySize = new Vector2(
+            InventoryCapacity.X * inventoryTileSize,
+            InventoryCapacity.Y * inventoryTileSize
+        );
+        
+        // Set the inventory control size
+        this.CustomMinimumSize = InventorySize;
         this.Size = InventorySize;
+        
         gridContainer.Columns = (int)InventoryCapacity.X;
-        gridContainer.Size = InventoryCapacity * (inventoryTileSize);
+        gridContainer.Size = InventorySize;
+        
         foreach (var itemgrid in gridContainer.GetChildren())
         {
             itemgrid.QueueFree(); // Clear existing items 
