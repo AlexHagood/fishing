@@ -30,8 +30,13 @@ project/assembly_name="Glop 3"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/TerrainTools/plugin.cfg")
+enabled=PackedStringArray("res://addons/TerrainTools/plugin.cfg", "res://addons/gdUnit4/plugin.cfg")
 project/assembly_name="Glop 3"
+
+[gdunit4]
+
+settings/test/test_lookup_folder="Tests"
+settings/test/test_discovery=true
 
 [input]
 

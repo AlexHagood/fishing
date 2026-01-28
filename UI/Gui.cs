@@ -183,15 +183,22 @@ public partial class Gui : CanvasLayer
         // Case 1: If we're dragging an item, rotate the drag ghost and update the dragged item
         if (_draggedItem != null && _dragGhost != null)
         {
-            _rotateHeld = !_rotateHeld; // Toggle the flag
-            
-            // Update ghost to show the rotated preview
-            bool targetRotation = _draggedItem.ItemInstance.IsRotated ^ _rotateHeld;
-            _dragGhost.UpdateRotation(targetRotation);
+            // XOR: if IsRotated and _rotateHeld match, rotate left; if they differ, rotate right
+            if (_draggedItem.ItemInstance.IsRotated == _rotateHeld)
+            {
+                _dragGhost.RotateLeft();
+            }
+            else
+            {
+                _dragGhost.RotateRight();
+            }
+
+            _rotateHeld = !_rotateHeld;
+
             
             GD.Print($"[GUI] Rotate toggle. _rotateHeld: {_rotateHeld}");
-            return; // Done - don't check fit until drop
-        } 
+            return; // Done - fit checking happens in _Process
+        }
         // Case 2: If we're hovering over an item (not dragging), rotate it in place
         var mousePos = GetViewport().GetMousePosition();
         var slotUnder = GetSlotAtPosition(mousePos);

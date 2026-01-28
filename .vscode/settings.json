@@ -3,6 +3,8 @@
     "godot": "/usr/bin/godot-mono",
     "files.exclude": {
         "**/*.uid": true,
-        "**/*.import": true
-    }
+        "**/*.import": true,
+        "**/gdunit4_testadapter_v5": true
+    },
+    "dotnet.unitTests.runSettingsPath": "./.runsettings"
 }
