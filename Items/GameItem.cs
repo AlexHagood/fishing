@@ -23,7 +23,7 @@ public partial class GameItem : WorldItem
 		
 		// Try to add item to character's inventory
 		
-		bool added = inventoryManager.TryPushItem(character.inventoryId, InvItemData);
+		bool added = inventoryManager.TryPushItem(character.inventoryId, InvItemData, false);
 		
 		if (added)
 		{

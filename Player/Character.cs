@@ -4,6 +4,9 @@ public partial class Character : CharacterBody3D
 {
     [Signal]
     public delegate void InventoryRequestedEventHandler(int inventoryId);
+    
+    [Signal]
+    public delegate void RotateRequestedEventHandler();
 
     [Export] public float Speed = 5.0f;
     [Export] public float JumpVelocity = 8.0f;
@@ -95,6 +98,12 @@ public partial class Character : CharacterBody3D
             GD.Print($"Trying to open inventory {inventoryId}");
             OpenInventory(inventoryId);
             return;
+        }
+
+        // R key - rotate item in inventory
+        if (Input.IsActionJustPressed("rotate"))
+        {
+            EmitSignal(SignalName.RotateRequested);
         }
 
         // E key - interact with WorldItem (don't allow in menu mode)

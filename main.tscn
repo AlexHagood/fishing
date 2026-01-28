@@ -1,4 +1,4 @@
-[gd_scene load_steps=218 format=3 uid="uid://cldbqjys6m8o0"]
+[gd_scene load_steps=418 format=3 uid="uid://cldbqjys6m8o0"]
 
 [ext_resource type="PackedScene" uid="uid://bk8ja346yxa6l" path="res://Environment/Terrain/terrain.tscn" id="1_h2yge"]
 [ext_resource type="PackedScene" uid="uid://cutmcayiu5nn6" path="res://Player/character.tscn" id="2_0xm2m"]
@@ -21,11 +21,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ycdy4"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_w48qg"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w48qg"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_vivmo"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vivmo"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2cqfq"]
 radius = 0.1
 height = 0.2
 
@@ -37,11 +53,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yaehf"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_074og"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_074og"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_cegan"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cegan"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_82xsv"]
 radius = 0.1
 height = 0.2
 
@@ -53,11 +85,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_getpj"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ryguw"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryguw"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_d13ii"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d13ii"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_1u8w0"]
 radius = 0.1
 height = 0.2
 
@@ -69,11 +117,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0odxb"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_lswn8"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lswn8"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_a6jrf"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a6jrf"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_xuqvo"]
 radius = 0.1
 height = 0.2
 
@@ -85,11 +149,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qsp4k"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_kq58d"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kq58d"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_seu75"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_seu75"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_htxhm"]
 radius = 0.1
 height = 0.2
 
@@ -101,11 +181,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jq2sk"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_4k2k6"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4k2k6"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_0rl1p"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0rl1p"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ok6jj"]
 radius = 0.1
 height = 0.2
 
@@ -117,11 +213,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_facbu"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_b1qrp"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_b1qrp"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_come4"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_come4"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_h8e4i"]
 radius = 0.1
 height = 0.2
 
@@ -133,11 +245,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4lmeg"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0cp0l"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0cp0l"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_d2t1y"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d2t1y"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_gngh3"]
 radius = 0.1
 height = 0.2
 
@@ -149,11 +277,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0n3wm"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_qnost"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qnost"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_wnkbs"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wnkbs"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_f6a44"]
 radius = 0.1
 height = 0.2
 
@@ -165,11 +309,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0cbny"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_hrvbo"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hrvbo"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_uypp3"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uypp3"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_blkrb"]
 radius = 0.1
 height = 0.2
 
@@ -181,11 +341,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_abqjc"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_6iyjs"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6iyjs"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_4w656"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4w656"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_e71vb"]
 radius = 0.1
 height = 0.2
 
@@ -197,11 +373,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rnkwl"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_vke2r"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vke2r"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_uit24"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uit24"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ruth0"]
 radius = 0.1
 height = 0.2
 
@@ -213,11 +405,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rm4vd"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_pjyto"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pjyto"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_sm6fg"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sm6fg"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_b17eg"]
 radius = 0.1
 height = 0.2
 
@@ -229,11 +437,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ntx8l"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_uatky"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uatky"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_rqtf5"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rqtf5"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_1vm84"]
 radius = 0.1
 height = 0.2
 
@@ -245,11 +469,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wu3dr"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_cyx1q"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_cyx1q"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_0dhbp"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0dhbp"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_jx0wj"]
 radius = 0.1
 height = 0.2
 
@@ -261,11 +501,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kkkcx"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_34ol3"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_34ol3"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_c2n8d"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c2n8d"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_wy5fy"]
 radius = 0.1
 height = 0.2
 
@@ -277,11 +533,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gx4rg"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5dllo"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5dllo"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_phcyf"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_phcyf"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_birbe"]
 radius = 0.1
 height = 0.2
 
@@ -293,11 +565,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f1p13"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_4obbf"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4obbf"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_ovcoh"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ovcoh"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ppx11"]
 radius = 0.1
 height = 0.2
 
@@ -309,11 +597,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1yv1y"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5yh34"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5yh34"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_pjuso"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pjuso"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_23xmf"]
 radius = 0.1
 height = 0.2
 
@@ -325,11 +629,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_swlj1"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yysqy"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yysqy"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_n5t1e"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_n5t1e"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_h6isl"]
 radius = 0.1
 height = 0.2
 
@@ -341,11 +661,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_53bls"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_lwnsi"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lwnsi"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_41lik"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_41lik"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_jbvwl"]
 radius = 0.1
 height = 0.2
 
@@ -357,11 +693,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_sn1fb"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yvsr8"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yvsr8"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_vieuh"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vieuh"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yjja3"]
 radius = 0.1
 height = 0.2
 
@@ -373,11 +725,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_l0gw7"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_inymm"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_inymm"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_jcxqu"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jcxqu"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0arob"]
 radius = 0.1
 height = 0.2
 
@@ -389,11 +757,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dij0e"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_k1udn"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_k1udn"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_wat4s"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wat4s"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ywjan"]
 radius = 0.1
 height = 0.2
 
@@ -405,11 +789,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_m74q3"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_tko6h"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tko6h"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_am8a1"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_am8a1"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8dc3g"]
 radius = 0.1
 height = 0.2
 
@@ -421,11 +821,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_htgcl"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_smeu8"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_smeu8"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_f3y11"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_f3y11"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_cpm2s"]
 radius = 0.1
 height = 0.2
 
@@ -437,11 +853,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_u81y6"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rt5wr"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rt5wr"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_mnw77"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mnw77"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_vjgyh"]
 radius = 0.1
 height = 0.2
 
@@ -453,11 +885,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_d5iia"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_asu84"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_asu84"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_qwt6e"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qwt6e"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_off2o"]
 radius = 0.1
 height = 0.2
 
@@ -469,11 +917,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_tttfs"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_1iygd"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1iygd"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_g5xqc"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g5xqc"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_s4o1y"]
 radius = 0.1
 height = 0.2
 
@@ -485,11 +949,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7mmqq"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_3exxq"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3exxq"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_5aa3q"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5aa3q"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bmvma"]
 radius = 0.1
 height = 0.2
 
@@ -501,11 +981,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_shlp4"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2n44k"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2n44k"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_86lig"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_86lig"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ldnlw"]
 radius = 0.1
 height = 0.2
 
@@ -517,11 +1013,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qe8ju"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bnk2o"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bnk2o"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_oosfy"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oosfy"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_nf4f2"]
 radius = 0.1
 height = 0.2
 
@@ -533,11 +1045,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xkvoa"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_t5kpo"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_t5kpo"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_pw0td"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pw0td"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_37eu1"]
 radius = 0.1
 height = 0.2
 
@@ -549,11 +1077,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0wkqm"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ve5sr"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ve5sr"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_5s44m"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5s44m"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ibca3"]
 radius = 0.1
 height = 0.2
 
@@ -565,11 +1109,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_g3y5b"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_1slqb"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1slqb"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_uo83y"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uo83y"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_y0aao"]
 radius = 0.1
 height = 0.2
 
@@ -581,11 +1141,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wm5rm"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ekl5k"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ekl5k"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_fdpg8"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fdpg8"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rpys8"]
 radius = 0.1
 height = 0.2
 
@@ -597,11 +1173,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6gr3f"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_6seew"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6seew"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_3ox4t"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3ox4t"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_4fmho"]
 radius = 0.1
 height = 0.2
 
@@ -613,11 +1205,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_aivy6"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bil4k"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bil4k"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_hnquj"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hnquj"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0h8y2"]
 radius = 0.1
 height = 0.2
 
@@ -629,11 +1237,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_nycv6"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_x4ftd"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_x4ftd"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_arf1h"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arf1h"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_s0om5"]
 radius = 0.1
 height = 0.2
 
@@ -645,11 +1269,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gkfde"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_4qxq8"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4qxq8"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_ryg4g"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ryg4g"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_oy6td"]
 radius = 0.1
 height = 0.2
 
@@ -661,11 +1301,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fe76k"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_p5pln"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_p5pln"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_oiuw5"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_oiuw5"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_mldrc"]
 radius = 0.1
 height = 0.2
 
@@ -677,11 +1333,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_1tiwm"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_xxpw2"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_xxpw2"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_wghq8"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wghq8"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_k08w7"]
 radius = 0.1
 height = 0.2
 
@@ -693,11 +1365,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hp4ct"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_suf1q"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_suf1q"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_lxb2r"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lxb2r"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ceu5l"]
 radius = 0.1
 height = 0.2
 
@@ -709,11 +1397,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lv1ug"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_mofpq"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mofpq"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_6kttw"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6kttw"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_oqmj5"]
 radius = 0.1
 height = 0.2
 
@@ -725,11 +1429,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uor2d"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bdw5g"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bdw5g"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_j6smb"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_j6smb"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_xp7cv"]
 radius = 0.1
 height = 0.2
 
@@ -741,11 +1461,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ff2c"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ly5pk"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ly5pk"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_s0u5n"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s0u5n"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8lrju"]
 radius = 0.1
 height = 0.2
 
@@ -757,11 +1493,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5kegx"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_afgqn"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_afgqn"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_jvn2n"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jvn2n"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_jegnu"]
 radius = 0.1
 height = 0.2
 
@@ -773,11 +1525,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rx6mv"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_31js7"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_31js7"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_0a4i0"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0a4i0"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_i0xsp"]
 radius = 0.1
 height = 0.2
 
@@ -789,11 +1557,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kll2q"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ft875"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ft875"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_6hmxt"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6hmxt"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rhlye"]
 radius = 0.1
 height = 0.2
 
@@ -805,11 +1589,27 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pqvsh"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_3qj4k"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3qj4k"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_mo8hc"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mo8hc"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_gbg58"]
 radius = 0.1
 height = 0.2
 
@@ -836,2065 +1636,2465 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1122272, -3.0734415, 2.544
 TerrainSize = Vector3(100, 3, 100)
 NodeCount = 100
 
-[node name="Node_0" type="Node3D" parent="Terrain"]
+[node name="GraphNode" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.557114, -0.16319172, 27.032705)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_0"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode"]
 material_override = SubResource("StandardMaterial3D_dg77c")
 mesh = SubResource("SphereMesh_ycdy4")
 
-[node name="Node_1" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39882" type="MeshInstance3D" parent="Terrain/GraphNode"]
+material_override = SubResource("StandardMaterial3D_ycdy4")
+mesh = SubResource("SphereMesh_w48qg")
+
+[node name="GraphNode2" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1366053, 1.2952037, 29.201153)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_1"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode2"]
 material_override = SubResource("StandardMaterial3D_w48qg")
 mesh = SubResource("SphereMesh_vivmo")
 
-[node name="Node_2" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39883" type="MeshInstance3D" parent="Terrain/GraphNode2"]
+material_override = SubResource("StandardMaterial3D_vivmo")
+mesh = SubResource("SphereMesh_2cqfq")
+
+[node name="GraphNode3" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.927758, 1.409976, 40.833096)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_2"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode3"]
 material_override = SubResource("StandardMaterial3D_2cqfq")
 mesh = SubResource("SphereMesh_yaehf")
 
-[node name="Node_3" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39884" type="MeshInstance3D" parent="Terrain/GraphNode3"]
+material_override = SubResource("StandardMaterial3D_yaehf")
+mesh = SubResource("SphereMesh_074og")
+
+[node name="GraphNode4" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.989368, 0.5852279, 21.298172)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_3"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode4"]
 material_override = SubResource("StandardMaterial3D_074og")
 mesh = SubResource("SphereMesh_cegan")
 
-[node name="Node_4" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39885" type="MeshInstance3D" parent="Terrain/GraphNode4"]
+material_override = SubResource("StandardMaterial3D_cegan")
+mesh = SubResource("SphereMesh_82xsv")
+
+[node name="GraphNode5" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.783038, 1.2246251, -32.91007)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_4"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode5"]
 material_override = SubResource("StandardMaterial3D_82xsv")
 mesh = SubResource("SphereMesh_getpj")
 
-[node name="Node_5" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39886" type="MeshInstance3D" parent="Terrain/GraphNode5"]
+material_override = SubResource("StandardMaterial3D_getpj")
+mesh = SubResource("SphereMesh_ryguw")
+
+[node name="GraphNode6" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.195491, 1.2286867, 26.026112)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_5"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode6"]
 material_override = SubResource("StandardMaterial3D_ryguw")
 mesh = SubResource("SphereMesh_d13ii")
 
-[node name="Node_6" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39887" type="MeshInstance3D" parent="Terrain/GraphNode6"]
+material_override = SubResource("StandardMaterial3D_d13ii")
+mesh = SubResource("SphereMesh_1u8w0")
+
+[node name="GraphNode7" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.913452, 1.1824667, -7.7215066)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_6"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode7"]
 material_override = SubResource("StandardMaterial3D_1u8w0")
 mesh = SubResource("SphereMesh_0odxb")
 
-[node name="Node_7" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39888" type="MeshInstance3D" parent="Terrain/GraphNode7"]
+material_override = SubResource("StandardMaterial3D_0odxb")
+mesh = SubResource("SphereMesh_lswn8")
+
+[node name="GraphNode8" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.2491112, -1.3605328, -40.354954)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_7"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode8"]
 material_override = SubResource("StandardMaterial3D_lswn8")
 mesh = SubResource("SphereMesh_a6jrf")
 
-[node name="Node_8" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39889" type="MeshInstance3D" parent="Terrain/GraphNode8"]
+material_override = SubResource("StandardMaterial3D_a6jrf")
+mesh = SubResource("SphereMesh_xuqvo")
+
+[node name="GraphNode9" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.511738, 1.356261, -20.659258)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_8"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode9"]
 material_override = SubResource("StandardMaterial3D_xuqvo")
 mesh = SubResource("SphereMesh_qsp4k")
 
-[node name="Node_9" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39890" type="MeshInstance3D" parent="Terrain/GraphNode9"]
+material_override = SubResource("StandardMaterial3D_qsp4k")
+mesh = SubResource("SphereMesh_kq58d")
+
+[node name="GraphNode10" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.900017, 1.0505056, 20.081995)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_9"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode10"]
 material_override = SubResource("StandardMaterial3D_kq58d")
 mesh = SubResource("SphereMesh_seu75")
 
-[node name="Node_10" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39891" type="MeshInstance3D" parent="Terrain/GraphNode10"]
+material_override = SubResource("StandardMaterial3D_seu75")
+mesh = SubResource("SphereMesh_htxhm")
+
+[node name="GraphNode11" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.005466, -0.9835248, 17.7181)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_10"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode11"]
 material_override = SubResource("StandardMaterial3D_htxhm")
 mesh = SubResource("SphereMesh_jq2sk")
 
-[node name="Node_11" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39892" type="MeshInstance3D" parent="Terrain/GraphNode11"]
+material_override = SubResource("StandardMaterial3D_jq2sk")
+mesh = SubResource("SphereMesh_4k2k6")
+
+[node name="GraphNode12" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.670753, -0.34097221, -16.21218)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_11"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode12"]
 material_override = SubResource("StandardMaterial3D_4k2k6")
 mesh = SubResource("SphereMesh_0rl1p")
 
-[node name="Node_12" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39893" type="MeshInstance3D" parent="Terrain/GraphNode12"]
+material_override = SubResource("StandardMaterial3D_0rl1p")
+mesh = SubResource("SphereMesh_ok6jj")
+
+[node name="GraphNode13" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.360447, -0.18067405, 8.57344)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_12"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode13"]
 material_override = SubResource("StandardMaterial3D_ok6jj")
 mesh = SubResource("SphereMesh_facbu")
 
-[node name="Node_13" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39894" type="MeshInstance3D" parent="Terrain/GraphNode13"]
+material_override = SubResource("StandardMaterial3D_facbu")
+mesh = SubResource("SphereMesh_b1qrp")
+
+[node name="GraphNode14" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.992622, -1.4670984, -19.891874)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_13"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode14"]
 material_override = SubResource("StandardMaterial3D_b1qrp")
 mesh = SubResource("SphereMesh_come4")
 
-[node name="Node_14" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39895" type="MeshInstance3D" parent="Terrain/GraphNode14"]
+material_override = SubResource("StandardMaterial3D_come4")
+mesh = SubResource("SphereMesh_h8e4i")
+
+[node name="GraphNode15" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.54582, 0.82609344, 10.225821)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_14"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode15"]
 material_override = SubResource("StandardMaterial3D_h8e4i")
 mesh = SubResource("SphereMesh_4lmeg")
 
-[node name="Node_15" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39896" type="MeshInstance3D" parent="Terrain/GraphNode15"]
+material_override = SubResource("StandardMaterial3D_4lmeg")
+mesh = SubResource("SphereMesh_0cp0l")
+
+[node name="GraphNode16" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.884537, -0.3730579, 21.421396)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_15"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode16"]
 material_override = SubResource("StandardMaterial3D_0cp0l")
 mesh = SubResource("SphereMesh_d2t1y")
 
-[node name="Node_16" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39897" type="MeshInstance3D" parent="Terrain/GraphNode16"]
+material_override = SubResource("StandardMaterial3D_d2t1y")
+mesh = SubResource("SphereMesh_gngh3")
+
+[node name="GraphNode17" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.3193846, -1.186694, 14.753396)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_16"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode17"]
 material_override = SubResource("StandardMaterial3D_gngh3")
 mesh = SubResource("SphereMesh_0n3wm")
 
-[node name="Node_17" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39898" type="MeshInstance3D" parent="Terrain/GraphNode17"]
+material_override = SubResource("StandardMaterial3D_0n3wm")
+mesh = SubResource("SphereMesh_qnost")
+
+[node name="GraphNode18" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.2064, 1.0505651, 28.89422)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_17"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode18"]
 material_override = SubResource("StandardMaterial3D_qnost")
 mesh = SubResource("SphereMesh_wnkbs")
 
-[node name="Node_18" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39899" type="MeshInstance3D" parent="Terrain/GraphNode18"]
+material_override = SubResource("StandardMaterial3D_wnkbs")
+mesh = SubResource("SphereMesh_f6a44")
+
+[node name="GraphNode19" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.40198925, -1.1518843, -33.71967)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_18"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode19"]
 material_override = SubResource("StandardMaterial3D_f6a44")
 mesh = SubResource("SphereMesh_0cbny")
 
-[node name="Node_19" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39900" type="MeshInstance3D" parent="Terrain/GraphNode19"]
+material_override = SubResource("StandardMaterial3D_0cbny")
+mesh = SubResource("SphereMesh_hrvbo")
+
+[node name="GraphNode20" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.127243, -1.4087938, 6.23658)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_19"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode20"]
 material_override = SubResource("StandardMaterial3D_hrvbo")
 mesh = SubResource("SphereMesh_uypp3")
 
-[node name="Node_20" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39901" type="MeshInstance3D" parent="Terrain/GraphNode20"]
+material_override = SubResource("StandardMaterial3D_uypp3")
+mesh = SubResource("SphereMesh_blkrb")
+
+[node name="GraphNode21" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.173131, 0.31916136, 8.628957)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_20"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode21"]
 material_override = SubResource("StandardMaterial3D_blkrb")
 mesh = SubResource("SphereMesh_abqjc")
 
-[node name="Node_21" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39902" type="MeshInstance3D" parent="Terrain/GraphNode21"]
+material_override = SubResource("StandardMaterial3D_abqjc")
+mesh = SubResource("SphereMesh_6iyjs")
+
+[node name="GraphNode22" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.854277, 1.0419408, -38.977234)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_21"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode22"]
 material_override = SubResource("StandardMaterial3D_6iyjs")
 mesh = SubResource("SphereMesh_4w656")
 
-[node name="Node_22" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39903" type="MeshInstance3D" parent="Terrain/GraphNode22"]
+material_override = SubResource("StandardMaterial3D_4w656")
+mesh = SubResource("SphereMesh_e71vb")
+
+[node name="GraphNode23" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.12455, 1.2550238, 16.087044)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_22"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode23"]
 material_override = SubResource("StandardMaterial3D_e71vb")
 mesh = SubResource("SphereMesh_rnkwl")
 
-[node name="Node_23" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39904" type="MeshInstance3D" parent="Terrain/GraphNode23"]
+material_override = SubResource("StandardMaterial3D_rnkwl")
+mesh = SubResource("SphereMesh_vke2r")
+
+[node name="GraphNode24" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.40285, -1.4539323, 21.985802)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_23"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode24"]
 material_override = SubResource("StandardMaterial3D_vke2r")
 mesh = SubResource("SphereMesh_uit24")
 
-[node name="Node_24" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39905" type="MeshInstance3D" parent="Terrain/GraphNode24"]
+material_override = SubResource("StandardMaterial3D_uit24")
+mesh = SubResource("SphereMesh_ruth0")
+
+[node name="GraphNode25" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.3976693, 0.8624053, -27.203522)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_24"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode25"]
 material_override = SubResource("StandardMaterial3D_ruth0")
 mesh = SubResource("SphereMesh_rm4vd")
 
-[node name="Node_25" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39906" type="MeshInstance3D" parent="Terrain/GraphNode25"]
+material_override = SubResource("StandardMaterial3D_rm4vd")
+mesh = SubResource("SphereMesh_pjyto")
+
+[node name="GraphNode26" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.823788, -0.8939194, -8.072247)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_25"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode26"]
 material_override = SubResource("StandardMaterial3D_pjyto")
 mesh = SubResource("SphereMesh_sm6fg")
 
-[node name="Node_26" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39907" type="MeshInstance3D" parent="Terrain/GraphNode26"]
+material_override = SubResource("StandardMaterial3D_sm6fg")
+mesh = SubResource("SphereMesh_b17eg")
+
+[node name="GraphNode27" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.656048, -0.92562586, 2.7700644)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_26"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode27"]
 material_override = SubResource("StandardMaterial3D_b17eg")
 mesh = SubResource("SphereMesh_ntx8l")
 
-[node name="Node_27" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39908" type="MeshInstance3D" parent="Terrain/GraphNode27"]
+material_override = SubResource("StandardMaterial3D_ntx8l")
+mesh = SubResource("SphereMesh_uatky")
+
+[node name="GraphNode28" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.385015, 0.7622093, -24.558945)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_27"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode28"]
 material_override = SubResource("StandardMaterial3D_uatky")
 mesh = SubResource("SphereMesh_rqtf5")
 
-[node name="Node_28" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39909" type="MeshInstance3D" parent="Terrain/GraphNode28"]
+material_override = SubResource("StandardMaterial3D_rqtf5")
+mesh = SubResource("SphereMesh_1vm84")
+
+[node name="GraphNode29" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.091151, 0.49846157, -19.958998)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_28"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode29"]
 material_override = SubResource("StandardMaterial3D_1vm84")
 mesh = SubResource("SphereMesh_wu3dr")
 
-[node name="Node_29" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39910" type="MeshInstance3D" parent="Terrain/GraphNode29"]
+material_override = SubResource("StandardMaterial3D_wu3dr")
+mesh = SubResource("SphereMesh_cyx1q")
+
+[node name="GraphNode30" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.3122, -0.48780042, -23.25428)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_29"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode30"]
 material_override = SubResource("StandardMaterial3D_cyx1q")
 mesh = SubResource("SphereMesh_0dhbp")
 
-[node name="Node_30" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39911" type="MeshInstance3D" parent="Terrain/GraphNode30"]
+material_override = SubResource("StandardMaterial3D_0dhbp")
+mesh = SubResource("SphereMesh_jx0wj")
+
+[node name="GraphNode31" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.2406948, 0.29026103, 22.575932)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_30"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode31"]
 material_override = SubResource("StandardMaterial3D_jx0wj")
 mesh = SubResource("SphereMesh_kkkcx")
 
-[node name="Node_31" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39912" type="MeshInstance3D" parent="Terrain/GraphNode31"]
+material_override = SubResource("StandardMaterial3D_kkkcx")
+mesh = SubResource("SphereMesh_34ol3")
+
+[node name="GraphNode32" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.934006, 0.30471265, -27.569601)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_31"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode32"]
 material_override = SubResource("StandardMaterial3D_34ol3")
 mesh = SubResource("SphereMesh_c2n8d")
 
-[node name="Node_32" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39913" type="MeshInstance3D" parent="Terrain/GraphNode32"]
+material_override = SubResource("StandardMaterial3D_c2n8d")
+mesh = SubResource("SphereMesh_wy5fy")
+
+[node name="GraphNode33" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -41.533073, -0.5948614, -0.0668541)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_32"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode33"]
 material_override = SubResource("StandardMaterial3D_wy5fy")
 mesh = SubResource("SphereMesh_gx4rg")
 
-[node name="Node_33" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39914" type="MeshInstance3D" parent="Terrain/GraphNode33"]
+material_override = SubResource("StandardMaterial3D_gx4rg")
+mesh = SubResource("SphereMesh_5dllo")
+
+[node name="GraphNode34" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.299154, 0.62099826, -17.061588)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_33"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode34"]
 material_override = SubResource("StandardMaterial3D_5dllo")
 mesh = SubResource("SphereMesh_phcyf")
 
-[node name="Node_34" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39915" type="MeshInstance3D" parent="Terrain/GraphNode34"]
+material_override = SubResource("StandardMaterial3D_phcyf")
+mesh = SubResource("SphereMesh_birbe")
+
+[node name="GraphNode35" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.470142, 0.55927277, -15.571385)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_34"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode35"]
 material_override = SubResource("StandardMaterial3D_birbe")
 mesh = SubResource("SphereMesh_f1p13")
 
-[node name="Node_35" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39916" type="MeshInstance3D" parent="Terrain/GraphNode35"]
+material_override = SubResource("StandardMaterial3D_f1p13")
+mesh = SubResource("SphereMesh_4obbf")
+
+[node name="GraphNode36" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.69822, -1.2807511, -25.93871)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_35"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode36"]
 material_override = SubResource("StandardMaterial3D_4obbf")
 mesh = SubResource("SphereMesh_ovcoh")
 
-[node name="Node_36" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39917" type="MeshInstance3D" parent="Terrain/GraphNode36"]
+material_override = SubResource("StandardMaterial3D_ovcoh")
+mesh = SubResource("SphereMesh_ppx11")
+
+[node name="GraphNode37" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.344301, 1.4700774, -5.4526215)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_36"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode37"]
 material_override = SubResource("StandardMaterial3D_ppx11")
 mesh = SubResource("SphereMesh_1yv1y")
 
-[node name="Node_37" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39918" type="MeshInstance3D" parent="Terrain/GraphNode37"]
+material_override = SubResource("StandardMaterial3D_1yv1y")
+mesh = SubResource("SphereMesh_5yh34")
+
+[node name="GraphNode38" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.318338, -1.3141941, 32.818592)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_37"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode38"]
 material_override = SubResource("StandardMaterial3D_5yh34")
 mesh = SubResource("SphereMesh_pjuso")
 
-[node name="Node_38" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39919" type="MeshInstance3D" parent="Terrain/GraphNode38"]
+material_override = SubResource("StandardMaterial3D_pjuso")
+mesh = SubResource("SphereMesh_23xmf")
+
+[node name="GraphNode39" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.798637, 0.3378549, -22.062204)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_38"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode39"]
 material_override = SubResource("StandardMaterial3D_23xmf")
 mesh = SubResource("SphereMesh_swlj1")
 
-[node name="Node_39" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39920" type="MeshInstance3D" parent="Terrain/GraphNode39"]
+material_override = SubResource("StandardMaterial3D_swlj1")
+mesh = SubResource("SphereMesh_yysqy")
+
+[node name="GraphNode40" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.31462, -0.40093908, 8.800597)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_39"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode40"]
 material_override = SubResource("StandardMaterial3D_yysqy")
 mesh = SubResource("SphereMesh_n5t1e")
 
-[node name="Node_40" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39921" type="MeshInstance3D" parent="Terrain/GraphNode40"]
+material_override = SubResource("StandardMaterial3D_n5t1e")
+mesh = SubResource("SphereMesh_h6isl")
+
+[node name="GraphNode41" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.102337, -1.2551738, -25.439253)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_40"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode41"]
 material_override = SubResource("StandardMaterial3D_h6isl")
 mesh = SubResource("SphereMesh_53bls")
 
-[node name="Node_41" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39922" type="MeshInstance3D" parent="Terrain/GraphNode41"]
+material_override = SubResource("StandardMaterial3D_53bls")
+mesh = SubResource("SphereMesh_lwnsi")
+
+[node name="GraphNode42" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.9837, 0.28110403, -12.665644)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_41"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode42"]
 material_override = SubResource("StandardMaterial3D_lwnsi")
 mesh = SubResource("SphereMesh_41lik")
 
-[node name="Node_42" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39923" type="MeshInstance3D" parent="Terrain/GraphNode42"]
+material_override = SubResource("StandardMaterial3D_41lik")
+mesh = SubResource("SphereMesh_jbvwl")
+
+[node name="GraphNode43" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.432112, -1.2625618, 35.435616)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_42"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode43"]
 material_override = SubResource("StandardMaterial3D_jbvwl")
 mesh = SubResource("SphereMesh_sn1fb")
 
-[node name="Node_43" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39924" type="MeshInstance3D" parent="Terrain/GraphNode43"]
+material_override = SubResource("StandardMaterial3D_sn1fb")
+mesh = SubResource("SphereMesh_yvsr8")
+
+[node name="GraphNode44" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.378754, 0.95988715, -38.709305)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_43"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode44"]
 material_override = SubResource("StandardMaterial3D_yvsr8")
 mesh = SubResource("SphereMesh_vieuh")
 
-[node name="Node_44" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39925" type="MeshInstance3D" parent="Terrain/GraphNode44"]
+material_override = SubResource("StandardMaterial3D_vieuh")
+mesh = SubResource("SphereMesh_yjja3")
+
+[node name="GraphNode45" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.750456, -0.65307176, -35.522232)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_44"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode45"]
 material_override = SubResource("StandardMaterial3D_yjja3")
 mesh = SubResource("SphereMesh_l0gw7")
 
-[node name="Node_45" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39926" type="MeshInstance3D" parent="Terrain/GraphNode45"]
+material_override = SubResource("StandardMaterial3D_l0gw7")
+mesh = SubResource("SphereMesh_inymm")
+
+[node name="GraphNode46" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.688712, -0.548028, -40.77346)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_45"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode46"]
 material_override = SubResource("StandardMaterial3D_inymm")
 mesh = SubResource("SphereMesh_jcxqu")
 
-[node name="Node_46" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39927" type="MeshInstance3D" parent="Terrain/GraphNode46"]
+material_override = SubResource("StandardMaterial3D_jcxqu")
+mesh = SubResource("SphereMesh_0arob")
+
+[node name="GraphNode47" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.3163571, 1.2672335, 38.620056)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_46"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode47"]
 material_override = SubResource("StandardMaterial3D_0arob")
 mesh = SubResource("SphereMesh_dij0e")
 
-[node name="Node_47" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39928" type="MeshInstance3D" parent="Terrain/GraphNode47"]
+material_override = SubResource("StandardMaterial3D_dij0e")
+mesh = SubResource("SphereMesh_k1udn")
+
+[node name="GraphNode48" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.57759, -0.4911425, 16.406458)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_47"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode48"]
 material_override = SubResource("StandardMaterial3D_k1udn")
 mesh = SubResource("SphereMesh_wat4s")
 
-[node name="Node_48" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39929" type="MeshInstance3D" parent="Terrain/GraphNode48"]
+material_override = SubResource("StandardMaterial3D_wat4s")
+mesh = SubResource("SphereMesh_ywjan")
+
+[node name="GraphNode49" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.310806, 1.4827646, -21.139168)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_48"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode49"]
 material_override = SubResource("StandardMaterial3D_ywjan")
 mesh = SubResource("SphereMesh_m74q3")
 
-[node name="Node_49" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39930" type="MeshInstance3D" parent="Terrain/GraphNode49"]
+material_override = SubResource("StandardMaterial3D_m74q3")
+mesh = SubResource("SphereMesh_tko6h")
+
+[node name="GraphNode50" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.1033535, 0.36275524, -14.159935)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_49"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode50"]
 material_override = SubResource("StandardMaterial3D_tko6h")
 mesh = SubResource("SphereMesh_am8a1")
 
-[node name="Node_50" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39931" type="MeshInstance3D" parent="Terrain/GraphNode50"]
+material_override = SubResource("StandardMaterial3D_am8a1")
+mesh = SubResource("SphereMesh_8dc3g")
+
+[node name="GraphNode51" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.333115, 1.3803867, -34.521782)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_50"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode51"]
 material_override = SubResource("StandardMaterial3D_8dc3g")
 mesh = SubResource("SphereMesh_htgcl")
 
-[node name="Node_51" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39932" type="MeshInstance3D" parent="Terrain/GraphNode51"]
+material_override = SubResource("StandardMaterial3D_htgcl")
+mesh = SubResource("SphereMesh_smeu8")
+
+[node name="GraphNode52" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.1153646, -0.30594167, 27.454432)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_51"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode52"]
 material_override = SubResource("StandardMaterial3D_smeu8")
 mesh = SubResource("SphereMesh_f3y11")
 
-[node name="Node_52" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39933" type="MeshInstance3D" parent="Terrain/GraphNode52"]
+material_override = SubResource("StandardMaterial3D_f3y11")
+mesh = SubResource("SphereMesh_cpm2s")
+
+[node name="GraphNode53" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.932216, -0.11559753, -23.138535)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_52"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode53"]
 material_override = SubResource("StandardMaterial3D_cpm2s")
 mesh = SubResource("SphereMesh_u81y6")
 
-[node name="Node_53" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39934" type="MeshInstance3D" parent="Terrain/GraphNode53"]
+material_override = SubResource("StandardMaterial3D_u81y6")
+mesh = SubResource("SphereMesh_rt5wr")
+
+[node name="GraphNode54" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.108974, 0.6471585, -8.10271)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_53"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode54"]
 material_override = SubResource("StandardMaterial3D_rt5wr")
 mesh = SubResource("SphereMesh_mnw77")
 
-[node name="Node_54" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39935" type="MeshInstance3D" parent="Terrain/GraphNode54"]
+material_override = SubResource("StandardMaterial3D_mnw77")
+mesh = SubResource("SphereMesh_vjgyh")
+
+[node name="GraphNode55" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.27674, 1.2133385, 14.261673)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_54"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode55"]
 material_override = SubResource("StandardMaterial3D_vjgyh")
 mesh = SubResource("SphereMesh_d5iia")
 
-[node name="Node_55" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39936" type="MeshInstance3D" parent="Terrain/GraphNode55"]
+material_override = SubResource("StandardMaterial3D_d5iia")
+mesh = SubResource("SphereMesh_asu84")
+
+[node name="GraphNode56" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.044064, -0.90040165, -11.111197)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_55"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode56"]
 material_override = SubResource("StandardMaterial3D_asu84")
 mesh = SubResource("SphereMesh_qwt6e")
 
-[node name="Node_56" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39937" type="MeshInstance3D" parent="Terrain/GraphNode56"]
+material_override = SubResource("StandardMaterial3D_qwt6e")
+mesh = SubResource("SphereMesh_off2o")
+
+[node name="GraphNode57" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.199321, -0.26133552, 39.38577)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_56"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode57"]
 material_override = SubResource("StandardMaterial3D_off2o")
 mesh = SubResource("SphereMesh_tttfs")
 
-[node name="Node_57" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39938" type="MeshInstance3D" parent="Terrain/GraphNode57"]
+material_override = SubResource("StandardMaterial3D_tttfs")
+mesh = SubResource("SphereMesh_1iygd")
+
+[node name="GraphNode58" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.454498, 1.4695262, -31.727337)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_57"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode58"]
 material_override = SubResource("StandardMaterial3D_1iygd")
 mesh = SubResource("SphereMesh_g5xqc")
 
-[node name="Node_58" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39939" type="MeshInstance3D" parent="Terrain/GraphNode58"]
+material_override = SubResource("StandardMaterial3D_g5xqc")
+mesh = SubResource("SphereMesh_s4o1y")
+
+[node name="GraphNode59" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.577385, -0.36943385, -1.3393965)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_58"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode59"]
 material_override = SubResource("StandardMaterial3D_s4o1y")
 mesh = SubResource("SphereMesh_7mmqq")
 
-[node name="Node_59" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39940" type="MeshInstance3D" parent="Terrain/GraphNode59"]
+material_override = SubResource("StandardMaterial3D_7mmqq")
+mesh = SubResource("SphereMesh_3exxq")
+
+[node name="GraphNode60" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.459488, 0.12877752, -3.220371)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_59"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode60"]
 material_override = SubResource("StandardMaterial3D_3exxq")
 mesh = SubResource("SphereMesh_5aa3q")
 
-[node name="Node_60" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39941" type="MeshInstance3D" parent="Terrain/GraphNode60"]
+material_override = SubResource("StandardMaterial3D_5aa3q")
+mesh = SubResource("SphereMesh_bmvma")
+
+[node name="GraphNode61" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.9359372, -1.0711372, -23.382242)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_60"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode61"]
 material_override = SubResource("StandardMaterial3D_bmvma")
 mesh = SubResource("SphereMesh_shlp4")
 
-[node name="Node_61" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39942" type="MeshInstance3D" parent="Terrain/GraphNode61"]
+material_override = SubResource("StandardMaterial3D_shlp4")
+mesh = SubResource("SphereMesh_2n44k")
+
+[node name="GraphNode62" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.427241, 0.7019933, -30.379147)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_61"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode62"]
 material_override = SubResource("StandardMaterial3D_2n44k")
 mesh = SubResource("SphereMesh_86lig")
 
-[node name="Node_62" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39943" type="MeshInstance3D" parent="Terrain/GraphNode62"]
+material_override = SubResource("StandardMaterial3D_86lig")
+mesh = SubResource("SphereMesh_ldnlw")
+
+[node name="GraphNode63" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.50535, 1.2546741, -18.872053)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_62"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode63"]
 material_override = SubResource("StandardMaterial3D_ldnlw")
 mesh = SubResource("SphereMesh_qe8ju")
 
-[node name="Node_63" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39944" type="MeshInstance3D" parent="Terrain/GraphNode63"]
+material_override = SubResource("StandardMaterial3D_qe8ju")
+mesh = SubResource("SphereMesh_bnk2o")
+
+[node name="GraphNode64" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.09859, 1.3387213, 27.291002)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_63"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode64"]
 material_override = SubResource("StandardMaterial3D_bnk2o")
 mesh = SubResource("SphereMesh_oosfy")
 
-[node name="Node_64" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39945" type="MeshInstance3D" parent="Terrain/GraphNode64"]
+material_override = SubResource("StandardMaterial3D_oosfy")
+mesh = SubResource("SphereMesh_nf4f2")
+
+[node name="GraphNode65" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.12804, 1.2877458, 13.050501)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_64"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode65"]
 material_override = SubResource("StandardMaterial3D_nf4f2")
 mesh = SubResource("SphereMesh_xkvoa")
 
-[node name="Node_65" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39946" type="MeshInstance3D" parent="Terrain/GraphNode65"]
+material_override = SubResource("StandardMaterial3D_xkvoa")
+mesh = SubResource("SphereMesh_t5kpo")
+
+[node name="GraphNode66" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.231985, -0.6985114, 40.72816)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_65"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode66"]
 material_override = SubResource("StandardMaterial3D_t5kpo")
 mesh = SubResource("SphereMesh_pw0td")
 
-[node name="Node_66" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39947" type="MeshInstance3D" parent="Terrain/GraphNode66"]
+material_override = SubResource("StandardMaterial3D_pw0td")
+mesh = SubResource("SphereMesh_37eu1")
+
+[node name="GraphNode67" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.8793194, 0.859994, 2.1272657)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_66"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode67"]
 material_override = SubResource("StandardMaterial3D_37eu1")
 mesh = SubResource("SphereMesh_0wkqm")
 
-[node name="Node_67" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39948" type="MeshInstance3D" parent="Terrain/GraphNode67"]
+material_override = SubResource("StandardMaterial3D_0wkqm")
+mesh = SubResource("SphereMesh_ve5sr")
+
+[node name="GraphNode68" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.253698, -1.2307405, 37.558887)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_67"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode68"]
 material_override = SubResource("StandardMaterial3D_ve5sr")
 mesh = SubResource("SphereMesh_5s44m")
 
-[node name="Node_68" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39949" type="MeshInstance3D" parent="Terrain/GraphNode68"]
+material_override = SubResource("StandardMaterial3D_5s44m")
+mesh = SubResource("SphereMesh_ibca3")
+
+[node name="GraphNode69" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.363861, 0.58798563, 39.3722)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_68"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode69"]
 material_override = SubResource("StandardMaterial3D_ibca3")
 mesh = SubResource("SphereMesh_g3y5b")
 
-[node name="Node_69" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39950" type="MeshInstance3D" parent="Terrain/GraphNode69"]
+material_override = SubResource("StandardMaterial3D_g3y5b")
+mesh = SubResource("SphereMesh_1slqb")
+
+[node name="GraphNode70" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -39.989475, -1.0721544, -9.217287)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_69"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode70"]
 material_override = SubResource("StandardMaterial3D_1slqb")
 mesh = SubResource("SphereMesh_uo83y")
 
-[node name="Node_70" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39951" type="MeshInstance3D" parent="Terrain/GraphNode70"]
+material_override = SubResource("StandardMaterial3D_uo83y")
+mesh = SubResource("SphereMesh_y0aao")
+
+[node name="GraphNode71" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 15.144575, 0.63265365, -21.754044)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_70"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode71"]
 material_override = SubResource("StandardMaterial3D_y0aao")
 mesh = SubResource("SphereMesh_wm5rm")
 
-[node name="Node_71" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39952" type="MeshInstance3D" parent="Terrain/GraphNode71"]
+material_override = SubResource("StandardMaterial3D_wm5rm")
+mesh = SubResource("SphereMesh_ekl5k")
+
+[node name="GraphNode72" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.41146, -0.051413395, -30.534698)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_71"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode72"]
 material_override = SubResource("StandardMaterial3D_ekl5k")
 mesh = SubResource("SphereMesh_fdpg8")
 
-[node name="Node_72" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39953" type="MeshInstance3D" parent="Terrain/GraphNode72"]
+material_override = SubResource("StandardMaterial3D_fdpg8")
+mesh = SubResource("SphereMesh_rpys8")
+
+[node name="GraphNode73" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.247982, -1.2945843, -14.162096)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_72"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode73"]
 material_override = SubResource("StandardMaterial3D_rpys8")
 mesh = SubResource("SphereMesh_6gr3f")
 
-[node name="Node_73" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39954" type="MeshInstance3D" parent="Terrain/GraphNode73"]
+material_override = SubResource("StandardMaterial3D_6gr3f")
+mesh = SubResource("SphereMesh_6seew")
+
+[node name="GraphNode74" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.764374, -0.39392158, -17.988977)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_73"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode74"]
 material_override = SubResource("StandardMaterial3D_6seew")
 mesh = SubResource("SphereMesh_3ox4t")
 
-[node name="Node_74" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39955" type="MeshInstance3D" parent="Terrain/GraphNode74"]
+material_override = SubResource("StandardMaterial3D_3ox4t")
+mesh = SubResource("SphereMesh_4fmho")
+
+[node name="GraphNode75" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.324936, -0.8742615, 33.858433)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_74"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode75"]
 material_override = SubResource("StandardMaterial3D_4fmho")
 mesh = SubResource("SphereMesh_aivy6")
 
-[node name="Node_75" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39956" type="MeshInstance3D" parent="Terrain/GraphNode75"]
+material_override = SubResource("StandardMaterial3D_aivy6")
+mesh = SubResource("SphereMesh_bil4k")
+
+[node name="GraphNode76" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.406223, 0.24241233, 1.4335444)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_75"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode76"]
 material_override = SubResource("StandardMaterial3D_bil4k")
 mesh = SubResource("SphereMesh_hnquj")
 
-[node name="Node_76" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39957" type="MeshInstance3D" parent="Terrain/GraphNode76"]
+material_override = SubResource("StandardMaterial3D_hnquj")
+mesh = SubResource("SphereMesh_0h8y2")
+
+[node name="GraphNode77" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.44601, -1.0731164, -4.520175)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_76"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode77"]
 material_override = SubResource("StandardMaterial3D_0h8y2")
 mesh = SubResource("SphereMesh_nycv6")
 
-[node name="Node_77" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39958" type="MeshInstance3D" parent="Terrain/GraphNode77"]
+material_override = SubResource("StandardMaterial3D_nycv6")
+mesh = SubResource("SphereMesh_x4ftd")
+
+[node name="GraphNode78" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.893094, -0.56951934, 7.2633576)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_77"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode78"]
 material_override = SubResource("StandardMaterial3D_x4ftd")
 mesh = SubResource("SphereMesh_arf1h")
 
-[node name="Node_78" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39959" type="MeshInstance3D" parent="Terrain/GraphNode78"]
+material_override = SubResource("StandardMaterial3D_arf1h")
+mesh = SubResource("SphereMesh_s0om5")
+
+[node name="GraphNode79" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.06616, 0.7659957, -27.536793)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_78"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode79"]
 material_override = SubResource("StandardMaterial3D_s0om5")
 mesh = SubResource("SphereMesh_gkfde")
 
-[node name="Node_79" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39960" type="MeshInstance3D" parent="Terrain/GraphNode79"]
+material_override = SubResource("StandardMaterial3D_gkfde")
+mesh = SubResource("SphereMesh_4qxq8")
+
+[node name="GraphNode80" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.696645, -0.43606865, 36.42343)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_79"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode80"]
 material_override = SubResource("StandardMaterial3D_4qxq8")
 mesh = SubResource("SphereMesh_ryg4g")
 
-[node name="Node_80" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39961" type="MeshInstance3D" parent="Terrain/GraphNode80"]
+material_override = SubResource("StandardMaterial3D_ryg4g")
+mesh = SubResource("SphereMesh_oy6td")
+
+[node name="GraphNode81" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.7368336, -0.1958864, -35.602985)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_80"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode81"]
 material_override = SubResource("StandardMaterial3D_oy6td")
 mesh = SubResource("SphereMesh_fe76k")
 
-[node name="Node_81" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39962" type="MeshInstance3D" parent="Terrain/GraphNode81"]
+material_override = SubResource("StandardMaterial3D_fe76k")
+mesh = SubResource("SphereMesh_p5pln")
+
+[node name="GraphNode82" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.308908, 0.74253505, -0.06509914)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_81"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode82"]
 material_override = SubResource("StandardMaterial3D_p5pln")
 mesh = SubResource("SphereMesh_oiuw5")
 
-[node name="Node_82" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39963" type="MeshInstance3D" parent="Terrain/GraphNode82"]
+material_override = SubResource("StandardMaterial3D_oiuw5")
+mesh = SubResource("SphereMesh_mldrc")
+
+[node name="GraphNode83" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.370892, 1.0790415, 1.8238112)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_82"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode83"]
 material_override = SubResource("StandardMaterial3D_mldrc")
 mesh = SubResource("SphereMesh_1tiwm")
 
-[node name="Node_83" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39964" type="MeshInstance3D" parent="Terrain/GraphNode83"]
+material_override = SubResource("StandardMaterial3D_1tiwm")
+mesh = SubResource("SphereMesh_xxpw2")
+
+[node name="GraphNode84" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.606213, -0.9944423, 39.268757)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_83"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode84"]
 material_override = SubResource("StandardMaterial3D_xxpw2")
 mesh = SubResource("SphereMesh_wghq8")
 
-[node name="Node_84" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39965" type="MeshInstance3D" parent="Terrain/GraphNode84"]
+material_override = SubResource("StandardMaterial3D_wghq8")
+mesh = SubResource("SphereMesh_k08w7")
+
+[node name="GraphNode85" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 34.966515, -0.15597859, 14.530397)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_84"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode85"]
 material_override = SubResource("StandardMaterial3D_k08w7")
 mesh = SubResource("SphereMesh_hp4ct")
 
-[node name="Node_85" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39966" type="MeshInstance3D" parent="Terrain/GraphNode85"]
+material_override = SubResource("StandardMaterial3D_hp4ct")
+mesh = SubResource("SphereMesh_suf1q")
+
+[node name="GraphNode86" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.361116, -0.44882774, 15.119948)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_85"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode86"]
 material_override = SubResource("StandardMaterial3D_suf1q")
 mesh = SubResource("SphereMesh_lxb2r")
 
-[node name="Node_86" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39967" type="MeshInstance3D" parent="Terrain/GraphNode86"]
+material_override = SubResource("StandardMaterial3D_lxb2r")
+mesh = SubResource("SphereMesh_ceu5l")
+
+[node name="GraphNode87" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.036652, 1.4400003, -15.124479)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_86"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode87"]
 material_override = SubResource("StandardMaterial3D_ceu5l")
 mesh = SubResource("SphereMesh_lv1ug")
 
-[node name="Node_87" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39968" type="MeshInstance3D" parent="Terrain/GraphNode87"]
+material_override = SubResource("StandardMaterial3D_lv1ug")
+mesh = SubResource("SphereMesh_mofpq")
+
+[node name="GraphNode88" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 39.068344, 0.08194323, 24.977829)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_87"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode88"]
 material_override = SubResource("StandardMaterial3D_mofpq")
 mesh = SubResource("SphereMesh_6kttw")
 
-[node name="Node_88" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39969" type="MeshInstance3D" parent="Terrain/GraphNode88"]
+material_override = SubResource("StandardMaterial3D_6kttw")
+mesh = SubResource("SphereMesh_oqmj5")
+
+[node name="GraphNode89" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.300547, 1.0802276, 35.902546)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_88"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode89"]
 material_override = SubResource("StandardMaterial3D_oqmj5")
 mesh = SubResource("SphereMesh_uor2d")
 
-[node name="Node_89" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39970" type="MeshInstance3D" parent="Terrain/GraphNode89"]
+material_override = SubResource("StandardMaterial3D_uor2d")
+mesh = SubResource("SphereMesh_bdw5g")
+
+[node name="GraphNode90" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.528471, -1.3971599, -38.296352)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_89"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode90"]
 material_override = SubResource("StandardMaterial3D_bdw5g")
 mesh = SubResource("SphereMesh_j6smb")
 
-[node name="Node_90" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39971" type="MeshInstance3D" parent="Terrain/GraphNode90"]
+material_override = SubResource("StandardMaterial3D_j6smb")
+mesh = SubResource("SphereMesh_xp7cv")
+
+[node name="GraphNode91" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.519897, 0.28993285, 18.496098)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_90"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode91"]
 material_override = SubResource("StandardMaterial3D_xp7cv")
 mesh = SubResource("SphereMesh_6ff2c")
 
-[node name="Node_91" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39972" type="MeshInstance3D" parent="Terrain/GraphNode91"]
+material_override = SubResource("StandardMaterial3D_6ff2c")
+mesh = SubResource("SphereMesh_ly5pk")
+
+[node name="GraphNode92" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.766165, 0.7060377, 35.866158)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_91"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode92"]
 material_override = SubResource("StandardMaterial3D_ly5pk")
 mesh = SubResource("SphereMesh_s0u5n")
 
-[node name="Node_92" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39973" type="MeshInstance3D" parent="Terrain/GraphNode92"]
+material_override = SubResource("StandardMaterial3D_s0u5n")
+mesh = SubResource("SphereMesh_8lrju")
+
+[node name="GraphNode93" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.927725, 0.33193824, 7.0478024)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_92"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode93"]
 material_override = SubResource("StandardMaterial3D_8lrju")
 mesh = SubResource("SphereMesh_5kegx")
 
-[node name="Node_93" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39974" type="MeshInstance3D" parent="Terrain/GraphNode93"]
+material_override = SubResource("StandardMaterial3D_5kegx")
+mesh = SubResource("SphereMesh_afgqn")
+
+[node name="GraphNode94" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.62012595, -0.6896595, 35.11894)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_93"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode94"]
 material_override = SubResource("StandardMaterial3D_afgqn")
 mesh = SubResource("SphereMesh_jvn2n")
 
-[node name="Node_94" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39975" type="MeshInstance3D" parent="Terrain/GraphNode94"]
+material_override = SubResource("StandardMaterial3D_jvn2n")
+mesh = SubResource("SphereMesh_jegnu")
+
+[node name="GraphNode95" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.866328, -1.184446, 41.342316)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_94"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode95"]
 material_override = SubResource("StandardMaterial3D_jegnu")
 mesh = SubResource("SphereMesh_rx6mv")
 
-[node name="Node_95" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39976" type="MeshInstance3D" parent="Terrain/GraphNode95"]
+material_override = SubResource("StandardMaterial3D_rx6mv")
+mesh = SubResource("SphereMesh_31js7")
+
+[node name="GraphNode96" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.73295, 0.39176822, -35.191383)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_95"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode96"]
 material_override = SubResource("StandardMaterial3D_31js7")
 mesh = SubResource("SphereMesh_0a4i0")
 
-[node name="Node_96" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39977" type="MeshInstance3D" parent="Terrain/GraphNode96"]
+material_override = SubResource("StandardMaterial3D_0a4i0")
+mesh = SubResource("SphereMesh_i0xsp")
+
+[node name="GraphNode97" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.422539, -0.8908557, -33.742905)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_96"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode97"]
 material_override = SubResource("StandardMaterial3D_i0xsp")
 mesh = SubResource("SphereMesh_kll2q")
 
-[node name="Node_97" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39978" type="MeshInstance3D" parent="Terrain/GraphNode97"]
+material_override = SubResource("StandardMaterial3D_kll2q")
+mesh = SubResource("SphereMesh_ft875")
+
+[node name="GraphNode98" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.5225096, 0.26743808, -37.678715)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_97"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode98"]
 material_override = SubResource("StandardMaterial3D_ft875")
 mesh = SubResource("SphereMesh_6hmxt")
 
-[node name="Node_98" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39979" type="MeshInstance3D" parent="Terrain/GraphNode98"]
+material_override = SubResource("StandardMaterial3D_6hmxt")
+mesh = SubResource("SphereMesh_rhlye")
+
+[node name="GraphNode99" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.544426, -0.06528879, 9.429508)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_98"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode99"]
 material_override = SubResource("StandardMaterial3D_rhlye")
 mesh = SubResource("SphereMesh_pqvsh")
 
-[node name="Node_99" type="Node3D" parent="Terrain"]
+[node name="@MeshInstance3D@39980" type="MeshInstance3D" parent="Terrain/GraphNode99"]
+material_override = SubResource("StandardMaterial3D_pqvsh")
+mesh = SubResource("SphereMesh_3qj4k")
+
+[node name="GraphNode100" type="Node3D" parent="Terrain"]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.724205, -0.37845626, -35.13072)
 script = ExtResource("3_4c57u")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/Node_99"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Terrain/GraphNode100"]
 material_override = SubResource("StandardMaterial3D_3qj4k")
 mesh = SubResource("SphereMesh_mo8hc")
+
+[node name="@MeshInstance3D@39981" type="MeshInstance3D" parent="Terrain/GraphNode100"]
+material_override = SubResource("StandardMaterial3D_mo8hc")
+mesh = SubResource("SphereMesh_gbg58")
 
 [node name="@StaticBody3D@29659" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.088657, -0.07080499, 25.576666)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_0")
-NodeB = NodePath("../Node_54")
-NodeC = NodePath("../Node_42")
+NodeA = NodePath("../GraphNode")
+NodeB = NodePath("../GraphNode55")
+NodeC = NodePath("../GraphNode43")
 
 [node name="@StaticBody3D@29662" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.784584, 0.4466932, 19.930159)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_0")
-NodeB = NodePath("../Node_54")
-NodeC = NodePath("../Node_90")
+NodeA = NodePath("../GraphNode")
+NodeB = NodePath("../GraphNode55")
+NodeC = NodePath("../GraphNode91")
 
 [node name="@StaticBody3D@29665" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.435854, -0.91331583, 31.762304)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_0")
-NodeB = NodePath("../Node_42")
-NodeC = NodePath("../Node_37")
+NodeA = NodePath("../GraphNode")
+NodeB = NodePath("../GraphNode43")
+NodeC = NodePath("../GraphNode38")
 
 [node name="@StaticBody3D@29668" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.159954, -0.44239703, 22.504868)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_0")
-NodeB = NodePath("../Node_23")
-NodeC = NodePath("../Node_90")
+NodeA = NodePath("../GraphNode")
+NodeB = NodePath("../GraphNode24")
+NodeC = NodePath("../GraphNode91")
 
 [node name="@StaticBody3D@29671" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.759432, -0.97710603, 27.279032)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_0")
-NodeB = NodePath("../Node_23")
-NodeC = NodePath("../Node_37")
+NodeA = NodePath("../GraphNode")
+NodeB = NodePath("../GraphNode24")
+NodeC = NodePath("../GraphNode38")
 
 [node name="@StaticBody3D@29674" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.190931, 0.93805045, 25.934397)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_1")
-NodeB = NodePath("../Node_30")
-NodeC = NodePath("../Node_5")
+NodeA = NodePath("../GraphNode2")
+NodeB = NodePath("../GraphNode31")
+NodeC = NodePath("../GraphNode6")
 
 [node name="@StaticBody3D@29677" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.0873119, 0.42650768, 26.410505)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_1")
-NodeB = NodePath("../Node_30")
-NodeC = NodePath("../Node_51")
+NodeA = NodePath("../GraphNode2")
+NodeB = NodePath("../GraphNode31")
+NodeC = NodePath("../GraphNode52")
 
 [node name="@StaticBody3D@29680" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.877547, 1.2013727, 30.376602)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_1")
-NodeB = NodePath("../Node_5")
-NodeC = NodePath("../Node_88")
+NodeA = NodePath("../GraphNode2")
+NodeB = NodePath("../GraphNode6")
+NodeC = NodePath("../GraphNode89")
 
 [node name="@StaticBody3D@29683" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.7862111, 0.0998675, 30.591507)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_1")
-NodeB = NodePath("../Node_51")
-NodeC = NodePath("../Node_93")
+NodeA = NodePath("../GraphNode2")
+NodeB = NodePath("../GraphNode52")
+NodeC = NodePath("../GraphNode94")
 
 [node name="@StaticBody3D@29686" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.352426, 0.5619239, 33.407547)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_1")
-NodeB = NodePath("../Node_88")
-NodeC = NodePath("../Node_93")
+NodeA = NodePath("../GraphNode2")
+NodeB = NodePath("../GraphNode89")
+NodeC = NodePath("../GraphNode94")
 
 [node name="@StaticBody3D@29689" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.682594, -0.33507016, 39.911434)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_2")
-NodeB = NodePath("../Node_94")
-NodeC = NodePath("../Node_67")
+NodeA = NodePath("../GraphNode3")
+NodeB = NodePath("../GraphNode95")
+NodeC = NodePath("../GraphNode68")
 
 [node name="@StaticBody3D@29692" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.675357, -0.15766047, 40.96786)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_2")
-NodeB = NodePath("../Node_94")
-NodeC = NodePath("../Node_65")
+NodeA = NodePath("../GraphNode3")
+NodeB = NodePath("../GraphNode95")
+NodeC = NodePath("../GraphNode66")
 
 [node name="@StaticBody3D@29695" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.460259, -0.027366688, 39.25925)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_2")
-NodeB = NodePath("../Node_67")
-NodeC = NodePath("../Node_56")
+NodeA = NodePath("../GraphNode3")
+NodeB = NodePath("../GraphNode68")
+NodeC = NodePath("../GraphNode57")
 
 [node name="@StaticBody3D@29698" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.453021, 0.15004303, 40.315674)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_2")
-NodeB = NodePath("../Node_56")
-NodeC = NodePath("../Node_65")
+NodeA = NodePath("../GraphNode3")
+NodeB = NodePath("../GraphNode57")
+NodeC = NodePath("../GraphNode66")
 
 [node name="@StaticBody3D@29701" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.733744, 0.21742272, 22.636831)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_3")
-NodeB = NodePath("../Node_17")
-NodeC = NodePath("../Node_10")
+NodeA = NodePath("../GraphNode4")
+NodeB = NodePath("../GraphNode18")
+NodeC = NodePath("../GraphNode11")
 
 [node name="@StaticBody3D@29704" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.764786, 0.9915047, 25.827797)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_3")
-NodeB = NodePath("../Node_17")
-NodeC = NodePath("../Node_63")
+NodeA = NodePath("../GraphNode4")
+NodeB = NodePath("../GraphNode18")
+NodeC = NodePath("../GraphNode64")
 
 [node name="@StaticBody3D@29707" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.11865, -0.2823749, 18.045408)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_3")
-NodeB = NodePath("../Node_10")
-NodeC = NodePath("../Node_85")
+NodeA = NodePath("../GraphNode4")
+NodeB = NodePath("../GraphNode11")
+NodeC = NodePath("../GraphNode86")
 
 [node name="@StaticBody3D@29710" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.99599, 0.99148494, 22.890388)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_3")
-NodeB = NodePath("../Node_63")
-NodeC = NodePath("../Node_9")
+NodeA = NodePath("../GraphNode4")
+NodeB = NodePath("../GraphNode64")
+NodeC = NodePath("../GraphNode10")
 
 [node name="@StaticBody3D@29713" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 31.750168, 0.39563528, 18.833372)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_3")
-NodeB = NodePath("../Node_9")
-NodeC = NodePath("../Node_85")
+NodeA = NodePath("../GraphNode4")
+NodeB = NodePath("../GraphNode10")
+NodeC = NodePath("../GraphNode86")
 
 [node name="@StaticBody3D@29716" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.228101, 0.8173168, -36.432693)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_4")
-NodeB = NodePath("../Node_43")
-NodeC = NodePath("../Node_97")
+NodeA = NodePath("../GraphNode5")
+NodeB = NodePath("../GraphNode44")
+NodeC = NodePath("../GraphNode98")
 
 [node name="@StaticBody3D@29719" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.950169, 0.54549474, -37.464275)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_4")
-NodeB = NodePath("../Node_43")
-NodeC = NodePath("../Node_45")
+NodeA = NodePath("../GraphNode5")
+NodeB = NodePath("../GraphNode44")
+NodeC = NodePath("../GraphNode46")
 
 [node name="@StaticBody3D@29722" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.967853, 0.11339295, -34.769485)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_4")
-NodeB = NodePath("../Node_97")
-NodeC = NodePath("../Node_18")
+NodeA = NodePath("../GraphNode5")
+NodeB = NodePath("../GraphNode98")
+NodeC = NodePath("../GraphNode19")
 
 [node name="@StaticBody3D@29725" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.268288, 0.6856613, -36.06844)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_4")
-NodeB = NodePath("../Node_45")
-NodeC = NodePath("../Node_50")
+NodeA = NodePath("../GraphNode5")
+NodeB = NodePath("../GraphNode46")
+NodeC = NodePath("../GraphNode51")
 
 [node name="@StaticBody3D@29728" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.753575, 1.0792218, -29.728632)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_4")
-NodeB = NodePath("../Node_50")
-NodeC = NodePath("../Node_70")
+NodeA = NodePath("../GraphNode5")
+NodeB = NodePath("../GraphNode51")
+NodeC = NodePath("../GraphNode71")
 
 [node name="@StaticBody3D@29731" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 4.105662, -0.3327988, -30.003992)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_4")
-NodeB = NodePath("../Node_60")
-NodeC = NodePath("../Node_18")
+NodeA = NodePath("../GraphNode5")
+NodeB = NodePath("../GraphNode61")
+NodeC = NodePath("../GraphNode19")
 
 [node name="@StaticBody3D@29734" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 9.28785, 0.2620472, -26.015451)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_4")
-NodeB = NodePath("../Node_60")
-NodeC = NodePath("../Node_70")
+NodeA = NodePath("../GraphNode5")
+NodeB = NodePath("../GraphNode61")
+NodeC = NodePath("../GraphNode71")
 
 [node name="@StaticBody3D@29737" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.30556, -0.5131466, 26.943502)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_5")
-NodeB = NodePath("../Node_23")
-NodeC = NodePath("../Node_37")
+NodeA = NodePath("../GraphNode6")
+NodeB = NodePath("../GraphNode24")
+NodeC = NodePath("../GraphNode38")
 
 [node name="@StaticBody3D@29740" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.970985, -0.20872824, 18.937504)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_5")
-NodeB = NodePath("../Node_23")
-NodeC = NodePath("../Node_39")
+NodeA = NodePath("../GraphNode6")
+NodeB = NodePath("../GraphNode24")
+NodeC = NodePath("../GraphNode40")
 
 [node name="@StaticBody3D@29743" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.922508, -0.4387493, 32.134533)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_5")
-NodeB = NodePath("../Node_37")
-NodeC = NodePath("../Node_67")
+NodeA = NodePath("../GraphNode6")
+NodeB = NodePath("../GraphNode38")
+NodeC = NodePath("../GraphNode68")
 
 [node name="@StaticBody3D@29746" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -15.211553, 0.6942571, 16.97125)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_5")
-NodeB = NodePath("../Node_39")
-NodeC = NodePath("../Node_22")
+NodeA = NodePath("../GraphNode6")
+NodeB = NodePath("../GraphNode40")
+NodeC = NodePath("../GraphNode23")
 
 [node name="@StaticBody3D@29749" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.853579, 0.92465717, 21.563028)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_5")
-NodeB = NodePath("../Node_22")
-NodeC = NodePath("../Node_30")
+NodeA = NodePath("../GraphNode6")
+NodeB = NodePath("../GraphNode23")
+NodeC = NodePath("../GraphNode31")
 
 [node name="@StaticBody3D@29752" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.916577, 0.35939124, 33.162518)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_5")
-NodeB = NodePath("../Node_67")
-NodeC = NodePath("../Node_88")
+NodeA = NodePath("../GraphNode6")
+NodeB = NodePath("../GraphNode68")
+NodeC = NodePath("../GraphNode89")
 
 [node name="@StaticBody3D@29755" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.735794, 0.2826067, -10.455047)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_6")
-NodeB = NodePath("../Node_34")
-NodeC = NodePath("../Node_25")
+NodeA = NodePath("../GraphNode7")
+NodeB = NodePath("../GraphNode35")
+NodeC = NodePath("../GraphNode26")
 
 [node name="@StaticBody3D@29758" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.26327, 0.6613839, -7.2864494)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_6")
-NodeB = NodePath("../Node_34")
-NodeC = NodePath("../Node_75")
+NodeA = NodePath("../GraphNode7")
+NodeB = NodePath("../GraphNode35")
+NodeC = NodePath("../GraphNode76")
 
 [node name="@StaticBody3D@29761" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.381153, 0.17698656, -4.786736)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_6")
-NodeB = NodePath("../Node_25")
-NodeC = NodePath("../Node_75")
+NodeA = NodePath("../GraphNode7")
+NodeB = NodePath("../GraphNode26")
+NodeC = NodePath("../GraphNode76")
 
 [node name="@StaticBody3D@29764" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.114, -0.17149277, -38.31172)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_7")
-NodeB = NodePath("../Node_21")
-NodeC = NodePath("../Node_80")
+NodeA = NodePath("../GraphNode8")
+NodeB = NodePath("../GraphNode22")
+NodeC = NodePath("../GraphNode81")
 
 [node name="@StaticBody3D@29767" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.2965705, -0.90276784, -36.559204)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_7")
-NodeB = NodePath("../Node_80")
-NodeC = NodePath("../Node_18")
+NodeA = NodePath("../GraphNode8")
+NodeB = NodePath("../GraphNode81")
+NodeC = NodePath("../GraphNode19")
 
 [node name="@StaticBody3D@29770" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.050125, -0.04440252, -38.914326)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_7")
-NodeB = NodePath("../Node_97")
-NodeC = NodePath("../Node_43")
+NodeA = NodePath("../GraphNode8")
+NodeB = NodePath("../GraphNode98")
+NodeC = NodePath("../GraphNode44")
 
 [node name="@StaticBody3D@29773" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7898772, -0.7483263, -37.251114)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_7")
-NodeB = NodePath("../Node_97")
-NodeC = NodePath("../Node_18")
+NodeA = NodePath("../GraphNode8")
+NodeB = NodePath("../GraphNode98")
+NodeC = NodePath("../GraphNode19")
 
 [node name="@StaticBody3D@29776" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.772193, -0.31622455, -39.945904)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_7")
-NodeB = NodePath("../Node_43")
-NodeC = NodePath("../Node_45")
+NodeA = NodePath("../GraphNode8")
+NodeB = NodePath("../GraphNode44")
+NodeC = NodePath("../GraphNode46")
 
 [node name="@StaticBody3D@29779" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.459482, -0.09761146, -21.362495)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_8")
-NodeB = NodePath("../Node_40")
-NodeC = NodePath("../Node_73")
+NodeA = NodePath("../GraphNode9")
+NodeB = NodePath("../GraphNode41")
+NodeC = NodePath("../GraphNode74")
 
 [node name="@StaticBody3D@29782" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.226746, 0.28902763, -24.5451)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_8")
-NodeB = NodePath("../Node_40")
-NodeC = NodePath("../Node_78")
+NodeA = NodePath("../GraphNode9")
+NodeB = NodePath("../GraphNode41")
+NodeC = NodePath("../GraphNode79")
 
 [node name="@StaticBody3D@29785" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.841364, -0.11074829, -17.603445)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_8")
-NodeB = NodePath("../Node_73")
-NodeC = NodePath("../Node_72")
+NodeA = NodePath("../GraphNode9")
+NodeB = NodePath("../GraphNode74")
+NodeC = NodePath("../GraphNode73")
 
 [node name="@StaticBody3D@29788" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.20485, 1.187419, -21.106844)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_8")
-NodeB = NodePath("../Node_78")
-NodeC = NodePath("../Node_86")
+NodeA = NodePath("../GraphNode9")
+NodeB = NodePath("../GraphNode79")
+NodeC = NodePath("../GraphNode87")
 
 [node name="@StaticBody3D@29791" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.932123, 0.50055903, -16.648611)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_8")
-NodeB = NodePath("../Node_72")
-NodeC = NodePath("../Node_86")
+NodeA = NodePath("../GraphNode9")
+NodeB = NodePath("../GraphNode73")
+NodeC = NodePath("../GraphNode87")
 
 [node name="@StaticBody3D@29794" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.96105, 0.6720564, 22.931465)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_9")
-NodeB = NodePath("../Node_63")
-NodeC = NodePath("../Node_15")
+NodeA = NodePath("../GraphNode10")
+NodeB = NodePath("../GraphNode64")
+NodeC = NodePath("../GraphNode16")
 
 [node name="@StaticBody3D@29797" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.74255, 0.14856644, 16.577446)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_9")
-NodeB = NodePath("../Node_85")
-NodeC = NodePath("../Node_84")
+NodeA = NodePath("../GraphNode10")
+NodeB = NodePath("../GraphNode86")
+NodeC = NodePath("../GraphNode85")
 
 [node name="@StaticBody3D@29800" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.78738, 0.06210174, 19.303284)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_9")
-NodeB = NodePath("../Node_15")
-NodeC = NodePath("../Node_47")
+NodeA = NodePath("../GraphNode10")
+NodeB = NodePath("../GraphNode16")
+NodeC = NodePath("../GraphNode48")
 
 [node name="@StaticBody3D@29803" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.81471, 0.1344615, 17.006285)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_9")
-NodeB = NodePath("../Node_47")
-NodeC = NodePath("../Node_84")
+NodeA = NodePath("../GraphNode10")
+NodeB = NodePath("../GraphNode48")
+NodeC = NodePath("../GraphNode85")
 
 [node name="@StaticBody3D@29806" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 10.146739, -0.8253868, 19.97531)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_10")
-NodeB = NodePath("../Node_16")
-NodeC = NodePath("../Node_51")
+NodeA = NodePath("../GraphNode11")
+NodeB = NodePath("../GraphNode17")
+NodeC = NodePath("../GraphNode52")
 
 [node name="@StaticBody3D@29809" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.739315, -0.9132461, 13.244952)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_10")
-NodeB = NodePath("../Node_16")
-NodeC = NodePath("../Node_77")
+NodeA = NodePath("../GraphNode11")
+NodeB = NodePath("../GraphNode17")
+NodeC = NodePath("../GraphNode78")
 
 [node name="@StaticBody3D@29812" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.442411, -0.079633795, 24.688917)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_10")
-NodeB = NodePath("../Node_51")
-NodeC = NodePath("../Node_17")
+NodeA = NodePath("../GraphNode11")
+NodeB = NodePath("../GraphNode52")
+NodeC = NodePath("../GraphNode18")
 
 [node name="@StaticBody3D@29815" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.608763, -0.40703526, 10.676419)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_10")
-NodeB = NodePath("../Node_77")
-NodeC = NodePath("../Node_92")
+NodeA = NodePath("../GraphNode11")
+NodeB = NodePath("../GraphNode78")
+NodeC = NodePath("../GraphNode93")
 
 [node name="@StaticBody3D@29818" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.764769, -0.36680475, 13.295283)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_10")
-NodeB = NodePath("../Node_92")
-NodeC = NodePath("../Node_85")
+NodeA = NodePath("../GraphNode11")
+NodeB = NodePath("../GraphNode93")
+NodeC = NodePath("../GraphNode86")
 
 [node name="@StaticBody3D@29821" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.80925, -0.73399734, -18.031012)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_11")
-NodeB = NodePath("../Node_73")
-NodeC = NodePath("../Node_13")
+NodeA = NodePath("../GraphNode12")
+NodeB = NodePath("../GraphNode74")
+NodeC = NodePath("../GraphNode14")
 
 [node name="@StaticBody3D@29824" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.139606, -0.15126325, -15.622266)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_11")
-NodeB = NodePath("../Node_73")
-NodeC = NodePath("../Node_41")
+NodeA = NodePath("../GraphNode12")
+NodeB = NodePath("../GraphNode74")
+NodeC = NodePath("../GraphNode42")
 
 [node name="@StaticBody3D@29827" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.55095, -0.96007496, -15.107114)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_11")
-NodeB = NodePath("../Node_13")
-NodeC = NodePath("../Node_69")
+NodeA = NodePath("../GraphNode12")
+NodeB = NodePath("../GraphNode14")
+NodeC = NodePath("../GraphNode70")
 
 [node name="@StaticBody3D@29830" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.256405, -0.2553227, -11.177392)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_11")
-NodeB = NodePath("../Node_69")
-NodeC = NodePath("../Node_53")
+NodeA = NodePath("../GraphNode12")
+NodeB = NodePath("../GraphNode70")
+NodeC = NodePath("../GraphNode54")
 
 [node name="@StaticBody3D@29833" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.254475, 0.19576342, -12.326844)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_11")
-NodeB = NodePath("../Node_41")
-NodeC = NodePath("../Node_53")
+NodeA = NodePath("../GraphNode12")
+NodeB = NodePath("../GraphNode42")
+NodeC = NodePath("../GraphNode54")
 
 [node name="@StaticBody3D@29836" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.54976, -0.09918785, 10.247064)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_12")
-NodeB = NodePath("../Node_92")
-NodeC = NodePath("../Node_85")
+NodeA = NodePath("../GraphNode13")
+NodeB = NodePath("../GraphNode93")
+NodeC = NodePath("../GraphNode86")
 
 [node name="@StaticBody3D@29839" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.553019, 0.4101019, 5.8150177)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_12")
-NodeB = NodePath("../Node_92")
-NodeC = NodePath("../Node_82")
+NodeA = NodePath("../GraphNode13")
+NodeB = NodePath("../GraphNode93")
+NodeC = NodePath("../GraphNode83")
 
 [node name="@StaticBody3D@29842" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.896027, -0.26182678, 12.7412615)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_12")
-NodeB = NodePath("../Node_85")
-NodeC = NodePath("../Node_84")
+NodeA = NodePath("../GraphNode13")
+NodeB = NodePath("../GraphNode86")
+NodeC = NodePath("../GraphNode85")
 
 [node name="@StaticBody3D@29845" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.12913, -0.009086132, 4.3891053)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_12")
-NodeB = NodePath("../Node_26")
-NodeC = NodePath("../Node_82")
+NodeA = NodePath("../GraphNode13")
+NodeB = NodePath("../GraphNode27")
+NodeC = NodePath("../GraphNode83")
 
 [node name="@StaticBody3D@29848" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.52077, -0.09340215, 7.189775)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_12")
-NodeB = NodePath("../Node_26")
-NodeC = NodePath("../Node_14")
+NodeA = NodePath("../GraphNode13")
+NodeB = NodePath("../GraphNode27")
+NodeC = NodePath("../GraphNode15")
 
 [node name="@StaticBody3D@29851" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.290928, 0.16314693, 11.109886)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_12")
-NodeB = NodePath("../Node_84")
-NodeC = NodePath("../Node_14")
+NodeA = NodePath("../GraphNode13")
+NodeB = NodePath("../GraphNode85")
+NodeC = NodePath("../GraphNode15")
 
 [node name="@StaticBody3D@29854" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.28644, -1.0387312, -21.106703)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_13")
-NodeB = NodePath("../Node_73")
-NodeC = NodePath("../Node_40")
+NodeA = NodePath("../GraphNode14")
+NodeB = NodePath("../GraphNode74")
+NodeC = NodePath("../GraphNode41")
 
 [node name="@StaticBody3D@29857" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.18315, -0.417582, -25.686155)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_13")
-NodeB = NodePath("../Node_40")
-NodeC = NodePath("../Node_57")
+NodeA = NodePath("../GraphNode14")
+NodeB = NodePath("../GraphNode41")
+NodeC = NodePath("../GraphNode58")
 
 [node name="@StaticBody3D@29860" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.171726, -1.0447048, -9.725339)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_13")
-NodeB = NodePath("../Node_69")
-NodeC = NodePath("../Node_32")
+NodeA = NodePath("../GraphNode14")
+NodeB = NodePath("../GraphNode70")
+NodeC = NodePath("../GraphNode33")
 
 [node name="@StaticBody3D@29863" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.363308, 0.059657454, 13.720891)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_14")
-NodeB = NodePath("../Node_84")
-NodeC = NodePath("../Node_47")
+NodeA = NodePath("../GraphNode15")
+NodeB = NodePath("../GraphNode85")
+NodeC = NodePath("../GraphNode48")
 
 [node name="@StaticBody3D@29866" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.202698, 0.047626633, 4.8098097)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_14")
-NodeB = NodePath("../Node_26")
-NodeC = NodePath("../Node_75")
+NodeA = NodePath("../GraphNode15")
+NodeB = NodePath("../GraphNode27")
+NodeC = NodePath("../GraphNode76")
 
 [node name="@StaticBody3D@29869" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.509876, 0.19245441, 9.355274)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_14")
-NodeB = NodePath("../Node_75")
-NodeC = NodePath("../Node_47")
+NodeA = NodePath("../GraphNode15")
+NodeB = NodePath("../GraphNode76")
+NodeC = NodePath("../GraphNode48")
 
 [node name="@StaticBody3D@29872" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 38.84349, -0.2607524, 20.935228)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_15")
-NodeB = NodePath("../Node_47")
-NodeC = NodePath("../Node_87")
+NodeA = NodePath("../GraphNode16")
+NodeB = NodePath("../GraphNode48")
+NodeC = NodePath("../GraphNode88")
 
 [node name="@StaticBody3D@29875" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.017155, 0.3492022, 24.563408)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_15")
-NodeB = NodePath("../Node_87")
-NodeC = NodePath("../Node_63")
+NodeA = NodePath("../GraphNode16")
+NodeB = NodePath("../GraphNode88")
+NodeC = NodePath("../GraphNode64")
 
 [node name="@StaticBody3D@29878" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -3.9927654, 0.12916373, 13.1564665)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_16")
-NodeB = NodePath("../Node_20")
-NodeC = NodePath("../Node_22")
+NodeA = NodePath("../GraphNode17")
+NodeB = NodePath("../GraphNode21")
+NodeC = NodePath("../GraphNode23")
 
 [node name="@StaticBody3D@29881" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.008524339, -0.002512892, 8.503206)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_16")
-NodeB = NodePath("../Node_20")
-NodeC = NodePath("../Node_66")
+NodeA = NodePath("../GraphNode17")
+NodeB = NodePath("../GraphNode21")
+NodeC = NodePath("../GraphNode67")
 
 [node name="@StaticBody3D@29884" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.6819534, 0.11953028, 17.805456)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_16")
-NodeB = NodePath("../Node_22")
-NodeC = NodePath("../Node_30")
+NodeA = NodePath("../GraphNode17")
+NodeB = NodePath("../GraphNode23")
+NodeC = NodePath("../GraphNode31")
 
 [node name="@StaticBody3D@29887" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.7313516, -0.40079156, 21.594587)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_16")
-NodeB = NodePath("../Node_30")
-NodeC = NodePath("../Node_51")
+NodeA = NodePath("../GraphNode17")
+NodeB = NodePath("../GraphNode31")
+NodeC = NodePath("../GraphNode52")
 
 [node name="@StaticBody3D@29890" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.363933, -0.29873982, 8.048007)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_16")
-NodeB = NodePath("../Node_77")
-NodeC = NodePath("../Node_66")
+NodeA = NodePath("../GraphNode17")
+NodeB = NodePath("../GraphNode78")
+NodeC = NodePath("../GraphNode67")
 
 [node name="@StaticBody3D@29893" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 14.362643, 0.48355374, 30.738272)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_17")
-NodeB = NodePath("../Node_51")
-NodeC = NodePath("../Node_91")
+NodeA = NodePath("../GraphNode18")
+NodeB = NodePath("../GraphNode52")
+NodeC = NodePath("../GraphNode92")
 
 [node name="@StaticBody3D@29896" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.765833, 0.29411376, 32.872936)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_17")
-NodeB = NodePath("../Node_91")
-NodeC = NodePath("../Node_74")
+NodeA = NodePath("../GraphNode18")
+NodeB = NodePath("../GraphNode92")
+NodeC = NodePath("../GraphNode75")
 
 [node name="@StaticBody3D@29899" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.876642, 0.5050083, 30.014551)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_17")
-NodeB = NodePath("../Node_74")
-NodeC = NodePath("../Node_63")
+NodeA = NodePath("../GraphNode18")
+NodeB = NodePath("../GraphNode75")
+NodeC = NodePath("../GraphNode64")
 
 [node name="@StaticBody3D@29902" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.1788306, -0.16178848, -32.175392)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_18")
-NodeB = NodePath("../Node_24")
-NodeC = NodePath("../Node_80")
+NodeA = NodePath("../GraphNode19")
+NodeB = NodePath("../GraphNode25")
+NodeC = NodePath("../GraphNode81")
 
 [node name="@StaticBody3D@29905" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.95457387, -0.45353875, -28.101812)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_18")
-NodeB = NodePath("../Node_24")
-NodeC = NodePath("../Node_60")
+NodeA = NodePath("../GraphNode19")
+NodeB = NodePath("../GraphNode25")
+NodeC = NodePath("../GraphNode61")
 
 [node name="@StaticBody3D@29908" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.06825, -0.689648, 5.1997447)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_19")
-NodeB = NodePath("../Node_98")
-NodeC = NodePath("../Node_32")
+NodeA = NodePath("../GraphNode20")
+NodeB = NodePath("../GraphNode99")
+NodeC = NodePath("../GraphNode33")
 
 [node name="@StaticBody3D@29911" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.26657, -0.062112253, 9.572196)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_19")
-NodeB = NodePath("../Node_98")
-NodeC = NodePath("../Node_64")
+NodeA = NodePath("../GraphNode20")
+NodeB = NodePath("../GraphNode99")
+NodeC = NodePath("../GraphNode65")
 
 [node name="@StaticBody3D@29914" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -38.079235, -0.7910297, 1.6101098)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_19")
-NodeB = NodePath("../Node_32")
-NodeC = NodePath("../Node_58")
+NodeA = NodePath("../GraphNode20")
+NodeB = NodePath("../GraphNode33")
+NodeC = NodePath("../GraphNode59")
 
 [node name="@StaticBody3D@29917" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.856634, -0.17399569, 9.362559)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_19")
-NodeB = NodePath("../Node_64")
-NodeC = NodePath("../Node_39")
+NodeA = NodePath("../GraphNode20")
+NodeB = NodePath("../GraphNode65")
+NodeC = NodePath("../GraphNode40")
 
 [node name="@StaticBody3D@29920" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.250257, -0.3557326, 4.9906926)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_19")
-NodeB = NodePath("../Node_39")
-NodeC = NodePath("../Node_81")
+NodeA = NodePath("../GraphNode20")
+NodeB = NodePath("../GraphNode40")
+NodeC = NodePath("../GraphNode82")
 
 [node name="@StaticBody3D@29923" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.671177, -0.3452309, 1.6106948)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_19")
-NodeB = NodePath("../Node_58")
-NodeC = NodePath("../Node_81")
+NodeA = NodePath("../GraphNode20")
+NodeB = NodePath("../GraphNode59")
+NodeC = NodePath("../GraphNode82")
 
 [node name="@StaticBody3D@29926" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -5.2510996, 0.4359776, 2.5119505)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_20")
-NodeB = NodePath("../Node_59")
-NodeC = NodePath("../Node_66")
+NodeA = NodePath("../GraphNode21")
+NodeB = NodePath("../GraphNode60")
+NodeC = NodePath("../GraphNode67")
 
 [node name="@StaticBody3D@29929" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.649078, 0.015666595, 4.7363944)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_20")
-NodeB = NodePath("../Node_59")
-NodeC = NodePath("../Node_39")
+NodeA = NodePath("../GraphNode21")
+NodeB = NodePath("../GraphNode60")
+NodeC = NodePath("../GraphNode40")
 
 [node name="@StaticBody3D@29932" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -12.870766, 0.39108202, 11.172199)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_20")
-NodeB = NodePath("../Node_22")
-NodeC = NodePath("../Node_39")
+NodeA = NodePath("../GraphNode21")
+NodeB = NodePath("../GraphNode23")
+NodeC = NodePath("../GraphNode40")
 
 [node name="@StaticBody3D@29935" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.010994, 0.71100354, -35.27843)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_21")
-NodeB = NodePath("../Node_57")
-NodeC = NodePath("../Node_99")
+NodeA = NodePath("../GraphNode22")
+NodeB = NodePath("../GraphNode58")
+NodeC = NodePath("../GraphNode100")
 
 [node name="@StaticBody3D@29938" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.776314, 0.0034709375, -36.543396)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_21")
-NodeB = NodePath("../Node_99")
-NodeC = NodePath("../Node_44")
+NodeA = NodePath("../GraphNode22")
+NodeB = NodePath("../GraphNode100")
+NodeC = NodePath("../GraphNode45")
 
 [node name="@StaticBody3D@29941" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.447189, 0.064327545, -36.700817)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_21")
-NodeB = NodePath("../Node_44")
-NodeC = NodePath("../Node_80")
+NodeA = NodePath("../GraphNode22")
+NodeB = NodePath("../GraphNode45")
+NodeC = NodePath("../GraphNode81")
 
 [node name="@StaticBody3D@29944" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.281836, -0.18904185, 14.6123)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_23")
-NodeB = NodePath("../Node_39")
-NodeC = NodePath("../Node_64")
+NodeA = NodePath("../GraphNode24")
+NodeB = NodePath("../GraphNode40")
+NodeC = NodePath("../GraphNode65")
 
 [node name="@StaticBody3D@29947" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -33.01693, 0.0412488, 17.844133)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_23")
-NodeB = NodePath("../Node_64")
-NodeC = NodePath("../Node_90")
+NodeA = NodePath("../GraphNode24")
+NodeB = NodePath("../GraphNode65")
+NodeC = NodePath("../GraphNode91")
 
 [node name="@StaticBody3D@29950" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -8.520581, 0.4561707, -31.061884)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_24")
-NodeB = NodePath("../Node_61")
-NodeC = NodePath("../Node_80")
+NodeA = NodePath("../GraphNode25")
+NodeB = NodePath("../GraphNode62")
+NodeC = NodePath("../GraphNode81")
 
 [node name="@StaticBody3D@29953" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.5411825, 0.63408446, -26.548292)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_24")
-NodeB = NodePath("../Node_61")
-NodeC = NodePath("../Node_38")
+NodeA = NodePath("../GraphNode25")
+NodeB = NodePath("../GraphNode62")
+NodeC = NodePath("../GraphNode39")
 
 [node name="@StaticBody3D@29956" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.473679, 0.41508982, -23.433685)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_24")
-NodeB = NodePath("../Node_28")
-NodeC = NodePath("../Node_52")
+NodeA = NodePath("../GraphNode25")
+NodeB = NodePath("../GraphNode29")
+NodeC = NodePath("../GraphNode53")
 
 [node name="@StaticBody3D@29959" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.517628, 0.09657657, -23.514921)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_24")
-NodeB = NodePath("../Node_28")
-NodeC = NodePath("../Node_60")
+NodeA = NodePath("../GraphNode25")
+NodeB = NodePath("../GraphNode29")
+NodeC = NodePath("../GraphNode61")
 
 [node name="@StaticBody3D@29962" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -7.762486, 0.5662406, -23.074907)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_24")
-NodeB = NodePath("../Node_28")
-NodeC = NodePath("../Node_38")
+NodeA = NodePath("../GraphNode25")
+NodeB = NodePath("../GraphNode29")
+NodeC = NodePath("../GraphNode39")
 
 [node name="@StaticBody3D@29965" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.7979828, -0.10810981, -24.574766)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_24")
-NodeB = NodePath("../Node_52")
-NodeC = NodePath("../Node_60")
+NodeA = NodePath("../GraphNode25")
+NodeB = NodePath("../GraphNode53")
+NodeC = NodePath("../GraphNode61")
 
 [node name="@StaticBody3D@29968" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.53103, 0.09545054, -13.568406)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_25")
-NodeB = NodePath("../Node_34")
-NodeC = NodePath("../Node_33")
+NodeA = NodePath("../GraphNode26")
+NodeB = NodePath("../GraphNode35")
+NodeC = NodePath("../GraphNode34")
 
 [node name="@StaticBody3D@29971" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 36.233383, -0.03074477, -7.4033623)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_25")
-NodeB = NodePath("../Node_34")
-NodeC = NodePath("../Node_75")
+NodeA = NodePath("../GraphNode26")
+NodeB = NodePath("../GraphNode35")
+NodeC = NodePath("../GraphNode76")
 
 [node name="@StaticBody3D@29974" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 26.856318, -0.4486792, -9.88467)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_25")
-NodeB = NodePath("../Node_33")
-NodeC = NodePath("../Node_76")
+NodeA = NodePath("../GraphNode26")
+NodeB = NodePath("../GraphNode34")
+NodeC = NodePath("../GraphNode77")
 
 [node name="@StaticBody3D@29977" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.880228, -0.2959981, -3.5895367)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_25")
-NodeB = NodePath("../Node_76")
-NodeC = NodePath("../Node_82")
+NodeA = NodePath("../GraphNode26")
+NodeB = NodePath("../GraphNode77")
+NodeC = NodePath("../GraphNode83")
 
 [node name="@StaticBody3D@29980" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.283573, -0.24683459, -1.1594571)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_25")
-NodeB = NodePath("../Node_82")
-NodeC = NodePath("../Node_26")
+NodeA = NodePath("../GraphNode26")
+NodeB = NodePath("../GraphNode83")
+NodeC = NodePath("../GraphNode27")
 
 [node name="@StaticBody3D@29983" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.96202, -0.525711, -1.289546)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_25")
-NodeB = NodePath("../Node_75")
-NodeC = NodePath("../Node_26")
+NodeA = NodePath("../GraphNode26")
+NodeB = NodePath("../GraphNode76")
+NodeC = NodePath("../GraphNode27")
 
 [node name="@StaticBody3D@29986" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.910162, 0.33850285, -27.554415)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_27")
-NodeB = NodePath("../Node_31")
-NodeC = NodePath("../Node_71")
+NodeA = NodePath("../GraphNode28")
+NodeB = NodePath("../GraphNode32")
+NodeC = NodePath("../GraphNode72")
 
 [node name="@StaticBody3D@29989" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.539392, 0.5626401, -23.06338)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_27")
-NodeB = NodePath("../Node_31")
-NodeC = NodePath("../Node_33")
+NodeA = NodePath("../GraphNode28")
+NodeB = NodePath("../GraphNode32")
+NodeC = NodePath("../GraphNode34")
 
 [node name="@StaticBody3D@29992" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.498234, -0.18998508, -27.010782)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_27")
-NodeB = NodePath("../Node_71")
-NodeC = NodePath("../Node_35")
+NodeA = NodePath("../GraphNode28")
+NodeB = NodePath("../GraphNode72")
+NodeC = NodePath("../GraphNode36")
 
 [node name="@StaticBody3D@29995" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 30.729837, 0.8792939, -20.164194)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_27")
-NodeB = NodePath("../Node_33")
-NodeC = NodePath("../Node_62")
+NodeA = NodePath("../GraphNode28")
+NodeB = NodePath("../GraphNode34")
+NodeC = NodePath("../GraphNode63")
 
 [node name="@StaticBody3D@29998" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.798477, -0.3354474, -24.583979)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_27")
-NodeB = NodePath("../Node_35")
-NodeC = NodePath("../Node_29")
+NodeA = NodePath("../GraphNode28")
+NodeB = NodePath("../GraphNode36")
+NodeC = NodePath("../GraphNode30")
 
 [node name="@StaticBody3D@30001" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 33.400852, 0.50969434, -22.228426)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_27")
-NodeB = NodePath("../Node_29")
-NodeC = NodePath("../Node_62")
+NodeA = NodePath("../GraphNode28")
+NodeB = NodePath("../GraphNode30")
+NodeC = NodePath("../GraphNode63")
 
 [node name="@StaticBody3D@30004" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.69581, -0.22942437, -22.159925)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_28")
-NodeB = NodePath("../Node_52")
-NodeC = NodePath("../Node_60")
+NodeA = NodePath("../GraphNode29")
+NodeB = NodePath("../GraphNode53")
+NodeC = NodePath("../GraphNode61")
 
 [node name="@StaticBody3D@30007" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.331047, 0.39969054, -18.727045)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_28")
-NodeB = NodePath("../Node_49")
-NodeC = NodePath("../Node_38")
+NodeA = NodePath("../GraphNode29")
+NodeB = NodePath("../GraphNode50")
+NodeC = NodePath("../GraphNode39")
 
 [node name="@StaticBody3D@30010" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -4.38348, -0.013061623, -15.076711)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_28")
-NodeB = NodePath("../Node_49")
-NodeC = NodePath("../Node_55")
+NodeA = NodePath("../GraphNode29")
+NodeB = NodePath("../GraphNode50")
+NodeC = NodePath("../GraphNode56")
 
 [node name="@StaticBody3D@30013" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.03705001, -0.49102578, -18.150812)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_28")
-NodeB = NodePath("../Node_55")
-NodeC = NodePath("../Node_60")
+NodeA = NodePath("../GraphNode29")
+NodeB = NodePath("../GraphNode56")
+NodeC = NodePath("../GraphNode61")
 
 [node name="@StaticBody3D@30016" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.44041, -0.09526233, -23.444052)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_29")
-NodeB = NodePath("../Node_35")
-NodeC = NodePath("../Node_48")
+NodeA = NodePath("../GraphNode30")
+NodeB = NodePath("../GraphNode36")
+NodeC = NodePath("../GraphNode49")
 
 [node name="@StaticBody3D@30019" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.04278, 0.7498794, -21.088501)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_29")
-NodeB = NodePath("../Node_48")
-NodeC = NodePath("../Node_62")
+NodeA = NodePath("../GraphNode30")
+NodeB = NodePath("../GraphNode49")
+NodeC = NodePath("../GraphNode63")
 
 [node name="@StaticBody3D@30022" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.470566, 0.7725844, -27.948477)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_31")
-NodeB = NodePath("../Node_70")
-NodeC = NodePath("../Node_50")
+NodeA = NodePath("../GraphNode32")
+NodeB = NodePath("../GraphNode71")
+NodeC = NodePath("../GraphNode51")
 
 [node name="@StaticBody3D@30025" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.125914, 0.5194549, -22.128412)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_31")
-NodeB = NodePath("../Node_70")
-NodeC = NodePath("../Node_33")
+NodeA = NodePath("../GraphNode32")
+NodeB = NodePath("../GraphNode71")
+NodeC = NodePath("../GraphNode34")
 
 [node name="@StaticBody3D@30028" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.333357, 0.6922892, -32.42759)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_31")
-NodeB = NodePath("../Node_50")
-NodeC = NodePath("../Node_95")
+NodeA = NodePath("../GraphNode32")
+NodeB = NodePath("../GraphNode51")
+NodeC = NodePath("../GraphNode96")
 
 [node name="@StaticBody3D@30031" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 28.359472, 0.21502249, -31.098562)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_31")
-NodeB = NodePath("../Node_71")
-NodeC = NodePath("../Node_95")
+NodeA = NodePath("../GraphNode32")
+NodeB = NodePath("../GraphNode72")
+NodeC = NodePath("../GraphNode96")
 
 [node name="@StaticBody3D@30034" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.033314, -0.67881656, -3.5411794)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_32")
-NodeB = NodePath("../Node_69")
-NodeC = NodePath("../Node_58")
+NodeA = NodePath("../GraphNode33")
+NodeB = NodePath("../GraphNode70")
+NodeC = NodePath("../GraphNode59")
 
 [node name="@StaticBody3D@30037" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -40.11808, 0.1843961, 7.8747754)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_32")
-NodeB = NodePath("../Node_54")
-NodeC = NodePath("../Node_98")
+NodeA = NodePath("../GraphNode33")
+NodeB = NodePath("../GraphNode55")
+NodeC = NodePath("../GraphNode99")
 
 [node name="@StaticBody3D@30040" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 20.629913, 0.060178477, -14.44527)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_33")
-NodeB = NodePath("../Node_70")
-NodeC = NodePath("../Node_76")
+NodeA = NodePath("../GraphNode34")
+NodeB = NodePath("../GraphNode71")
+NodeC = NodePath("../GraphNode77")
 
 [node name="@StaticBody3D@30043" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.42488, 0.81164837, -17.168343)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_33")
-NodeB = NodePath("../Node_34")
-NodeC = NodePath("../Node_62")
+NodeA = NodePath("../GraphNode34")
+NodeB = NodePath("../GraphNode35")
+NodeC = NodePath("../GraphNode63")
 
 [node name="@StaticBody3D@30046" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 35.42877, 1.0989038, -18.527536)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_34")
-NodeB = NodePath("../Node_62")
-NodeC = NodePath("../Node_48")
+NodeA = NodePath("../GraphNode35")
+NodeB = NodePath("../GraphNode63")
+NodeC = NodePath("../GraphNode49")
 
 [node name="@StaticBody3D@30049" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 37.06239, 0.76148325, -11.759003)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_34")
-NodeB = NodePath("../Node_48")
-NodeC = NodePath("../Node_75")
+NodeA = NodePath("../GraphNode35")
+NodeB = NodePath("../GraphNode49")
+NodeC = NodePath("../GraphNode76")
 
 [node name="@StaticBody3D@30052" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.51074, -0.7410068, -30.072104)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_35")
-NodeB = NodePath("../Node_71")
-NodeC = NodePath("../Node_96")
+NodeA = NodePath("../GraphNode36")
+NodeB = NodePath("../GraphNode72")
+NodeC = NodePath("../GraphNode97")
 
 [node name="@StaticBody3D@30055" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -28.191996, 0.15219903, -10.76012)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_36")
-NodeB = NodePath("../Node_41")
-NodeC = NodePath("../Node_72")
+NodeA = NodePath("../GraphNode37")
+NodeB = NodePath("../GraphNode42")
+NodeC = NodePath("../GraphNode73")
 
 [node name="@StaticBody3D@30058" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.812326, 0.7994466, -8.740325)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_36")
-NodeB = NodePath("../Node_41")
-NodeC = NodePath("../Node_53")
+NodeA = NodePath("../GraphNode37")
+NodeB = NodePath("../GraphNode42")
+NodeC = NodePath("../GraphNode54")
 
 [node name="@StaticBody3D@30061" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.542978, 0.5384978, -11.579732)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_36")
-NodeB = NodePath("../Node_72")
-NodeC = NodePath("../Node_86")
+NodeA = NodePath("../GraphNode37")
+NodeB = NodePath("../GraphNode73")
+NodeC = NodePath("../GraphNode87")
 
 [node name="@StaticBody3D@30064" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -19.280146, 1.0129517, -7.932491)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_36")
-NodeB = NodePath("../Node_86")
-NodeC = NodePath("../Node_59")
+NodeA = NodePath("../GraphNode37")
+NodeB = NodePath("../GraphNode87")
+NodeC = NodePath("../GraphNode60")
 
 [node name="@StaticBody3D@30067" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -30.920729, 0.953257, -4.5401435)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_36")
-NodeB = NodePath("../Node_53")
-NodeC = NodePath("../Node_81")
+NodeA = NodePath("../GraphNode37")
+NodeB = NodePath("../GraphNode54")
+NodeC = NodePath("../GraphNode82")
 
 [node name="@StaticBody3D@30070" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -26.655943, 0.6038911, 1.0942922)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_36")
-NodeB = NodePath("../Node_81")
-NodeC = NodePath("../Node_39")
+NodeA = NodePath("../GraphNode37")
+NodeB = NodePath("../GraphNode82")
+NodeC = NodePath("../GraphNode40")
 
 [node name="@StaticBody3D@30073" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.039469, 0.39930525, 0.04253483)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_36")
-NodeB = NodePath("../Node_59")
-NodeC = NodePath("../Node_39")
+NodeA = NodePath("../GraphNode37")
+NodeB = NodePath("../GraphNode60")
+NodeC = NodePath("../GraphNode40")
 
 [node name="@StaticBody3D@30076" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.452219, -1.1903994, 35.84099)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_37")
-NodeB = NodePath("../Node_42")
-NodeC = NodePath("../Node_83")
+NodeA = NodePath("../GraphNode38")
+NodeB = NodePath("../GraphNode43")
+NodeC = NodePath("../GraphNode84")
 
 [node name="@StaticBody3D@30079" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.429472, -0.5735503, 37.153183)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_37")
-NodeB = NodePath("../Node_83")
-NodeC = NodePath("../Node_68")
+NodeA = NodePath("../GraphNode38")
+NodeB = NodePath("../GraphNode84")
+NodeC = NodePath("../GraphNode69")
 
 [node name="@StaticBody3D@30082" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.6453, -0.65231633, 36.583225)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_37")
-NodeB = NodePath("../Node_68")
-NodeC = NodePath("../Node_67")
+NodeA = NodePath("../GraphNode38")
+NodeB = NodePath("../GraphNode69")
+NodeC = NodePath("../GraphNode68")
 
 [node name="@StaticBody3D@30085" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.097347, 0.60194796, -26.659384)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_38")
-NodeB = NodePath("../Node_78")
-NodeC = NodePath("../Node_61")
+NodeA = NodePath("../GraphNode39")
+NodeB = NodePath("../GraphNode79")
+NodeC = NodePath("../GraphNode62")
 
 [node name="@StaticBody3D@30088" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.300484, 0.8479503, -21.574493)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_38")
-NodeB = NodePath("../Node_78")
-NodeC = NodePath("../Node_86")
+NodeA = NodePath("../GraphNode39")
+NodeB = NodePath("../GraphNode79")
+NodeC = NodePath("../GraphNode87")
 
 [node name="@StaticBody3D@30091" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -14.312881, 0.7135368, -17.11554)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_38")
-NodeB = NodePath("../Node_86")
-NodeC = NodePath("../Node_49")
+NodeA = NodePath("../GraphNode39")
+NodeB = NodePath("../GraphNode87")
+NodeC = NodePath("../GraphNode50")
 
 [node name="@StaticBody3D@30094" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.540998, 0.32678267, -28.23446)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_40")
-NodeB = NodePath("../Node_57")
-NodeC = NodePath("../Node_78")
+NodeA = NodePath("../GraphNode41")
+NodeB = NodePath("../GraphNode58")
+NodeC = NodePath("../GraphNode79")
 
 [node name="@StaticBody3D@30097" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -29.998686, -0.46913394, -14.938907)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_41")
-NodeB = NodePath("../Node_73")
-NodeC = NodePath("../Node_72")
+NodeA = NodePath("../GraphNode42")
+NodeB = NodePath("../GraphNode74")
+NodeC = NodePath("../GraphNode73")
 
 [node name="@StaticBody3D@30100" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.180273, -0.08851078, -32.729916)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_44")
-NodeB = NodePath("../Node_78")
-NodeC = NodePath("../Node_99")
+NodeA = NodePath("../GraphNode45")
+NodeB = NodePath("../GraphNode79")
+NodeC = NodePath("../GraphNode100")
 
 [node name="@StaticBody3D@30103" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.081285, 0.27163908, -31.146057)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_44")
-NodeB = NodePath("../Node_78")
-NodeC = NodePath("../Node_61")
+NodeA = NodePath("../GraphNode45")
+NodeB = NodePath("../GraphNode79")
+NodeC = NodePath("../GraphNode62")
 
 [node name="@StaticBody3D@30106" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.971509, -0.048988294, -33.83479)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_44")
-NodeB = NodePath("../Node_61")
-NodeC = NodePath("../Node_80")
+NodeA = NodePath("../GraphNode45")
+NodeB = NodePath("../GraphNode62")
+NodeC = NodePath("../GraphNode81")
 
 [node name="@StaticBody3D@30109" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.8501, -0.18826707, -37.863865)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_45")
-NodeB = NodePath("../Node_50")
-NodeC = NodePath("../Node_89")
+NodeA = NodePath("../GraphNode46")
+NodeB = NodePath("../GraphNode51")
+NodeC = NodePath("../GraphNode90")
 
 [node name="@StaticBody3D@30112" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 2.1309586, 0.047168452, 36.72081)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_46")
-NodeB = NodePath("../Node_93")
-NodeC = NodePath("../Node_79")
+NodeA = NodePath("../GraphNode47")
+NodeB = NodePath("../GraphNode94")
+NodeC = NodePath("../GraphNode80")
 
 [node name="@StaticBody3D@30115" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.8452513, -0.04031247, 38.15572)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_46")
-NodeB = NodePath("../Node_93")
-NodeC = NodePath("../Node_65")
+NodeA = NodePath("../GraphNode47")
+NodeB = NodePath("../GraphNode94")
+NodeC = NodePath("../GraphNode66")
 
 [node name="@StaticBody3D@30118" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.5930557, 0.51240087, 36.969883)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_46")
-NodeB = NodePath("../Node_79")
-NodeC = NodePath("../Node_91")
+NodeA = NodePath("../GraphNode47")
+NodeB = NodePath("../GraphNode80")
+NodeC = NodePath("../GraphNode92")
 
 [node name="@StaticBody3D@30121" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.802485, 0.36633655, 36.114883)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_46")
-NodeB = NodePath("../Node_91")
-NodeC = NodePath("../Node_74")
+NodeA = NodePath("../GraphNode47")
+NodeB = NodePath("../GraphNode92")
+NodeC = NodePath("../GraphNode75")
 
 [node name="@StaticBody3D@30124" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -13.866498, 0.64384437, -10.834928)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_49")
-NodeB = NodePath("../Node_59")
-NodeC = NodePath("../Node_86")
+NodeA = NodePath("../GraphNode50")
+NodeB = NodePath("../GraphNode60")
+NodeC = NodePath("../GraphNode87")
 
 [node name="@StaticBody3D@30127" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.5062594, -0.13628964, -9.497169)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_49")
-NodeB = NodePath("../Node_59")
-NodeC = NodePath("../Node_55")
+NodeA = NodePath("../GraphNode50")
+NodeB = NodePath("../GraphNode60")
+NodeC = NodePath("../GraphNode56")
 
 [node name="@StaticBody3D@30130" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 23.19818, 0.12499833, -36.00317)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_50")
-NodeB = NodePath("../Node_89")
-NodeC = NodePath("../Node_95")
+NodeA = NodePath("../GraphNode51")
+NodeB = NodePath("../GraphNode90")
+NodeC = NodePath("../GraphNode96")
 
 [node name="@StaticBody3D@30133" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 3.7306278, -0.47722328, 32.998936)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_51")
-NodeB = NodePath("../Node_93")
-NodeC = NodePath("../Node_79")
+NodeA = NodePath("../GraphNode52")
+NodeB = NodePath("../GraphNode94")
+NodeC = NodePath("../GraphNode80")
 
 [node name="@StaticBody3D@30136" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.192725, -0.011990885, 33.248005)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_51")
-NodeB = NodePath("../Node_79")
-NodeC = NodePath("../Node_91")
+NodeA = NodePath("../GraphNode52")
+NodeB = NodePath("../GraphNode80")
+NodeC = NodePath("../GraphNode92")
 
 [node name="@StaticBody3D@30139" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.891945, -0.26480994, -6.2197976)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_53")
-NodeB = NodePath("../Node_69")
-NodeC = NodePath("../Node_58")
+NodeA = NodePath("../GraphNode54")
+NodeB = NodePath("../GraphNode70")
+NodeC = NodePath("../GraphNode59")
 
 [node name="@StaticBody3D@30142" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.99842, 0.34008658, -3.1690683)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_53")
-NodeB = NodePath("../Node_58")
-NodeC = NodePath("../Node_81")
+NodeA = NodePath("../GraphNode54")
+NodeB = NodePath("../GraphNode59")
+NodeC = NodePath("../GraphNode82")
 
 [node name="@StaticBody3D@30145" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -37.316402, 0.81193185, 12.247228)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_54")
-NodeB = NodePath("../Node_98")
-NodeC = NodePath("../Node_64")
+NodeA = NodePath("../GraphNode55")
+NodeB = NodePath("../GraphNode99")
+NodeC = NodePath("../GraphNode65")
 
 [node name="@StaticBody3D@30148" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.64156, 0.93033904, 15.269424)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_54")
-NodeB = NodePath("../Node_64")
-NodeC = NodePath("../Node_90")
+NodeA = NodePath("../GraphNode55")
+NodeB = NodePath("../GraphNode65")
+NodeC = NodePath("../GraphNode91")
 
 [node name="@StaticBody3D@30151" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -2.1787016, 0.029456615, -4.068101)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_55")
-NodeB = NodePath("../Node_59")
-NodeC = NodePath("../Node_66")
+NodeA = NodePath("../GraphNode56")
+NodeB = NodePath("../GraphNode60")
+NodeC = NodePath("../GraphNode67")
 
 [node name="@StaticBody3D@30154" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.7081923, -0.44629502, -18.74916)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_55")
-NodeB = NodePath("../Node_60")
-NodeC = NodePath("../Node_70")
+NodeA = NodePath("../GraphNode56")
+NodeB = NodePath("../GraphNode61")
+NodeC = NodePath("../GraphNode71")
 
 [node name="@StaticBody3D@30157" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.211551, -0.44695482, -12.461806)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_55")
-NodeB = NodePath("../Node_70")
-NodeC = NodePath("../Node_76")
+NodeA = NodePath("../GraphNode56")
+NodeB = NodePath("../GraphNode71")
+NodeC = NodePath("../GraphNode77")
 
 [node name="@StaticBody3D@30160" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 8.123132, -0.3711747, -4.501369)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_55")
-NodeB = NodePath("../Node_66")
-NodeC = NodePath("../Node_76")
+NodeA = NodePath("../GraphNode56")
+NodeB = NodePath("../GraphNode67")
+NodeC = NodePath("../GraphNode77")
 
 [node name="@StaticBody3D@30163" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -9.910617, 0.04012688, 38.67216)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_56")
-NodeB = NodePath("../Node_65")
-NodeC = NodePath("../Node_88")
+NodeA = NodePath("../GraphNode57")
+NodeB = NodePath("../GraphNode66")
+NodeC = NodePath("../GraphNode89")
 
 [node name="@StaticBody3D@30166" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -11.917854, -0.1372828, 37.615734)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_56")
-NodeB = NodePath("../Node_88")
-NodeC = NodePath("../Node_67")
+NodeA = NodePath("../GraphNode57")
+NodeB = NodePath("../GraphNode89")
+NodeC = NodePath("../GraphNode68")
 
 [node name="@StaticBody3D@30169" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -24.414955, 0.61902183, -31.46495)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_57")
-NodeB = NodePath("../Node_78")
-NodeC = NodePath("../Node_99")
+NodeA = NodePath("../GraphNode58")
+NodeB = NodePath("../GraphNode79")
+NodeC = NodePath("../GraphNode100")
 
 [node name="@StaticBody3D@30172" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 32.163956, 0.18213433, 28.70909)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_63")
-NodeB = NodePath("../Node_74")
-NodeC = NodePath("../Node_87")
+NodeA = NodePath("../GraphNode64")
+NodeB = NodePath("../GraphNode75")
+NodeC = NodePath("../GraphNode88")
 
 [node name="@StaticBody3D@30175" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.3842196, -0.10264776, 37.24988)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_65")
-NodeB = NodePath("../Node_88")
-NodeC = NodePath("../Node_93")
+NodeA = NodePath("../GraphNode66")
+NodeB = NodePath("../GraphNode89")
+NodeC = NodePath("../GraphNode94")
 
 [node name="@StaticBody3D@30178" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.406142, -0.2608806, 1.6234827)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_66")
-NodeB = NodePath("../Node_76")
-NodeC = NodePath("../Node_77")
+NodeA = NodePath("../GraphNode67")
+NodeB = NodePath("../GraphNode77")
+NodeC = NodePath("../GraphNode78")
 
 [node name="@StaticBody3D@30181" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -17.827963, -0.60906696, 39.42447)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_67")
-NodeB = NodePath("../Node_68")
-NodeC = NodePath("../Node_94")
+NodeA = NodePath("../GraphNode68")
+NodeB = NodePath("../GraphNode69")
+NodeC = NodePath("../GraphNode95")
 
 [node name="@StaticBody3D@30184" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -20.612135, -0.53030086, 39.994427)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_68")
-NodeB = NodePath("../Node_83")
-NodeC = NodePath("../Node_94")
+NodeA = NodePath("../GraphNode69")
+NodeB = NodePath("../GraphNode84")
+NodeC = NodePath("../GraphNode95")
 
 [node name="@StaticBody3D@30187" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 29.85565, -0.18350029, -33.15633)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_71")
-NodeB = NodePath("../Node_95")
-NodeC = NodePath("../Node_96")
+NodeA = NodePath("../GraphNode72")
+NodeB = NodePath("../GraphNode96")
+NodeC = NodePath("../GraphNode97")
 
 [node name="@StaticBody3D@30190" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 24.914877, 0.1126211, 1.4504795)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_76")
-NodeB = NodePath("../Node_82")
-NodeC = NodePath("../Node_92")
+NodeA = NodePath("../GraphNode77")
+NodeB = NodePath("../GraphNode83")
+NodeC = NodePath("../GraphNode93")
 
 [node name="@StaticBody3D@30193" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.75561, -0.4368992, 3.2636616)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_76")
-NodeB = NodePath("../Node_92")
-NodeC = NodePath("../Node_77")
+NodeA = NodePath("../GraphNode77")
+NodeB = NodePath("../GraphNode93")
+NodeC = NodePath("../GraphNode78")
 
 [node name="@StaticBody3D@30196" type="StaticBody3D" parent="Terrain" node_paths=PackedStringArray("NodeA", "NodeB", "NodeC")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 27.227987, -0.63208246, -35.743546)
 script = ExtResource("4_efxa6")
-NodeA = NodePath("../Node_89")
-NodeB = NodePath("../Node_95")
-NodeC = NodePath("../Node_96")
+NodeA = NodePath("../GraphNode90")
+NodeB = NodePath("../GraphNode96")
+NodeC = NodePath("../GraphNode97")
 
 [node name="Character" parent="." instance=ExtResource("2_0xm2m")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 5.33068, -3.6849785)

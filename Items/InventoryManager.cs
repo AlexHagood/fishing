@@ -15,7 +15,7 @@ public class ItemInstance
     public ItemDefinition ItemData { get; set; }
     public int CurrentStackSize { get; set; }
     public Vector2I GridPosition { get; set; }
-    public bool IsRotated { get; set; } = true;
+    public bool IsRotated { get; set; } = false;
 
     public Vector2I Size
     {
@@ -95,6 +95,7 @@ public partial class InventoryManager : Node
         {
             for (int y = 0; y < item.Size.Y; y++)
             {
+                GD.Print($"Dropping item {item.InstanceId} from inventory {inventoryId} at position {item.GridPosition.X + x}, {item.GridPosition.Y + y}");
                 Vector2I pos = new Vector2I(item.GridPosition.X + x, item.GridPosition.Y + y);
                 if (!inv.Grid.Remove(pos))
                 {
@@ -170,10 +171,10 @@ public partial class InventoryManager : Node
         return false;
     }
 
-    public int TryTransferItemPosition(int toInventoryId, ItemInstance item, Vector2I position)
+    public int TryTransferItemPosition(int toInventoryId, ItemInstance item, Vector2I position, bool rotateAgain)
     {
         Inventory targetInv = _Inventories[toInventoryId];
-        int spaceAvailable = CheckItemFits(toInventoryId, item.ItemData, position, item.IsRotated, item.InstanceId);
+        int spaceAvailable = CheckItemFits(toInventoryId, item.ItemData, position, item.IsRotated ^ rotateAgain, item.InstanceId);
         
         if (spaceAvailable > 0)
         {
@@ -202,6 +203,7 @@ public partial class InventoryManager : Node
                 DropItem(item.InventoryId, item);
                 item.InventoryId = toInventoryId;
                 item.GridPosition = position;
+                item.IsRotated = item.IsRotated ^ rotateAgain;
                 AddInstanceToInventory(item);
                 
                 return item.CurrentStackSize; // Successfully transferred
@@ -239,6 +241,23 @@ public partial class InventoryManager : Node
         return true; // Can rotate
     }
 
+    public bool RotateItem(ItemInstance item)
+    {
+        if (!CanRotateItem(item))
+            return false;
+
+        // Remove item from current grid positions
+        DropItem(item.InventoryId, item);
+
+        // Toggle rotation
+        item.IsRotated = !item.IsRotated;
+
+        // Add item back to inventory at new size
+        AddInstanceToInventory(item);
+
+        return true;
+    }
+
     private void AddInstanceToInventory(ItemInstance item)
     {
         Inventory inv = _Inventories[item.InventoryId];
@@ -254,13 +273,13 @@ public partial class InventoryManager : Node
             }
     }
 
-    public int TrySplitStack(int targetInventoryId, ItemInstance item, int splitCount, Vector2I targetPosition)
+    public int TrySplitStack(int targetInventoryId, ItemInstance item, int splitCount, Vector2I targetPosition, bool rotateAgain)
     {
         if (item.CurrentStackSize < splitCount)
             throw new InvalidOperationException($"Cannot split {splitCount} from stack of size {item.CurrentStackSize}");
 
         Inventory targetInv = _Inventories[targetInventoryId];
-        int spaceAvailable = CheckItemFits(targetInventoryId, item.ItemData, targetPosition, item.IsRotated);
+        int spaceAvailable = CheckItemFits(targetInventoryId, item.ItemData, targetPosition, item.IsRotated ^ rotateAgain);
         
         if (spaceAvailable >= splitCount)
         {
@@ -292,6 +311,7 @@ public partial class InventoryManager : Node
                     InstanceId = ItemCount,
                     ItemData = item.ItemData,
                     CurrentStackSize = splitCount,
+                    IsRotated = item.IsRotated ^ rotateAgain,
                     GridPosition = targetPosition,
                 };
                 AddInstanceToInventory(newItemInstance);

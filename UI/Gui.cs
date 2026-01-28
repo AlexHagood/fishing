@@ -18,6 +18,8 @@ public partial class Gui : CanvasLayer
     private AudioStreamPlayer _dropAudio = null!;
     private AudioStreamPlayer _pickupAudio = null!;
 
+    private bool _rotateHeld = false;
+
 
     public override void _Ready()
     {
@@ -25,9 +27,10 @@ public partial class Gui : CanvasLayer
         _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
         _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
         
-        // Connect to Character's InventoryRequested signal
+        // Connect to Character's signals
         var character = GetNode<Character>("/root/Main/Character/CharacterBody3D");
         character.InventoryRequested += OnInventoryRequested;
+        character.RotateRequested += OnRotateRequested;
     }
     
     public override void _Input(InputEvent @event)
@@ -83,11 +86,26 @@ public partial class Gui : CanvasLayer
                 // Highlight new slot
                 if (slotUnder != null)
                 {
-                    _highlightedSlots = slotUnder.GetSlotsForSize(_draggedItem!.ItemInstance.Size);
-                    bool validSlot = _inventoryManager.CheckItemFits(
+                    // Calculate target rotation
+                    bool targetRotation = _draggedItem.ItemInstance.IsRotated ^ _rotateHeld;
+                    
+                    // Get target size based on rotation
+                    Vector2I targetSize = targetRotation ? 
+                        new Vector2I(_draggedItem.ItemInstance.ItemData.Size.Y, 
+                                     _draggedItem.ItemInstance.ItemData.Size.X) : 
+                        _draggedItem.ItemInstance.ItemData.Size;
+                    
+                    _highlightedSlots = slotUnder.GetSlotsForSize(targetSize);
+                    
+                    // Check if it fits with target rotation and ignore self
+                    int spaceAvailable = _inventoryManager.CheckItemFits(
                         slotUnder.inventoryId,
-                        _draggedItem.ItemInstance,
-                        slotUnder.slotPosition);
+                        _draggedItem.ItemInstance.ItemData,
+                        slotUnder.slotPosition,
+                        _draggedItem.ItemInstance.IsRotated ^ _rotateHeld,
+                        _draggedItem.ItemInstance.InstanceId);
+                    
+                    bool validSlot = spaceAvailable > 0;
                     foreach (var slot in _highlightedSlots)
                     {
                         slot.SetHighlight(validSlot ? SlotState.Valid : SlotState.Invalid);
@@ -160,6 +178,46 @@ public partial class Gui : CanvasLayer
         }
     }
 
+    private void OnRotateRequested()
+    {
+        // Case 1: If we're dragging an item, rotate the drag ghost and update the dragged item
+        if (_draggedItem != null && _dragGhost != null)
+        {
+            _rotateHeld = !_rotateHeld; // Toggle the flag
+            
+            // Update ghost to show the rotated preview
+            bool targetRotation = _draggedItem.ItemInstance.IsRotated ^ _rotateHeld;
+            _dragGhost.UpdateRotation(targetRotation);
+            
+            GD.Print($"[GUI] Rotate toggle. _rotateHeld: {_rotateHeld}");
+            return; // Done - don't check fit until drop
+        } 
+        // Case 2: If we're hovering over an item (not dragging), rotate it in place
+        var mousePos = GetViewport().GetMousePosition();
+        var slotUnder = GetSlotAtPosition(mousePos);
+        
+        if (slotUnder != null)
+        {
+            var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
+            if (inv.Grid.ContainsKey(slotUnder.slotPosition))
+            {
+                var itemAtSlot = inv.Grid[slotUnder.slotPosition];
+                
+                // Check if we can rotate it in place
+                if (_inventoryManager.CanRotateItem(itemAtSlot))
+                {
+                    _inventoryManager.RotateItem(itemAtSlot);
+                    RefreshInventoryWindows();
+                    GD.Print($"[GUI] Rotated item {itemAtSlot.InstanceId} in place. IsRotated: {itemAtSlot.IsRotated}");
+                }
+                else
+                {
+                    GD.Print("[GUI] Cannot rotate item - not enough space");
+                }
+            }
+        }
+    }
+
     private void OpenInventory(int id)
     {
         // Load and instantiate the inventory window directly
@@ -221,7 +279,8 @@ public partial class Gui : CanvasLayer
                 res = _inventoryManager.TryTransferItemPosition(
                     targetSlot.inventoryId,
                     _draggedItem.ItemInstance,
-                    targetSlot.slotPosition);
+                    targetSlot.slotPosition,
+                    _rotateHeld);
 
                 } 
                 else 
@@ -230,8 +289,8 @@ public partial class Gui : CanvasLayer
                         targetSlot.inventoryId,
                         _draggedItem.ItemInstance,
                         1,
-                        targetSlot.slotPosition
-                    );
+                        targetSlot.slotPosition,
+                        _rotateHeld);
                 }
                 if (res > 0)
                 {
@@ -280,6 +339,7 @@ public partial class Gui : CanvasLayer
         // Clear references
         _draggedItem = null;
         _lastHoveredSlot = null;
+        _rotateHeld = false; // Reset rotation flag ⭐
     }
     
     private void RefreshInventoryWindows()
