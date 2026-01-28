@@ -5,44 +5,44 @@ using System.Linq;
 [Tool]
 public partial class Terrain : Node3D
 {
-    [ExportToolButton("Generate")]
-    public Callable ResetButton => Callable.From(Reset);
+	[ExportToolButton("Generate")]
+	public Callable ResetButton => Callable.From(Reset);
 
-    private List<GraphNode> nodes;
-    private int _nodeCount = 0;
-    [Export]
-    public Vector3 TerrainSize = new Vector3(40, 3, 40);
-    [Export]
-    public int NodeCount = 20;
-    [Export]
-    Vector3 TerrainOrigin = Vector3.Zero;
+	private List<GraphNode> nodes;
+	private int _nodeCount = 0;
+	[Export]
+	public Vector3 TerrainSize = new Vector3(40, 3, 40);
+	[Export]
+	public int NodeCount = 20;
+	[Export]
+	Vector3 TerrainOrigin = Vector3.Zero;
 
-    public Terrain()
-    {
-        nodes = new List<GraphNode>();
-    }
+	public Terrain()
+	{
+		nodes = new List<GraphNode>();
+	}
 
 
 
-    public void Reset()
-    {
-        GD.Print("Resetting terrain...");
-        foreach (var child in GetChildren())
-        {
-            // Don't delete the brush if it's a child of the terrain
-            if (child is TerrainBrush)
-                continue;
+	public void Reset()
+	{
+		GD.Print("Resetting terrain...");
+		foreach (var child in GetChildren())
+		{
+			// Don't delete the brush if it's a child of the terrain
+			if (child is TerrainBrush)
+				continue;
 
-            RemoveChild(child);
-            child.QueueFree();
-        }
-        nodes.Clear();
-        _nodeCount = 0; // Reset node count
+			RemoveChild(child);
+			child.QueueFree();
+		}
+		nodes.Clear();
+		_nodeCount = 0; // Reset node count
 
-        // Regenerate terrain
-        var generatedNodes = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
-        
-        // Apply Lloyd's relaxation to improve triangle quality
+		// Regenerate terrain
+		var generatedNodes = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
+		
+		// Apply Lloyd's relaxation to improve triangle quality
         if (RelaxationIterations > 0)
         {
             generatedNodes = DelaunayTriangulator.ApplyLloydsRelaxation(
@@ -51,7 +51,7 @@ public partial class Terrain : Node3D
                 TerrainOrigin, 
                 TerrainSize
             );
-            GD.Print($"Applied {RelaxationIterations} iterations of Lloyd's relaxation.");
+			GD.Print($"Applied {RelaxationIterations} iterations of Lloyd's relaxation.");
         }
         
         var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
@@ -80,7 +80,7 @@ public partial class Terrain : Node3D
 #endif
         }
 
-        GD.Print($"Terrain regenerated: {triangulatedNodes.Count} nodes triangulated.");
+		GD.Print($"Terrain regenerated: {triangulatedNodes.Count} nodes triangulated.");
     }
 
     private void SetMeshOwner(GroundMesh mesh)
@@ -106,14 +106,14 @@ public partial class Terrain : Node3D
         // Only regenerate in editor, never in game
         if (!Engine.IsEditorHint())
         {
-            GD.Print("Terrain: Game mode - using pre-generated terrain from editor.");
+			GD.Print("Terrain: Game mode - using pre-generated terrain from editor.");
             return;
         }
 
-        GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
+		GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
     }
 
-    [Export(PropertyHint.Range, "0,10")]
+	[Export(PropertyHint.Range, "0,10")]
     public int RelaxationIterations = 2; // Number of Lloyd's relaxation iterations to improve triangle quality
 
     public List<GraphNode> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
@@ -130,7 +130,7 @@ public partial class Terrain : Node3D
             float z = (float)(startLocation.Z + (rng.NextDouble() - 0.5) * spread.Z);
             var node = new GraphNode
             {
-                Name = $"Node_{_nodeCount++}",
+				Name = $"Node_{_nodeCount++}",
                 Position = new Vector3(x, y, z)
             };
             AddChild(node);
@@ -144,7 +144,7 @@ public partial class Terrain : Node3D
             generatedNodes.Add(node);
         }
         
-        GD.Print($"{count} nodes generated with random distribution at {startLocation} with spread {spread}.");
+		GD.Print($"{count} nodes generated with random distribution at {startLocation} with spread {spread}.");
         return generatedNodes;
     }
 
@@ -152,7 +152,7 @@ public partial class Terrain : Node3D
     /// <summary>
     /// Performs Delaunay triangulation on nodes and connects them
     /// </summary>
-    /// <param name="graphNodes">List of nodes to triangulate</param>
+	/// <param name="graphNodes">List of nodes to triangulate</param>
     /// <returns>The same list of nodes, now connected via Delaunay triangulation</returns>
     public List<GraphNode> DelaunayTriangulateXZ(List<GraphNode> graphNodes)
     {
@@ -164,13 +164,13 @@ public partial class Terrain : Node3D
     /// Finds triangles by looking for sets of 3 nodes that are all connected to each other.
     /// Uses node indices for efficient duplicate detection.
     /// </summary>
-    /// <param name="graphNodes">List of nodes with connections</param>
-    /// <param name="action">Action to call for each triangle (nodeA, nodeB, nodeC)</param>
+	/// <param name="graphNodes">List of nodes with connections</param>
+	/// <param name="action">Action to call for each triangle (nodeA, nodeB, nodeC)</param>
     public void ForEachTriangle(List<GraphNode> graphNodes, Action<GraphNode, GraphNode, GraphNode> action)
     {
         if (graphNodes == null || graphNodes.Count < 3)
         {
-            GD.Print("ForEachTriangle: Need at least 3 nodes to form triangles");
+			GD.Print("ForEachTriangle: Need at least 3 nodes to form triangles");
             return;
         }
 
@@ -227,7 +227,7 @@ public partial class Terrain : Node3D
             }
         }
 
-        GD.Print($"ForEachTriangle: Processed {triangleCount} triangles from node connections");
+		GD.Print($"ForEachTriangle: Processed {triangleCount} triangles from node connections");
     }
 
 
@@ -237,9 +237,9 @@ public partial class Terrain : Node3D
     /// <summary>
     /// Creates a debug line as a pink cylinder between two 3D points. If addToScene is false, does not add to scene tree (for dynamic lines).
     /// </summary>
-    /// <param name="pointA">Start point</param>
-    /// <param name="pointB">End point</param>
-    /// <param name="addToScene">If true, adds to scene tree. If false, caller manages it.</param>
+	/// <param name="pointA">Start point</param>
+	/// <param name="pointB">End point</param>
+	/// <param name="addToScene">If true, adds to scene tree. If false, caller manages it.</param>
     /// <returns>MeshInstance3D representing the debug line</returns>
     public MeshInstance3D CreateDebugLine(Vector3 pointA, Vector3 pointB, bool addToScene = true)
     {
@@ -342,7 +342,7 @@ public partial class Terrain : Node3D
             }
         }
 
-        GD.Print($"Panel Cracked: 3 new meshes created");
+		GD.Print($"Panel Cracked: 3 new meshes created");
     }
     
     private void SetOwnerRecursive(Node node, Node owner)
@@ -355,4 +355,3 @@ public partial class Terrain : Node3D
     }
 
 }
-

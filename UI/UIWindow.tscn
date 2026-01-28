@@ -9,6 +9,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
 script = ExtResource("1_aw1ht")
 
 [node name="Panel" type="Panel" parent="."]
@@ -23,6 +24,7 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 0
 
 [node name="StatusBar" type="PanelContainer" parent="Panel/VBoxContainer"]
 custom_minimum_size = Vector2(0, 20)
@@ -30,14 +32,13 @@ layout_mode = 2
 
 [node name="HBoxContainer" type="HBoxContainer" parent="Panel/VBoxContainer/StatusBar"]
 layout_mode = 2
+mouse_filter = 2
 
 [node name="Label" type="Label" parent="Panel/VBoxContainer/StatusBar/HBoxContainer"]
 layout_mode = 2
-text = "Label"
-
-[node name="Control" type="Control" parent="Panel/VBoxContainer/StatusBar/HBoxContainer"]
-layout_mode = 2
 size_flags_horizontal = 3
+text = "Label"
+horizontal_alignment = 1
 
 [node name="Button" type="Button" parent="Panel/VBoxContainer/StatusBar/HBoxContainer"]
 custom_minimum_size = Vector2(20, 20)

@@ -1,0 +1,11 @@
+[gd_resource type="Resource" script_class="ItemDefinition" load_steps=2 format=3 uid="uid://bw44vg40p452c"]
+
+[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="1_e17vm"]
+
+[resource]
+script = ExtResource("1_e17vm")
+Name = "Hook"
+Icon = "uid://c8jfpp2v13noh"
+Size = Vector2i(2, 2)
+StackSize = 5
+metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

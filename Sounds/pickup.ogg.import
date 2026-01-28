@@ -3,11 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://bhnd84rgcbrci"
-valid=false
+path="res://.godot/imported/pickup.ogg-eb8f24097e41f9e823149b0cb4a83479.oggvorbisstr"
 
 [deps]
 
 source_file="res://Sounds/pickup.ogg"
+dest_files=["res://.godot/imported/pickup.ogg-eb8f24097e41f9e823149b0cb4a83479.oggvorbisstr"]
 
 [params]
 

@@ -3,11 +3,12 @@
 importer="oggvorbisstr"
 type="AudioStreamOggVorbis"
 uid="uid://3mlqrb6p1u2"
-valid=false
+path="res://.godot/imported/Step1.ogg-5ee2fb7d2fe12962771104c6dc47c058.oggvorbisstr"
 
 [deps]
 
 source_file="res://Sounds/Step1.ogg"
+dest_files=["res://.godot/imported/Step1.ogg-5ee2fb7d2fe12962771104c6dc47c058.oggvorbisstr"]
 
 [params]
 

@@ -1,19 +1,17 @@
-[gd_scene load_steps=6 format=3 uid="uid://cx223jkmjqjoh"]
+[gd_scene load_steps=5 format=3 uid="uid://cx223jkmjqjoh"]
 
-[ext_resource type="Script" uid="uid://crkghn5almypb" path="res://Items/GameItem.cs" id="1_st5j7"]
-[ext_resource type="Resource" uid="uid://b421afksh50fd" path="res://Items/Box.tres" id="2_2i6rn"]
+[ext_resource type="Script" uid="uid://en5vyvs7nroe" path="res://Items/PhysItem.cs" id="1_mk5al"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_ttk8k"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kg5e7"]
-albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
+albedo_color = Color(0.78039217, 0, 0.15294118, 1)
 
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ys7tt"]
 points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
 
 [node name="Box" type="RigidBody3D"]
-script = ExtResource("1_st5j7")
-ItemDef = ExtResource("2_2i6rn")
+script = ExtResource("1_mk5al")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 mesh = SubResource("BoxMesh_ttk8k")

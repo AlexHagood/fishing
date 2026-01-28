@@ -1,31 +1,41 @@
 using Godot;
 
 /// <summary>
-/// Resource that defines an item's properties and metadata.
-/// Create .tres files in the editor to define new items.
+/// Resource that defines how an item appears in the inventory.
+/// Save as .tres files in your Items folder.
 /// </summary>
 [GlobalClass]
 public partial class ItemDefinition : Resource
 {
-    [Export] public string ItemName { get; set; } = "Item";
-    [Export] public Texture2D InvTexture { get; set; }
-    [Export] public Vector2 InvSize { get; set; } = new Vector2(2, 2);
-    [Export] public int MaxStackSize { get; set; } = 1; // 1 = not stackable (tools), >1 = stackable (materials)
+    /// <summary>
+    /// Display name in inventory
+    /// </summary>
+    [Export] public string Name { get; set; } = "Item";
+    /// <summary>
+    /// Icon displayed in inventory UI
+    /// </summary>
+    [Export(PropertyHint.File, "*.png,*.jpg,*.jpeg,*.svg")] public string Icon { get; set; }
     
-    [ExportGroup("Pickup Settings")]
-    [Export] public bool IsPickupable { get; set; } = true;
-    [Export] public float PickupRange { get; set; } = 3.0f;
-    [Export] public float ThrowForce { get; set; } = 10.0f;
+    /// <summary>
+    /// Size in inventory grid (e.g., 1x1, 2x1, 2x2)
+    /// </summary>
+    [Export] public Vector2I Size { get; set; } = new Vector2I(1, 1);
     
-    [ExportGroup("Physics")]
-    [Export] public float Buoyancy { get; set; } = 1.0f; // >1.0 floats, <1.0 sinks, 1.0 neutral
+    /// <summary>
+    /// Maximum stack size (1 = non-stackable)
+    /// </summary>
+    [Export] public int StackSize { get; set; } = 1;
     
-    [ExportGroup("World Representation")]
-    [Export] public string WorldScenePath { get; set; } = ""; // Path to the 3D scene for this item
+    /// <summary>
+    /// Path to the world scene that can be spawned (e.g., "res://Items/Scenes/rock.tscn")
+    /// </summary>
+    [Export(PropertyHint.File, "*.tscn")] public string ScenePath { get; set; } = "";
+
+    /// <summary>
+    /// Returns true if the item can be stacked (StackSize > 1)
+    /// </summary>
+    public bool Stackable => StackSize > 1;
     
-    [ExportGroup("Tool Settings (if applicable)")]
-    [Export] public bool IsTool { get; set; } = false;
-    [Export] public Vector3 HoldPosition { get; set; } = Vector3.Zero;
-    [Export] public Vector3 HoldRotation { get; set; } = Vector3.Zero;
-    [Export] public Vector3 HoldScale { get; set; } = Vector3.One;
+
 }
+    

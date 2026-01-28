@@ -1,19 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://kb4bqlnq5k0a"]
+[gd_scene load_steps=3 format=3 uid="uid://s88as57joj3e"]
 
-[ext_resource type="Script" uid="uid://c8mr0vaenb8sr" path="res://UI/Inventory.cs" id="1_psafj"]
+[ext_resource type="PackedScene" uid="uid://bsnet4uf0vfyw" path="res://UI/UIWindow.tscn" id="1_uiwindow"]
+[ext_resource type="Script" uid="uid://ikrotshmfpq7" path="res://UI/InventoryWindow.cs" id="2_7g8kd"]
 
-[node name="Inventory" type="Control"]
-layout_mode = 3
-anchors_preset = 0
-offset_right = 1600.0
-offset_bottom = 900.0
-script = ExtResource("1_psafj")
-
-[node name="GridContainer" type="GridContainer" parent="."]
-layout_mode = 1
-offset_right = 1023.0
-offset_bottom = 438.0
-columns = 6
-
-[node name="Panel" type="Panel" parent="GridContainer"]
-layout_mode = 2
+[node name="Inventory" instance=ExtResource("1_uiwindow")]
+script = ExtResource("2_7g8kd")

@@ -1,7 +1,14 @@
-[gd_scene load_steps=6 format=4 uid="uid://cksydhl1w3gte"]
+[gd_scene load_steps=7 format=4 uid="uid://cksydhl1w3gte"]
 
-[ext_resource type="Script" uid="uid://d03jcg7oaxuc7" path="res://Items/Tools/Pickaxe/Pickaxe.cs" id="2_script"]
-[ext_resource type="Texture2D" uid="uid://bqkp6n0rvol73" path="res://Textures/pickaxe.png" id="3_jerxx"]
+[ext_resource type="Script" uid="uid://kill1sr1ygyw" path="res://Items/GameItem.cs" id="1_5aqrx"]
+[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="2_b5nqb"]
+
+[sub_resource type="Resource" id="Resource_d2get"]
+script = ExtResource("2_b5nqb")
+Name = "Pickaxe"
+Icon = "uid://bqkp6n0rvol73"
+Size = Vector2i(2, 3)
+metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_dg77c"]
 _surfaces = [{
@@ -21,10 +28,8 @@ albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
 points = PackedVector3Array(-0.657239, 2.06992, -0.036702, -0.000133991, 0.799983, -0.05, -0.0353627, 0.799983, -0.03536, -0.0500527, 0.799983, -2.34321e-06, -0.657239, 2.06992, 0.0633044, -0.00911123, 2.22661, -0.036702, -0.000133991, 2.14896, -0.05, 0.732325, 2.07202, -0.036702, 0.0352308, 0.799983, -0.03536, -0.0353627, 0.799983, 0.0353443, -0.000133991, 0.799983, 0.0499953, 0.732325, 2.07202, 0.0633044, -0.00911123, 2.22661, 0.0633044, 0.0499208, 0.799983, -2.34321e-06, 0.0352308, 0.799983, 0.0353443)
 
 [node name="Pickaxe" type="RigidBody3D"]
-script = ExtResource("2_script")
-HoldPosition = Vector3(0, 1, 0)
-InvSize = Vector2(2, 3)
-InvTexture = ExtResource("3_jerxx")
+script = ExtResource("1_5aqrx")
+InvItemData = SubResource("Resource_d2get")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.54703, 0)

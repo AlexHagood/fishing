@@ -1,210 +1,330 @@
-using Godot;
-using System;
 using System.Collections.Generic;
+using System.Linq;
+using Godot;
+
+#nullable enable
 
 public partial class Gui : CanvasLayer
 {
-    
-    private bool _inventoryOpen = false;
-    private TextureRect _crosshair;
-    private Texture _crosshairTexture;
-    private Inventory _inventory;
-    private UIWindow _inventoryWindow;
-    
-    // Container management
-    private UIWindow _containerWindow;
-    private ContainerItem _currentContainer;
+    public List<UIWindow> openWindows = new List<UIWindow>();
+    protected ItemTile? _draggedItem = null;
 
-    public ProgressBar progressBar;
-    public ButtonHints buttonHints;
+    private ItemGhost _dragGhost = null!;
+    private InventoryManager _inventoryManager = null!;
+    private InventorySlot? _lastHoveredSlot = null;
 
-    
+    private List<InventorySlot> _highlightedSlots = new List<InventorySlot>();
 
-    public bool InventoryOpen
-    {
-        get => _inventoryOpen;
-        set
-        {
-            if (_inventoryOpen != value)
-            {
-                _inventoryOpen = value;
-                UpdateInventoryState();
-            }
-        }
-    }
+    private AudioStreamPlayer _dropAudio = null!;
+    private AudioStreamPlayer _pickupAudio = null!;
 
-    public void ToggleInventoryOpen()
-    {
-        InventoryOpen = !InventoryOpen;
-    }
 
     public override void _Ready()
     {
-        _crosshair = GetNode<TextureRect>("Crosshair");
-        _crosshairTexture = _crosshair.Texture;
-        _crosshair.Visible = true;
-        InventoryOpen = false;
+        _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+        _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
+        _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
         
-        // Get inventory
-        _inventory = GetNode<Inventory>("Inventory");
-        
-        // Check if InventoryWindow exists, if not create it
-        _inventoryWindow = GetNodeOrNull<UIWindow>("InventoryWindow");
-        if (_inventoryWindow == null)
+        // Connect to Character's InventoryRequested signal
+        var character = GetNode<Character>("/root/Main/Character/CharacterBody3D");
+        character.InventoryRequested += OnInventoryRequested;
+    }
+    
+    public override void _Input(InputEvent @event)
+    {
+        // Handle click to drop item (click-to-pick, click-to-drop behavior)
+        if (@event is InputEventMouseButton mouseButton &&  
+            mouseButton.Pressed && 
+            _draggedItem != null)
         {
-            GD.Print("[Gui] InventoryWindow not found in scene, creating dynamically...");
-            
-            // Load the UIWindow scene
-            var windowScene = GD.Load<PackedScene>("res://UI/UIWindow.tscn");
-            if (windowScene != null)
+            if (mouseButton.ButtonIndex == MouseButton.Left)
             {
-                _inventoryWindow = windowScene.Instantiate<UIWindow>();
-                _inventoryWindow.Name = "InventoryWindow";
-                _inventoryWindow.WindowTitle = "Inventory";
-                AddChild(_inventoryWindow);
+                GD.Print("[GUI] Left click detected for dropping item");
+                OnItemDropped(false);
+            }
+            else if (mouseButton.ButtonIndex == MouseButton.Right)
+            {
+                GD.Print("[GUI] Right click detected for dropping item");
+                OnItemDropped(true);
+            }
+            // Only drop if we're clicking on empty space or a slot, not on another item
+
+            GetViewport().SetInputAsHandled();
+        }
+    }
+    
+    public override void _Process(double delta)
+    {
+        // Update drag ghost position to follow mouse
+        if (_dragGhost != null)
+        {
+            var mousePos = GetViewport().GetMousePosition();
+            // Center the ghost on the cursor
+            _dragGhost.Position = mousePos - (_dragGhost.Size / 2);
+            
+            // Get the detection point (32px in, 32px down from ghost's top-left)
+            Vector2 detectionPoint = _dragGhost.Position + new Vector2(32, 32);
+            
+            // Find which slot is under the detection point
+            var slotUnder = GetSlotAtPosition(detectionPoint);
+            
+            // Update highlighting
+            if (slotUnder != _lastHoveredSlot)
+            {
+                // Unhighlight previous slot
+                if (_lastHoveredSlot != null)
+                {
+                    foreach (var slot in _highlightedSlots)
+                    {
+                        slot.SetHighlight(SlotState.Default);
+                    }
+                }
                 
-                GD.Print("[Gui] InventoryWindow created successfully");
+                // Highlight new slot
+                if (slotUnder != null)
+                {
+                    _highlightedSlots = slotUnder.GetSlotsForSize(_draggedItem!.ItemInstance.ItemData.Size);
+                    bool validSlot = _inventoryManager.CheckItemFits(
+                        slotUnder.inventoryId,
+                        _draggedItem.ItemInstance,
+                        slotUnder.slotPosition);
+                    foreach (var slot in _highlightedSlots)
+                    {
+                        slot.SetHighlight(validSlot ? SlotState.Valid : SlotState.Invalid);
+                    }
+                    GD.Print($"[GUI] Hovering slot at position: {slotUnder.Position}");
+                }
+                
+                _lastHoveredSlot = slotUnder;
+            }
+        }
+    }
+    
+    private InventorySlot? GetSlotAtPosition(Vector2 globalPosition)
+    {
+        // Check all open inventory windows
+        foreach (var window in openWindows.OfType<InventoryWindow>())
+        {
+            // Access the grid container directly (it's a public field)
+            var contentContainer = window.GetNode<PanelContainer>("Panel/VBoxContainer/Content");
+            
+            // The grid is the first child of content container
+            GridContainer? gridContainer = null;
+            foreach (Node child in contentContainer.GetChildren())
+            {
+                if (child is GridContainer grid)
+                {
+                    gridContainer = grid;
+                    break;
+                }
+            }
+            
+            if (gridContainer == null) continue;
+            
+            // Check each slot in the grid
+            foreach (Node child in gridContainer.GetChildren())
+            {
+                if (child is InventorySlot slot)
+                {
+                    // Get the slot's global rect
+                    var slotRect = slot.GetGlobalRect();
+                    
+                    // Check if the detection point is inside this slot
+                    if (slotRect.HasPoint(globalPosition))
+                    {
+                        return slot;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+    
+    /// <summary>
+    /// Get the detection point for the dragged item (32px offset from top-left corner)
+    /// </summary>
+
+
+    public void OnInventoryRequested(int id)
+    {
+        // Check if a window for this specific inventory is already open
+        var existing = openWindows.OfType<InventoryWindow>().FirstOrDefault(w => w.inventoryId == id);
+        if (existing != null)
+        {
+            existing.QueueFree();
+        }
+        else
+        {
+            OpenInventory(id);
+        }
+    }
+
+    private void OpenInventory(int id)
+    {
+        // Load and instantiate the inventory window directly
+        var inventoryScene = GD.Load<PackedScene>("res://UI/inventory.tscn");
+        var inventoryWindow = inventoryScene.Instantiate<InventoryWindow>();
+        inventoryWindow.inventoryId = id;
+        
+        // Connect the ItemGrab signal using += syntax
+        inventoryWindow.ItemGrab += OnItemGrabbed;
+        
+        // Set the window title
+        var titleLabel = inventoryWindow.GetNode<Label>("Panel/VBoxContainer/StatusBar/HBoxContainer/Label");
+        titleLabel.Text = "Inventory";
+        
+        // Add to scene
+        AddChild(inventoryWindow);
+
+        OnWindowOpened(inventoryWindow);
+
+        GD.Print($"[GUI] Inventory opened. Total windows: {openWindows.Count}");
+    }
+    
+    private void OnItemGrabbed(ItemTile itemTile)
+    {
+        GD.Print($"[GUI] Item grabbed: {itemTile.ItemInstance.InstanceId}");
+        _draggedItem = itemTile;
+        _dragGhost = new ItemGhost();
+        _dragGhost.MouseDefaultCursorShape = Control.CursorShape.Move;
+        _pickupAudio.Play();
+        AddChild(_dragGhost);
+        _dragGhost.setup(itemTile);
+    }
+    
+    private void OnItemDropped(bool split)
+    {
+        if (_draggedItem == null || _dragGhost == null)
+            return;
+        
+        // Get the slot under the detection point
+        Vector2 detectionPoint = _dragGhost.Position + new Vector2(32, 32);
+        var targetSlot = GetSlotAtPosition(detectionPoint);
+        
+        if (targetSlot != null)
+        {
+            // Check if the item fits in the target position
+            bool canPlace = _inventoryManager.CheckItemFits(
+                targetSlot.inventoryId,
+                _draggedItem.ItemInstance,
+                targetSlot.slotPosition);
+            
+            if (canPlace)
+            {
+                int res;
+                if (!split)
+                {
+                GD.Print($"[GUI] Dropping item at position: {targetSlot.slotPosition}");
+
+                // Move the item in the inventory manager
+                res = _inventoryManager.TryTransferItemPosition(
+                    targetSlot.inventoryId,
+                    _draggedItem.ItemInstance,
+                    targetSlot.slotPosition);
+
+                } 
+                else 
+                {
+                    res = _inventoryManager.TrySplitStack(
+                        targetSlot.inventoryId,
+                        _draggedItem.ItemInstance,
+                        1,
+                        targetSlot.slotPosition
+                    );
+                }
+                if (res > 0)
+                {
+                    _dragGhost.Count -= res;
+                    _dropAudio.Play();
+                }
+                
+                // Refresh both inventory windows
+                RefreshInventoryWindows();
             }
             else
             {
-                GD.PrintErr("[Gui] Failed to load UIWindow.tscn!");
-                return;
+                GD.Print("[GUI] Cannot place item here - doesn't fit");
             }
-        }
-        
-        // Set title
-        _inventoryWindow.WindowTitle = "Inventory";
-        
-        // Move inventory into the window using SetContent (which handles sizing)
-        if (_inventory.GetParent() != null)
-        {
-            _inventory.GetParent().RemoveChild(_inventory);
-        }
-        _inventoryWindow.SetContent(_inventory);
-        
-        // Hide the window initially
-        _inventoryWindow.Hide();
-        
-        // Connect window closed signal
-        _inventoryWindow.WindowClosed += OnInventoryWindowClosed;
-        
-        progressBar = GetNode<ProgressBar>("PickupBar");
-        buttonHints = GetNodeOrNull<ButtonHints>("ButtonHints");
-        
-        if (buttonHints == null)
-        {
-            GD.PrintErr("[Gui] ButtonHints node not found! Please add ButtonHints scene to GUI.");
-        }
-        
-        // Create container window (hidden initially)
-        CreateContainerWindow();
-    }
-    
-    private void CreateContainerWindow()
-    {
-        var windowScene = GD.Load<PackedScene>("res://UI/UIWindow.tscn");
-        if (windowScene != null)
-        {
-            _containerWindow = windowScene.Instantiate<UIWindow>();
-            _containerWindow.Name = "ContainerWindow";
-            _containerWindow.WindowTitle = "Container";
-            _containerWindow.Position = new Vector2(100, 100); // Offset from inventory
-            AddChild(_containerWindow);
-            _containerWindow.Hide();
-            _containerWindow.WindowClosed += OnContainerWindowClosed;
-            
-            GD.Print("[Gui] ContainerWindow created successfully");
         }
         else
         {
-            GD.PrintErr("[Gui] Failed to load UIWindow.tscn for container!");
+            GD.Print("[GUI] Dropped outside inventory - returning item");
         }
+        if (_dragGhost.Count <= 0)
+        {
+            GD.Print("[GUI] All items dropped from stack");
+            CleanupDragState();
+        }
+        
+        // Clean up drag state
     }
     
-    public void OpenContainer(ContainerItem container)
+    private void CleanupDragState()
     {
-        if (_containerWindow == null || container == null)
+        _dragGhost.MouseDefaultCursorShape = Control.CursorShape.Arrow;
+        // Remove ghost
+        if (_dragGhost != null)
         {
-            GD.PrintErr("[Gui] Cannot open container - window or container is null");
-            return;
+            _dragGhost.QueueFree();
+            _dragGhost = null!;
         }
         
-        _currentContainer = container;
-        var containerInventory = container.GetContainerInventory();
-        
-        if (containerInventory == null)
+        // Clear highlights
+        foreach (var slot in _highlightedSlots)
         {
-            GD.PrintErr("[Gui] Container has no inventory!");
-            return;
+            slot.SetHighlight(SlotState.Default);
         }
+        _highlightedSlots.Clear();
         
-        // Set window title to container name
-        _containerWindow.WindowTitle = container.ItemName;
-        
-        // Move container inventory into window
-        if (containerInventory.GetParent() != null && containerInventory.GetParent() != _containerWindow)
-        {
-            containerInventory.GetParent().RemoveChild(containerInventory);
-        }
-        _containerWindow.SetContent(containerInventory);
-        
-        // Show the window
-        _containerWindow.Show();
-        
-        // Ensure mouse is visible
-        Input.MouseMode = Input.MouseModeEnum.Visible;
-        
-        GD.Print($"[Gui] Opened container: {container.ItemName}");
+        // Clear references
+        _draggedItem = null;
+        _lastHoveredSlot = null;
     }
     
-    private void OnContainerWindowClosed()
+    private void RefreshInventoryWindows()
     {
-        if (_currentContainer != null && _containerWindow != null)
+        // Refresh all open inventory windows to show updated item positions
+        foreach (var window in openWindows.OfType<InventoryWindow>())
         {
-            // Move inventory back to container
-            var containerInventory = _currentContainer.GetContainerInventory();
-            if (containerInventory != null && containerInventory.GetParent() == _containerWindow)
-            {
-                _containerWindow.RemoveChild(containerInventory);
-                _currentContainer.AddChild(containerInventory);
-            }
-            _currentContainer = null;
+            window.RefreshItems();
         }
+    }
+
+    private void CloseAll()
+    {
+        foreach (var window in openWindows)
+        {
+            window.QueueFree();
+        }   
         
-        // If no windows are open, capture mouse
-        if (!_inventoryOpen)
+        GD.Print($"[GUI] Windows closed. Total windows: {openWindows.Count}");
+    }
+
+    // Call this when any UIWindow is closed
+    public void OnWindowClosed(UIWindow window)
+    {
+        openWindows.Remove(window);        
+        // If no windows are open, recapture the mouse for 3D view
+        if (openWindows.Count == 0)
         {
             Input.MouseMode = Input.MouseModeEnum.Captured;
         }
+        
+        GD.Print($"[GUI] Window closed. Total windows: {openWindows.Count}");
     }
 
-    private void OnInventoryWindowClosed()
+    // Call this when any UIWindow is opened
+    public void OnWindowOpened(UIWindow window)
     {
-        // Close inventory properly when X button is clicked
-        InventoryOpen = false;
-    }
-
-
-    private void UpdateInventoryState()
-    {
-        if (_inventoryOpen)
+        openWindows.Add(window);
+        
+        // If this is the first window, release mouse capture for UI interaction
+        if (openWindows.Count > 0)
         {
-            GD.Print("Inventory opened");
-            _inventoryWindow.Show();
-            _crosshair.Visible = false;
             Input.MouseMode = Input.MouseModeEnum.Visible;
         }
-        else
-        {
-            GD.Print("Inventory closed");
-            _inventoryWindow.Hide();
-            _crosshair.Visible = true;
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-        }
-    }
-
-    public void ToggleInventory()
-    {
-        ToggleInventoryOpen();
+        
+        GD.Print($"[GUI] On Window opened. Total windows: {openWindows.Count}");
     }
 }
