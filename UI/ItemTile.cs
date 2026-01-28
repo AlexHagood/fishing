@@ -19,10 +19,19 @@ public partial class ItemTile : TextureRect
     {
         if (ItemInstance == null) return;
         
-        Size = new Vector2(ItemInstance.ItemData.Size.X * 64, ItemInstance.ItemData.Size.Y * 64);
+        Size = new Vector2(ItemInstance.Size.X * 64, ItemInstance.Size.Y * 64);
         Position = new Vector2(ItemInstance.GridPosition.X * 64, ItemInstance.GridPosition.Y * 64);
         Texture = GD.Load<Texture2D>(ItemInstance.ItemData.Icon);
+        if (ItemInstance.IsRotated)
+        {
+            Image image = GD.Load<Texture2D>(ItemInstance.ItemData.Icon).GetImage();
+            image.Rotate90(ClockDirection.Counterclockwise);
+            Texture = ImageTexture.CreateFromImage(image);
+        }
+        else
+        {
+            Texture = GD.Load<Texture2D>(ItemInstance.ItemData.Icon);
+        }
         StackLabel.Text = $"{ItemInstance.CurrentStackSize} / {ItemInstance.ItemData.StackSize}";
     }
-
 } 

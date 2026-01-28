@@ -15,7 +15,7 @@ public class ItemInstance
     public ItemDefinition ItemData { get; set; }
     public int CurrentStackSize { get; set; }
     public Vector2I GridPosition { get; set; }
-    public bool IsRotated { get; set; } = false;
+    public bool IsRotated { get; set; } = true;
 
     public Vector2I Size
     {
@@ -91,12 +91,15 @@ public partial class InventoryManager : Node
         Inventory inv = _Inventories[inventoryId];
 
         // Remove item from grid
-        for (int x = 0; x < item.ItemData.Size.X; x++)
+        for (int x = 0; x < item.Size.X; x++)
         {
-            for (int y = 0; y < item.ItemData.Size.Y; y++)
+            for (int y = 0; y < item.Size.Y; y++)
             {
                 Vector2I pos = new Vector2I(item.GridPosition.X + x, item.GridPosition.Y + y);
-                inv.Grid.Remove(pos);
+                if (!inv.Grid.Remove(pos))
+                {
+                    throw new InvalidOperationException($"Massive Error: Position {pos} was not occupied in inventory {inventoryId} when trying to drop item {item.InstanceId}");
+                }
             }
         }
 
@@ -104,7 +107,7 @@ public partial class InventoryManager : Node
     }
 
     /// Check if an item fits in the inventory at any position and place it there
-    public bool TryPushItem(int inventoryId, ItemDefinition item)
+    public bool TryPushItem(int inventoryId, ItemDefinition item, bool rotated)
     {
         Inventory inv = _Inventories[inventoryId];
         for (int x = 0; x <= _Inventories[inventoryId].Size.X - item.Size.X; x++)
@@ -112,7 +115,7 @@ public partial class InventoryManager : Node
             for (int y = 0; y <= _Inventories[inventoryId].Size.Y - item.Size.Y; y++)
             {
                 Vector2I position = new Vector2I(x, y);
-                if (CheckItemFits(inventoryId, item, position) > 0)
+                if (CheckItemFits(inventoryId, item, position, rotated) > 0)
                 {
                     if (inv.Grid.ContainsKey(position) &&
                     inv.Grid[position] is ItemInstance existingItem &&
@@ -158,7 +161,7 @@ public partial class InventoryManager : Node
     // Move item from one inventory to another, any position in target inventory
     public bool TryTransferItem(int toInventoryId, ItemInstance item)
     {
-        if (TryPushItem(toInventoryId, item.ItemData))
+        if (TryPushItem(toInventoryId, item.ItemData, item.IsRotated))
         {
             // Remove from source inventory
             DropItem(item.InventoryId, item);
@@ -170,7 +173,7 @@ public partial class InventoryManager : Node
     public int TryTransferItemPosition(int toInventoryId, ItemInstance item, Vector2I position)
     {
         Inventory targetInv = _Inventories[toInventoryId];
-        int spaceAvailable = CheckItemFits(toInventoryId, item.ItemData, position, item.InstanceId);
+        int spaceAvailable = CheckItemFits(toInventoryId, item.ItemData, position, item.IsRotated, item.InstanceId);
         
         if (spaceAvailable > 0)
         {
@@ -207,13 +210,41 @@ public partial class InventoryManager : Node
         return 0;
     }
 
+    public bool CanRotateItem(ItemInstance item)
+    {
+        Vector2I newSize = new Vector2I(item.Size.Y, item.Size.X);
+        // Check if item fits in current position with new size
+        if (item.GridPosition.X + newSize.X > _Inventories[item.InventoryId].Size.X ||
+            item.GridPosition.Y + newSize.Y > _Inventories[item.InventoryId].Size.Y)
+        {
+            return false; // Out of bounds
+        }
+
+        for (int x = 0; x < newSize.X; x++)
+        {
+            for (int y = 0; y < newSize.Y; y++)
+            {
+                Vector2I checkPos = new Vector2I(item.GridPosition.X + x, item.GridPosition.Y + y);
+                if (_Inventories[item.InventoryId].Grid.ContainsKey(checkPos))
+                {
+                    if (_Inventories[item.InventoryId].Grid[checkPos].InstanceId == item.InstanceId)
+                    {
+                        // Allow checking against itself
+                        continue;
+                    }
+                    return false; // Space occupied 
+                }
+            }
+        }
+        return true; // Can rotate
+    }
 
     private void AddInstanceToInventory(ItemInstance item)
     {
         Inventory inv = _Inventories[item.InventoryId];
-        for (int ix = 0; ix < item.ItemData.Size.X; ix++)
+        for (int ix = 0; ix < item.Size.X; ix++)
             {
-                for (int iy = 0; iy < item.ItemData.Size.Y; iy++)
+                for (int iy = 0; iy < item.Size.Y; iy++)
                     {
                         Vector2I pos = new Vector2I(item.GridPosition.X + ix, item.GridPosition.Y + iy);
                         if (inv.Grid.ContainsKey(pos))
@@ -229,7 +260,7 @@ public partial class InventoryManager : Node
             throw new InvalidOperationException($"Cannot split {splitCount} from stack of size {item.CurrentStackSize}");
 
         Inventory targetInv = _Inventories[targetInventoryId];
-        int spaceAvailable = CheckItemFits(targetInventoryId, item.ItemData, targetPosition);
+        int spaceAvailable = CheckItemFits(targetInventoryId, item.ItemData, targetPosition, item.IsRotated);
         
         if (spaceAvailable >= splitCount)
         {
@@ -282,12 +313,12 @@ public partial class InventoryManager : Node
 
     public bool CheckItemFits(int inventoryId, ItemInstance item, Vector2I position)
     {
-        return CheckCountFit(inventoryId, item.ItemData, position, item.CurrentStackSize, item.InstanceId);
+        return CheckCountFit(inventoryId, item.ItemData, position, item.CurrentStackSize, item.IsRotated, item.InstanceId);
     }
 
-    public bool CheckCountFit(int inventoryId, ItemDefinition item, Vector2I position, int count, int instanceId = -1)
+    public bool CheckCountFit(int inventoryId, ItemDefinition item, Vector2I position, int count, bool rotated, int instanceId = -1)
     {
-        int fits = CheckItemFits(inventoryId, item, position, instanceId);
+        int fits = CheckItemFits(inventoryId, item, position, rotated, instanceId);
         return fits >= count;
     }
     
@@ -299,8 +330,10 @@ public partial class InventoryManager : Node
     /// <param name="position"></param>
     /// <returns></returns>
     /// <exception cref="ArgumentException"></exception>
-    public int CheckItemFits(int inventoryId, ItemDefinition item, Vector2I position, int instanceId = -1)
+    public int CheckItemFits(int inventoryId, ItemDefinition item, Vector2I position, bool rotated, int instanceId = -1)
     {
+        Vector2I size = rotated ? new Vector2I(item.Size.Y, item.Size.X) : item.Size;
+
         if (!_Inventories.ContainsKey(inventoryId))
             throw new ArgumentException($"Invalid inventory ID: {inventoryId}");
 
@@ -319,16 +352,16 @@ public partial class InventoryManager : Node
         }
 
         if (position.X < 0 || position.Y < 0 ||
-            position.X + item.Size.X > _Inventories[inventoryId].Size.X ||
-            position.Y + item.Size.Y > _Inventories[inventoryId].Size.Y)
+            position.X + size.X > _Inventories[inventoryId].Size.X ||
+            position.Y + size.Y > _Inventories[inventoryId].Size.Y)
         {
             GD.Print("ItemDef Doesn't fit, OOB");
             return 0; // Out of bounds
         }
         
-        for (int x = 0; x < item.Size.X; x++)
+        for (int x = 0; x < size.X; x++)
         {
-            for (int y = 0; y < item.Size.Y; y++)
+            for (int y = 0; y < size.Y; y++)
             {
                 Vector2I checkPos = new Vector2I(position.X + x, position.Y + y);
                 if (inv.Grid.ContainsKey(checkPos))

@@ -83,7 +83,7 @@ public partial class Gui : CanvasLayer
                 // Highlight new slot
                 if (slotUnder != null)
                 {
-                    _highlightedSlots = slotUnder.GetSlotsForSize(_draggedItem!.ItemInstance.ItemData.Size);
+                    _highlightedSlots = slotUnder.GetSlotsForSize(_draggedItem!.ItemInstance.Size);
                     bool validSlot = _inventoryManager.CheckItemFits(
                         slotUnder.inventoryId,
                         _draggedItem.ItemInstance,
