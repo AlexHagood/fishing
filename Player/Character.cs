@@ -15,17 +15,33 @@ public partial class Character : CharacterBody3D
     [Export] public float JumpVelocity = 8.0f;
     [Export] public float Gravity = 20.0f;
     [Export] public float MouseSensitivity = 0.01f;
+    
+    // Camera system
+    [ExportGroup("Camera Settings")]
+    [Export] public float ThirdPersonDistance = 3.0f;
+    [Export] public float CameraLerpSpeed = 10.0f;
+    
+    [ExportGroup("Animation Settings")]
+    [Export] public float AnimationBlendTime = 0.2f; // Smooth transition time in seconds
 
     private bool isOnFloor = false;
     private Vector2 mouseDelta = Vector2.Zero;
+    private float _cameraPitch = 0.0f; // Vertical camera angle
 
     private float _baseSpeed = 5.0f;
     private float _sprintSpeed = 10.0f;
     private bool _isSprinting = false;
 
-    private Camera3D camera;
     private Node3D _holdPosition;
     private PhysItem _heldPhysItem;
+    private Node3D _cameraTarget; // Third-person camera pivot
+    private SpringArm3D _springArm;  // For third-person collision
+    private Node3D _playerMesh;  // Reference to player's visual mesh
+    private AnimationPlayer _animationPlayer;  // Character animations
+
+    private Camera3D _activeCamera;
+    private Camera3D _firstPersonCamera;
+    private Camera3D _thirdPersonCamera;
 
     private InventoryManager _inventoryManager;
     private ToolScript _currentTool;
@@ -70,12 +86,23 @@ public partial class Character : CharacterBody3D
     public override void _Ready()
     {
         Input.MouseMode = Input.MouseModeEnum.Captured;
-        camera = GetNode<Camera3D>("Camera3D");
         
-        // Create hold position for physics items
+        // Setup camera system
+        SetupCameraSystem();
+        
+        // Get AnimationPlayer
+        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
+        
+        // Start with idle animation
+        if (_animationPlayer != null && _animationPlayer.HasAnimation("Idle"))
+        {
+            _animationPlayer.Play("Idle");
+        }
+        
+        // Create hold position for physics items (attached to active camera)
         _holdPosition = new Node3D();
         _holdPosition.Name = "HoldPosition";
-        camera.AddChild(_holdPosition);
+        _activeCamera.AddChild(_holdPosition);
         _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
         
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
@@ -83,6 +110,62 @@ public partial class Character : CharacterBody3D
         inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5));
         
 
+    }
+    
+    private void SetupCameraSystem()
+    {
+        // Get camera target from scene (created in editor)
+        _cameraTarget = GetNodeOrNull<Node3D>("CameraTarget");
+        if (_cameraTarget == null)
+        {
+            GD.PrintErr("[Character] ERROR: CameraTarget node not found! Create a Node3D called 'CameraTarget' as a child of Character.");
+        }
+        
+        // Get spring arm
+        _springArm = GetNodeOrNull<SpringArm3D>("CameraTarget/SpringArm3D");
+        if (_springArm == null)
+        {
+            GD.PrintErr("[Character] ERROR: SpringArm3D not found! Create a SpringArm3D as a child of CameraTarget.");
+        }
+        else
+        {
+            _springArm.SpringLength = ThirdPersonDistance;
+            _springArm.CollisionMask = 1;
+        }
+
+        // Get both cameras
+        _firstPersonCamera = GetNodeOrNull<Camera3D>("Camera3D");
+        
+        _thirdPersonCamera = GetNodeOrNull<Camera3D>("CameraTarget/SpringArm3D/Camera3D");
+        
+        // Start in first person if camera exists
+        if (_firstPersonCamera != null && _thirdPersonCamera != null)
+        {
+            _activeCamera = _firstPersonCamera;
+            _firstPersonCamera.Current = true;
+            _thirdPersonCamera.Current = false;
+            GD.Print("[Character] Camera system initialized successfully");
+        }
+        else
+        {
+            GD.PrintErr("[Character] ERROR: Camera system failed to initialize - missing camera nodes!");
+        }
+        
+        // Initialize camera angles
+        _cameraPitch = 0.0f;
+        
+        // Try to find player mesh
+        _playerMesh = GetNodeOrNull<Node3D>("CharacterArmature");
+        
+        if (_playerMesh != null)
+        {
+            _playerMesh.Visible = false; // Hidden in first person by default
+            GD.Print("[Character] Found player mesh: " + _playerMesh.Name);
+        }
+        else
+        {
+            GD.Print("[Character] No player mesh found - will not hide in first person");
+        }
     }
 
     public void OpenInventory(int id)
@@ -182,6 +265,12 @@ public partial class Character : CharacterBody3D
         {
             EmitSignal(SignalName.RotateRequested);
         }
+        
+        // C key - toggle camera mode
+        if (Input.IsActionJustPressed("camera"))
+        {
+            ToggleCameraMode();
+        }
 
         // E key - interact with WorldItem (don't allow in menu mode)
         if (Input.IsActionJustPressed("interact"))
@@ -270,21 +359,144 @@ public partial class Character : CharacterBody3D
         }
 
         // Handle mouse look
-        RotateY(-mouseDelta.X * MouseSensitivity);
-        camera.RotateX(-mouseDelta.Y * MouseSensitivity);
-        mouseDelta = Vector2.Zero;
+        HandleCameraRotation(delta);
 
-        // Clamp camera rotation
-        var rotation = camera.RotationDegrees;
-        rotation.X = Mathf.Clamp(rotation.X, -90, 90);
-        camera.RotationDegrees = rotation;
+        // Update camera position
+        UpdateCameraPosition(delta);
+        
+        // Update animations based on movement state
+        UpdateAnimations(direction);
+    }
+    
+    private void UpdateAnimations(Vector3 direction)
+    {
+        if (_animationPlayer == null) return;
+        
+        // Determine which animation to play based on state
+        string targetAnimation = "Idle";
+        
+        // Check if in air (jumping/falling)
+        if (!isOnFloor)
+        {
+            targetAnimation = "Jump";
+        }
+        // Check if moving on ground
+        else if (direction.Length() > 0.1f)
+        {
+            if (_isSprinting)
+            {
+                targetAnimation = "Run";
+            }
+            else
+            {
+                targetAnimation = "Walk";
+            }
+        }
+        
+        // Only switch animation if it's different from current and animation exists
+        if (_animationPlayer.HasAnimation(targetAnimation) && 
+            _animationPlayer.CurrentAnimation != targetAnimation)
+        {
+            // Use smooth crossfade transition
+            // Play(name, customBlend, customSpeed, fromEnd)
+            _animationPlayer.Play(targetAnimation, AnimationBlendTime);
+        }
+    }
+    
+    private void HandleCameraRotation(double delta)
+    {
+        // Always rotate the player character with mouse X
+        RotateY(-mouseDelta.X * MouseSensitivity);
+        
+        // Handle vertical camera rotation (pitch)
+        _cameraPitch -= mouseDelta.Y * MouseSensitivity * 100.0f;
+        _cameraPitch = Mathf.Clamp(_cameraPitch, -80, 80);
+        
+        // Check which camera is active
+        if (_activeCamera == _thirdPersonCamera)
+        {
+            // Third-person: apply pitch to camera target
+            if (_cameraTarget != null)
+            {
+                _cameraTarget.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
+            }
+        }
+        else
+        {
+            // First-person: apply pitch directly to first person camera
+            if (_firstPersonCamera != null)
+            {
+                _firstPersonCamera.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
+            }
+        }
+        
+        mouseDelta = Vector2.Zero;
+    }
+    
+    private void UpdateCameraPosition(double delta)
+    {
+        // No need to move cameras - they're already positioned correctly in the scene!
+        // The SpringArm automatically handles third-person camera collision
+    }
+    
+    private void ToggleCameraMode()
+    {
+        // Check if cameras are initialized
+        if (_firstPersonCamera == null || _thirdPersonCamera == null)
+        {
+            GD.PrintErr("[Character] Cannot toggle camera - cameras not initialized!");
+            return;
+        }
+        
+        // Check which camera is currently active and switch
+        if (_activeCamera == _thirdPersonCamera)
+        {
+            // Switch to first-person camera
+            GD.Print("[Character] Switched to first-person camera");
+            
+            _firstPersonCamera.Current = true;
+            _thirdPersonCamera.Current = false;
+            _activeCamera = _firstPersonCamera;
+            
+            // Reset camera pitch
+            _cameraPitch = 0.0f;
+            _firstPersonCamera.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
+            
+            // Hide player mesh
+            if (_playerMesh != null)
+            {
+                _playerMesh.Visible = false;
+            }
+        }
+        else
+        {
+            // Switch to third-person camera
+            GD.Print("[Character] Switched to third-person camera");
+            
+            _thirdPersonCamera.Current = true;
+            _firstPersonCamera.Current = false;
+            _activeCamera = _thirdPersonCamera;
+            
+            // Initialize camera pitch for third person
+            _cameraPitch = -10.0f;
+            if (_cameraTarget != null)
+            {
+                _cameraTarget.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
+            }
+            
+            // Show player mesh
+            if (_playerMesh != null)
+            {
+                _playerMesh.Visible = true;
+            }
+        }
     }
 
     public GodotObject RaycastFromCamera(float range = 5.0f)
     {
         var spaceState = GetWorld3D().DirectSpaceState;
-        var from = camera.GlobalTransform.Origin;
-        var to = from + camera.GlobalTransform.Basis.Z * -range;
+        var from = _activeCamera.GlobalTransform.Origin;
+        var to = from + _activeCamera.GlobalTransform.Basis.Z * -range;
         var query = PhysicsRayQueryParameters3D.Create(from, to);
         query.CollideWithAreas = false;
         query.CollideWithBodies = true;
@@ -357,7 +569,7 @@ public partial class Character : CharacterBody3D
 
         _heldPhysItem = physItem;
         _heldPhysItem.OnPickedUp();
-        GD.Print($"[Character] Picked up: {physItem.InvItemData.Name}");
+        GD.Print($"[Character] Picked up: {physItem.Name}");
     }
 
     private void DropPhysItem()
@@ -374,7 +586,7 @@ public partial class Character : CharacterBody3D
     {
         if (_heldPhysItem == null) return;
 
-        var throwDirection = -camera.GlobalTransform.Basis.Z;
+        var throwDirection = -_activeCamera.GlobalTransform.Basis.Z;
         var itemToThrow = _heldPhysItem;
         var throwForce = _heldPhysItem.ThrowForce;
         

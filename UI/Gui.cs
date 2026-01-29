@@ -31,7 +31,7 @@ public partial class Gui : CanvasLayer
         _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
         
         // Connect to Character's signals
-        var character = GetNode<Character>("/root/Main/Character/CharacterBody3D");
+        var character = GetNode<Character>("/root/Main/Character");
         character.InventoryRequested += OnInventoryRequested;
         character.RotateRequested += OnRotateRequested;
         character.HotbarSlotSelected += OnHotbarSlotSelected;
