@@ -1,3 +1,4 @@
+using System.Dynamic;
 using Godot;
 
 public partial class Character : CharacterBody3D
@@ -36,8 +37,11 @@ public partial class Character : CharacterBody3D
     private PhysItem _heldPhysItem;
     private Node3D _cameraTarget; // Third-person camera pivot
     private SpringArm3D _springArm;  // For third-person collision
-    private Node3D _playerMesh;  // Reference to player's visual mesh
+    private MeshInstance3D _playerBodyMesh;  // Reference to player's body mesh (not the whole armature!)
     private AnimationPlayer _animationPlayer;  // Character animations
+    private BoneAttachment3D _rightHandAttachment;  // Attachment point for held tools
+    private Node3D _toolPosition;  // Helper node for tool positioning
+    private bool _isPlayingActionAnimation = false;  // Prevent movement animations from interrupting actions
 
     private Camera3D _activeCamera;
     private Camera3D _firstPersonCamera;
@@ -53,6 +57,14 @@ public partial class Character : CharacterBody3D
         private set 
         {
             _hotbarSlot = value;
+            
+            // Safety check: ensure inventory manager is initialized
+            if (_inventoryManager == null)
+            {
+                GD.PushWarning("[Character] InventoryManager not initialized yet, deferring hotbar update");
+                return;
+            }
+            
             ItemInstance? item = _inventoryManager.GetInventory(inventoryId).HotbarItems[value];
 
             if (item != null)
@@ -64,11 +76,12 @@ public partial class Character : CharacterBody3D
                     _currentTool.QueueFree();
                     _currentTool = null;
                 }
-                if (item.ItemData.ToolScriptScene != null)
+                if (item.ItemData.ToolScriptScene != null && _toolPosition != null)
                 {
                     _currentTool = item.ItemData.ToolScriptScene.Instantiate<ToolScript>();
                     _currentTool.itemInstance = item;
-                    AddChild(_currentTool);
+                    // Add tool as child of hand attachment, not character root
+                    _toolPosition.AddChild(_currentTool);
                 }
             }
             else
@@ -93,10 +106,32 @@ public partial class Character : CharacterBody3D
         // Get AnimationPlayer
         _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
         
+        // Connect to animation_finished signal to track action animations
+        if (_animationPlayer != null)
+        {
+            _animationPlayer.AnimationFinished += OnAnimationFinished;
+        }
+        
         // Start with idle animation
         if (_animationPlayer != null && _animationPlayer.HasAnimation("Idle"))
         {
             _animationPlayer.Play("Idle");
+        }
+        
+        // Get hand attachment for tools
+        _rightHandAttachment = GetNodeOrNull<BoneAttachment3D>("CharacterArmature/Skeleton3D/RightHandAttachment");
+        if (_rightHandAttachment == null)
+        {
+            GD.PrintErr("[Character] ERROR: RightHandAttachment not found! Create a BoneAttachment3D at CharacterArmature/Skeleton3D/RightHandAttachment with bone_name='Fist.R'");
+        }
+        
+        // Get tool position helper (optional, but recommended)
+        _toolPosition = GetNodeOrNull<Node3D>("CharacterArmature/Skeleton3D/RightHandAttachment/ToolPosition");
+        if (_toolPosition == null)
+        {
+            GD.Print("[Character] ToolPosition helper not found, tools will attach directly to hand bone");
+            // Use the hand attachment itself as fallback
+            _toolPosition = _rightHandAttachment;
         }
         
         // Create hold position for physics items (attached to active camera)
@@ -154,17 +189,17 @@ public partial class Character : CharacterBody3D
         // Initialize camera angles
         _cameraPitch = 0.0f;
         
-        // Try to find player mesh
-        _playerMesh = GetNodeOrNull<Node3D>("CharacterArmature");
+        // Try to find player body mesh (not the armature, just the visible mesh!)
+        _playerBodyMesh = GetNodeOrNull<MeshInstance3D>("CharacterArmature/Skeleton3D/Body");
         
-        if (_playerMesh != null)
+        if (_playerBodyMesh != null)
         {
-            _playerMesh.Visible = false; // Hidden in first person by default
-            GD.Print("[Character] Found player mesh: " + _playerMesh.Name);
+            setMeshVisibility(false); // Hide body in first person by default (tool stays visible!)
+            GD.Print("[Character] Found player body mesh: " + _playerBodyMesh.Name);
         }
         else
         {
-            GD.Print("[Character] No player mesh found - will not hide in first person");
+            GD.Print("[Character] No player body mesh found - will not hide in first person");
         }
     }
 
@@ -225,6 +260,14 @@ public partial class Character : CharacterBody3D
                 if (_currentTool != null)
                 {
                     _currentTool.PrimaryFire(this);
+                    // Play character animation for tool use if specified
+                    if (!string.IsNullOrEmpty(_currentTool.primaryAnimation) && _animationPlayer != null)
+                    {
+                        if (_animationPlayer.HasAnimation(_currentTool.primaryAnimation))
+                        {
+                            _animationPlayer.Play(_currentTool.primaryAnimation);
+                        }
+                    }
                 }
             }
             // Right mouse button - drop
@@ -237,6 +280,14 @@ public partial class Character : CharacterBody3D
                 if (_currentTool != null)
                 {
                     _currentTool.SecondaryFire(this);
+                    // Play character animation for tool secondary use if specified
+                    if (!string.IsNullOrEmpty(_currentTool.secondaryAnimation) && _animationPlayer != null)
+                    {
+                        if (_animationPlayer.HasAnimation(_currentTool.secondaryAnimation))
+                        {
+                            _animationPlayer.Play(_currentTool.secondaryAnimation);
+                        }
+                    }
                 }
             }
         }
@@ -372,6 +423,9 @@ public partial class Character : CharacterBody3D
     {
         if (_animationPlayer == null) return;
         
+        // Don't interrupt action animations (like attacks, tool use, etc.)
+        if (_isPlayingActionAnimation) return;
+        
         // Determine which animation to play based on state
         string targetAnimation = "Idle";
         
@@ -463,10 +517,7 @@ public partial class Character : CharacterBody3D
             _firstPersonCamera.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
             
             // Hide player mesh
-            if (_playerMesh != null)
-            {
-                _playerMesh.Visible = false;
-            }
+            setMeshVisibility(false);
         }
         else
         {
@@ -485,11 +536,21 @@ public partial class Character : CharacterBody3D
             }
             
             // Show player mesh
-            if (_playerMesh != null)
-            {
-                _playerMesh.Visible = true;
-            }
+            setMeshVisibility(true);
         }
+    }
+
+    private void setMeshVisibility(bool isVisible)
+    {
+        // Only hide/show the body mesh, not the entire armature
+        // This keeps the skeleton and bone attachments (like tools) working
+        if (_playerBodyMesh != null)
+        {
+            _playerBodyMesh.Visible = isVisible;
+        }
+        
+        // Tool stays visible regardless (it's attached to the skeleton, not the mesh)
+        // No need to explicitly set tool visibility - it's always visible
     }
 
     public GodotObject RaycastFromCamera(float range = 5.0f)
@@ -596,5 +657,49 @@ public partial class Character : CharacterBody3D
         // Then throw the item
         itemToThrow.OnThrown(throwDirection, throwForce);
         GD.Print($"[Character] Threw: {itemToThrow.Name}");
+    }
+
+    /// <summary>
+    /// Play a character animation. Tools can call this to trigger animations.
+    /// </summary>
+    public void PlayAnimation(string animationName, float blendTime = -1, bool isActionAnimation = true)
+    {
+        if (_animationPlayer == null)
+        {
+            GD.PushWarning($"[Character] Cannot play animation '{animationName}' - AnimationPlayer not found");
+            return;
+        }
+
+        if (!_animationPlayer.HasAnimation(animationName))
+        {
+            GD.PushWarning($"[Character] Animation '{animationName}' not found");
+            return;
+        }
+
+        // Use provided blend time, or default to AnimationBlendTime
+        float actualBlendTime = blendTime >= 0 ? blendTime : AnimationBlendTime;
+        _animationPlayer.Play(animationName, actualBlendTime);
+        
+        // Mark as action animation to prevent movement animations from interrupting
+        if (isActionAnimation)
+        {
+            _isPlayingActionAnimation = true;
+        }
+        
+        GD.Print($"[Character] Playing animation: {animationName}");
+    }
+    
+    /// <summary>
+    /// Called when any animation finishes
+    /// </summary>
+    private void OnAnimationFinished(StringName animName)
+    {
+        GD.Print($"[Character] Animation finished: {animName}");
+        
+        // Reset action animation flag
+        _isPlayingActionAnimation = false;
+        
+        // Return to appropriate idle/movement animation
+        // The next _PhysicsProcess will handle this via UpdateAnimations
     }
 }

@@ -47,7 +47,9 @@ public partial class FishingRodTool : ToolScript
     {
         base._Ready();
         GD.Print("[FishingRodTool] Ready");
-        GD.Print($"[FishingRodTool] Tool Position: {Position}, Rotation: {RotationDegrees}");
+        
+        // Position and rotation are now controlled by the hand bone and tool scene positioning
+        // No need to set them here anymore
         
         // Get reference to bobber template (it should be a child in the scene)
         _bobberTemplate = GetNodeOrNull<RigidBody3D>("Bobber");
@@ -75,9 +77,8 @@ public partial class FishingRodTool : ToolScript
         _lineMeshInstance.TopLevel = true;
         AddChild(_lineMeshInstance);
         
-        // Set initial position and rotation (adjust as needed)
-        Position = new Vector3(0.5f, -0.3f, -1.0f);
-        RotationDegrees = new Vector3(0, 90f, 0);
+        // Position and rotation are now controlled by the hand bone and tool scene positioning
+        // No need to set them here anymore
     }
     
     public override void PrimaryFire(Character character)

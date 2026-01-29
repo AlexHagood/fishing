@@ -1,4 +1,4 @@
-[gd_scene load_steps=7 format=4 uid="uid://c1eiejlh0hahb"]
+[gd_scene load_steps=4 format=4 uid="uid://c1eiejlh0hahb"]
 
 [ext_resource type="Script" uid="uid://bm2kaxg1umne7" path="res://Items/Tools/Pickaxe/PickaxeTool.cs" id="1_tne74"]
 
@@ -16,43 +16,11 @@ _surfaces = [{
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_38u25"]
 albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
 
-[sub_resource type="Animation" id="Animation_1vd7m"]
-length = 0.001
-tracks/0/type = "rotation_3d"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("MeshInstance3D")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = PackedFloat32Array(0, 1, 0, 0, 0, 1)
-
-[sub_resource type="Animation" id="Animation_tne74"]
-resource_name = "Swing"
-length = 0.6
-tracks/0/type = "rotation_3d"
-tracks/0/imported = false
-tracks/0/enabled = true
-tracks/0/path = NodePath("MeshInstance3D")
-tracks/0/interp = 1
-tracks/0/loop_wrap = true
-tracks/0/keys = PackedFloat32Array(0.06666667, 1, 0, 0, 0, 1, 0.26666668, 1, 0, 0, -0.161, 0.987, 0.5, 1, 0, 0, 0, 1)
-
-[sub_resource type="AnimationLibrary" id="AnimationLibrary_38u25"]
-_data = {
-&"RESET": SubResource("Animation_1vd7m"),
-&"Swing": SubResource("Animation_tne74")
-}
-
 [node name="ToolPickaxe" type="Node3D"]
 script = ExtResource("1_tne74")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.54703, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2385862, 0)
 mesh = SubResource("ArrayMesh_1vd7m")
 skeleton = NodePath("")
 surface_material_override/0 = SubResource("StandardMaterial3D_38u25")
-
-[node name="AnimationPlayer" type="AnimationPlayer" parent="."]
-libraries = {
-&"": SubResource("AnimationLibrary_38u25")
-}

@@ -4018,7 +4018,7 @@ _data = {
 script = ExtResource("1_glpr6")
 
 [node name="Camera3D" type="Camera3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.46114e-05, 0.946008, -0.32587)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 6.46114e-05, 0.40244383, -0.32587)
 current = true
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="."]
@@ -4103,7 +4103,7 @@ bones/10/parent = 9
 bones/10/rest = Transform3D(0.78490007, 0.54425615, 0.29617146, -0.46815577, 0.83402383, -0.29194993, -0.4059096, 0.09049714, 0.9094218, -5.1958224e-08, 0.5282712, -1.9757781e-08)
 bones/10/enabled = true
 bones/10/position = Vector3(-5.1958224e-08, 0.5282712, -1.9757781e-08)
-bones/10/rotation = Quaternion(0.10180187, 0.18688378, -0.26948938, 0.9391945)
+bones/10/rotation = Quaternion(0.10180187, 0.18688379, -0.2694894, 0.9391945)
 bones/10/scale = Vector3(1.0000002, 1.0000001, 1.0000001)
 bones/11/name = "Fist.L"
 bones/11/parent = 10
@@ -4124,7 +4124,7 @@ bones/13/parent = 12
 bones/13/rest = Transform3D(-0.646538, -0.755923, 0.10280826, 0.5483305, -0.36677277, 0.75153965, -0.53039867, 0.5422716, 0.65162814, -2.1520395e-07, 0.25953156, -1.9224906e-09)
 bones/13/enabled = true
 bones/13/position = Vector3(-2.1520395e-07, 0.25953156, -1.9224906e-09)
-bones/13/rotation = Quaternion(-0.3094145, -0.19532157, 0.7320386, 0.57465774)
+bones/13/rotation = Quaternion(-0.30941457, -0.19532162, 0.7320387, 0.5746578)
 bones/13/scale = Vector3(1.0000002, 1.0000001, 1.0000002)
 bones/14/name = "LowerArm.R"
 bones/14/parent = 13
@@ -4193,6 +4193,14 @@ bones/22/scale = Vector3(1, 1.0000001, 1.0000001)
 [node name="Body" type="MeshInstance3D" parent="CharacterArmature/Skeleton3D"]
 mesh = SubResource("ArrayMesh_1sv7u")
 skin = SubResource("Skin_tygp5")
+
+[node name="RightHandAttachment" type="BoneAttachment3D" parent="CharacterArmature/Skeleton3D"]
+transform = Transform3D(-0.97905904, -0.04444981, -0.1986629, 0.11530418, -0.92532796, -0.36121082, -0.1677725, -0.3765536, 0.9110765, -0.43982813, 0.904279, -0.5183343)
+bone_name = "Fist.R"
+bone_idx = 15
+
+[node name="ToolPosition" type="Node3D" parent="CharacterArmature/Skeleton3D/RightHandAttachment"]
+transform = Transform3D(0.06872945, 0.108605295, 0.99170715, 0.9159937, -0.4007153, -0.019599095, 0.39526278, 0.9097437, -0.12702253, -0.03110981, 0.09064424, 0.27372998)
 
 [node name="AnimationPlayer" type="AnimationPlayer" parent="."]
 libraries = {

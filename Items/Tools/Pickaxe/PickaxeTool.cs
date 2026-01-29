@@ -1,12 +1,14 @@
 using Godot;
 public partial class PickaxeTool : ToolScript
 {
-    private AnimationPlayer _animationPlayer;
     public override void _Ready()
     {
-        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        Position = new Vector3(0.5f, 0, -1);
-        RotationDegrees = new Vector3(0, 90f, 0);
+        // Set the animation names for the base class to use
+        primaryAnimation = "SwordSlash";
+        secondaryAnimation = "";
+        
+        // Position and rotation are now controlled by the hand bone and tool scene positioning
+        // Animations are now handled by the character, not the tool
     }
 
     public override void PrimaryFire(Character character)
@@ -30,13 +32,16 @@ public partial class PickaxeTool : ToolScript
         }
 
         GD.Print($"[PickaxeTool] Swinging pickaxe: {itemInstance.ItemData.Name}");
-        _animationPlayer.Play("Swing");
+        base.PrimaryFire(character);
+        
+        // Character will play the animation automatically based on primaryAnimation field
         // Implement pickaxe swinging logic here (e.g., damage to rocks)
     }
 
     public override void SecondaryFire(Character character)
     {
         GD.Print($"[PickaxeTool] Aiming with pickaxe: {itemInstance.ItemData.Name}");
+        base.SecondaryFire(character);
         // Implement secondary action logic here (e.g., zoom in)
     }
 }
