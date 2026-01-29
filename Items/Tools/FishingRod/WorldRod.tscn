@@ -1,0 +1,40 @@
+[gd_scene load_steps=8 format=3 uid="uid://bso6pmegp53om"]
+
+[ext_resource type="Script" uid="uid://kill1sr1ygyw" path="res://Items/GameItem.cs" id="1_1q82x"]
+[ext_resource type="PackedScene" uid="uid://c6guy00earepd" path="res://Items/Tools/FishingRod/ToolRod.tscn" id="2_jhj2s"]
+[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="2_p4o6j"]
+
+[sub_resource type="Resource" id="Resource_jhj2s"]
+script = ExtResource("2_p4o6j")
+Name = "Rod"
+Icon = "uid://b31bomn1xak2y"
+Size = Vector2i(1, 4)
+ScenePath = "uid://bso6pmegp53om"
+ToolScriptScene = ExtResource("2_jhj2s")
+metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vsbcf"]
+albedo_color = Color(0.71352416, 0.3557741, 1.92523e-07, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_lg1v0"]
+material = SubResource("StandardMaterial3D_vsbcf")
+top_radius = 0.025
+bottom_radius = 0.025
+height = 3.0
+
+[sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jyuhk"]
+points = PackedVector3Array(0.038084112, 1.5070094, 0.010035753, -0.03200934, -1.5070094, -0.017985161, -0.03200934, -1.5070094, 0.02405307, -0.03200934, 1.5070094, -0.017985161, 0.02405307, -1.5070094, -0.03200934, 0.010035753, -1.5070094, 0.038084112, -0.03200934, 1.5070094, 0.02405307, 0.02405307, 1.5070094, -0.03200934, 0.038084112, -1.5070094, 0.010035753, 0.010035753, 1.5070094, 0.038084112)
+
+[node name="WorldRod" type="RigidBody3D"]
+freeze = true
+script = ExtResource("1_1q82x")
+InvItemData = SubResource("Resource_jhj2s")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0, 0)
+mesh = SubResource("CylinderMesh_lg1v0")
+skeleton = NodePath("")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0, 0)
+shape = SubResource("ConvexPolygonShape3D_jyuhk")

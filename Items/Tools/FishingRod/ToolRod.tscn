@@ -1,0 +1,47 @@
+[gd_scene load_steps=8 format=3 uid="uid://c6guy00earepd"]
+
+[ext_resource type="Script" uid="uid://ce7lvupegpwla" path="res://Items/Tools/FishingRod/FishingRodTool.cs" id="1_78gr2"]
+[ext_resource type="Shader" uid="uid://ckjxyhclureu8" path="res://Items/Tools/FishingRod/bobber.gdshader" id="2_0juja"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vsbcf"]
+albedo_color = Color(0.71352416, 0.3557741, 1.92523e-07, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_hndgl"]
+material = SubResource("StandardMaterial3D_vsbcf")
+top_radius = 0.025
+bottom_radius = 0.025
+height = 3.0
+
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_1kyt6"]
+render_priority = 0
+shader = ExtResource("2_0juja")
+
+[sub_resource type="SphereMesh" id="SphereMesh_h55ml"]
+material = SubResource("ShaderMaterial_1kyt6")
+radius = 0.1
+height = 0.2
+radial_segments = 10
+rings = 5
+
+[sub_resource type="SphereShape3D" id="SphereShape3D_rrqor"]
+radius = 0.1
+
+[node name="Node3D" type="Node3D"]
+script = ExtResource("1_78gr2")
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0, 0)
+mesh = SubResource("CylinderMesh_hndgl")
+skeleton = NodePath("")
+
+[node name="Bobber" type="RigidBody3D" parent="."]
+freeze = true
+
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Bobber"]
+mesh = SubResource("SphereMesh_h55ml")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bobber"]
+shape = SubResource("SphereShape3D_rrqor")
+
+[node name="RodTip" type="Node3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4916314, 0)

@@ -206,6 +206,7 @@ public partial class Terrain : Node3D
 	{
 		var generatedNodes = new List<GraphNode>();
 		var rng = seed == 0 ? new Random() : new Random(seed);
+		var centerXZ = new Vector2(startLocation.X, startLocation.Z);
 		
 		// Generate random points
 		for (int i = 0; i < count; i++)
@@ -214,6 +215,22 @@ public partial class Terrain : Node3D
 			float x = (float)(startLocation.X + (rng.NextDouble() - 0.5) * spread.X);
 			float y = (float)(startLocation.Y + (rng.NextDouble() - 0.5) * spread.Y);
 			float z = (float)(startLocation.Z + (rng.NextDouble() - 0.5) * spread.Z);
+
+			// Calculate distance from center in XZ plane
+			
+			var posXZ = new Vector2(x, z);
+			var distFromCenter = posXZ.DistanceTo(centerXZ);
+			var maxDist = Mathf.Min(spread.X, spread.Z) / 2.0f;
+
+			// If in the outer 50% (distance > 0.5 * maxDist), slope down in -Y direction
+			if (distFromCenter > maxDist * 0.5f)
+			{
+				// Slope factor: 0 at 0.5*maxDist, 1 at maxDist
+				float slopeT = Mathf.Clamp((distFromCenter - maxDist * 0.5f) / (maxDist * 0.5f), 0, 1);
+				// Lower the y value in the negative Y direction
+				y -= slopeT * spread.Y * 4f;
+			}
+			
 			var node = new GraphNode
 			{
 				Name = $"Node_{_nodeCount}",
