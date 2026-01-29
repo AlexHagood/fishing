@@ -14,6 +14,12 @@ public partial class TerrainEditorPlugin : EditorPlugin
     private float _brushRadius = 2.0f;
     private float _brushStrength = 1.0f;
     
+    // Continuous brush application
+    private bool _isMouseButtonHeld = false;
+    private bool _isRaising = true; // true = raise (LMB), false = lower (RMB)
+    private Vector3 _lastHitPoint = Vector3.Zero;
+    private bool _hasValidHitPoint = false;
+    
     // UI controls
     private Control _toolbarControl;
     private Button _toggleBrushButton;
@@ -63,6 +69,9 @@ public partial class TerrainEditorPlugin : EditorPlugin
             _currentTerrain = null;
         }
     }
+    
+    // Removed _Process - EditorPlugins don't reliably call _Process
+    // Using mouse motion events instead for continuous brush application
 
     public override void _MakeVisible(bool visible)
     {
@@ -104,14 +113,19 @@ public partial class TerrainEditorPlugin : EditorPlugin
         _radiusSlider.Value = _brushRadius;
         _radiusSlider.Step = 0.1f;
         _radiusSlider.CustomMinimumSize = new Vector2(100, 0);
-        _radiusSlider.ValueChanged += OnRadiusChanged;
         _toolbarControl.AddChild(_radiusSlider);
         
         var radiusValue = new Label();
         radiusValue.Text = _brushRadius.ToString("F1");
         radiusValue.CustomMinimumSize = new Vector2(30, 0);
         _toolbarControl.AddChild(radiusValue);
-        _radiusSlider.ValueChanged += (value) => radiusValue.Text = value.ToString("F1");
+        
+        // Single connection for both update and display
+        _radiusSlider.ValueChanged += (value) => 
+        {
+            OnRadiusChanged(value);
+            radiusValue.Text = value.ToString("F1");
+        };
         
         // Separator
         _toolbarControl.AddChild(new VSeparator());
@@ -127,14 +141,19 @@ public partial class TerrainEditorPlugin : EditorPlugin
         _strengthSlider.Value = _brushStrength;
         _strengthSlider.Step = 0.1f;
         _strengthSlider.CustomMinimumSize = new Vector2(100, 0);
-        _strengthSlider.ValueChanged += OnStrengthChanged;
         _toolbarControl.AddChild(_strengthSlider);
         
         var strengthValue = new Label();
         strengthValue.Text = _brushStrength.ToString("F1");
         strengthValue.CustomMinimumSize = new Vector2(30, 0);
         _toolbarControl.AddChild(strengthValue);
-        _strengthSlider.ValueChanged += (value) => strengthValue.Text = value.ToString("F1");
+        
+        // Single connection for both update and display
+        _strengthSlider.ValueChanged += (value) => 
+        {
+            OnStrengthChanged(value);
+            strengthValue.Text = value.ToString("F1");
+        };
         
         // Separator
         _toolbarControl.AddChild(new VSeparator());
@@ -274,17 +293,39 @@ public partial class TerrainEditorPlugin : EditorPlugin
                 var normal = camera.ProjectRayNormal(mousePos);
                 var to = from + normal * 10000;
 
-                var spaceState = _currentTerrain.GetWorld3D().DirectSpaceState;
+                // Get physics space state with null checks
+                var world = _currentTerrain.GetWorld3D();
+                if (world == null)
+                    return 0; // Pass - world not ready yet
+                    
+                var spaceState = world.DirectSpaceState;
+                if (spaceState == null)
+                    return 0; // Pass - physics space not ready yet
+                
                 var query = PhysicsRayQueryParameters3D.Create(from, to);
                 query.CollideWithAreas = false;
                 query.CollideWithBodies = true;
                 
-                var result = spaceState.IntersectRay(query);
+                // Try to perform raycast - may fail if physics isn't ready
+                Godot.Collections.Dictionary result;
+                try
+                {
+                    result = spaceState.IntersectRay(query);
+                }
+                catch
+                {
+                    // Physics space not accessible right now, skip this frame
+                    return 0;
+                }
                 
                 if (result.Count > 0)
                 {
                     var hitPoint = (Vector3)result["position"];
                     var collider = result["collider"].AsGodotObject();
+                    
+                    // Store hit point for continuous brush application
+                    _lastHitPoint = hitPoint;
+                    _hasValidHitPoint = true;
                     
                     // Update preview position
                     if (_brushPreview != null)
@@ -293,7 +334,7 @@ public partial class TerrainEditorPlugin : EditorPlugin
                         _brushPreview.Visible = true;
                     }
 
-                    // Handle brush painting - NO SHIFT REQUIRED (except for crack panel)
+                    // Handle brush painting
                     if (@event is InputEventMouseButton mb2)
                     {
                         if (mb2.ButtonIndex == MouseButton.Left || mb2.ButtonIndex == MouseButton.Right)
@@ -307,35 +348,41 @@ public partial class TerrainEditorPlugin : EditorPlugin
                                 }
                                 else
                                 {
-                                    // Normal raise/lower
-                                    bool raise = (mb2.ButtonIndex == MouseButton.Left);
-                                    ApplyBrush(hitPoint, raise);
+                                    // Start continuous brush application
+                                    _isMouseButtonHeld = true;
+                                    _isRaising = (mb2.ButtonIndex == MouseButton.Left);
+                                    // Apply brush immediately on click
+                                    ApplyBrushContinuous(hitPoint, _isRaising, 0.016f);
+                                    GD.Print($"Brush started: held={_isMouseButtonHeld}, raising={_isRaising}, enabled={_brushEnabled}, hasPoint={_hasValidHitPoint}");
                                 }
+                            }
+                            else
+                            {
+                                // Stop continuous brush application
+                                _isMouseButtonHeld = false;
+                                GD.Print("Brush stopped");
                             }
                             return 1; // Stop - Prevents selection and consumes the click
                         }
                     }
                     else if (@event is InputEventMouseMotion mm2)
                     {
-                        // Only allow drag painting if NOT holding shift
-                        if (!Input.IsKeyPressed(Key.Shift))
+                        // Update hit point while mouse moves (for continuous brush)
+                        _lastHitPoint = hitPoint;
+                        
+                        // Apply brush continuously while button is held
+                        if (_isMouseButtonHeld)
                         {
-                            // Paint while dragging - NO SHIFT REQUIRED
-                            if (mm2.ButtonMask.HasFlag(MouseButtonMask.Left))
-                            {
-                                ApplyBrush(hitPoint, true);
-                                return 1; // Stop - Prevents selection box drawing
-                            }
-                            else if (mm2.ButtonMask.HasFlag(MouseButtonMask.Right))
-                            {
-                                ApplyBrush(hitPoint, false);
-                                return 1; // Stop - Prevents selection box drawing
-                            }
+                            ApplyBrushContinuous(hitPoint, _isRaising, 0.016f); // Approximate 60 FPS delta
+                            return 1; // Stop - Prevents selection box drawing
                         }
                     }
                 }
                 else
                 {
+                    // No valid hit point
+                    _hasValidHitPoint = false;
+                    
                     // Hide preview if not hitting anything
                     if (_brushPreview != null)
                     {
@@ -366,10 +413,12 @@ public partial class TerrainEditorPlugin : EditorPlugin
         return 0; // Pass - allow normal editor behavior when brush is disabled
     }
 
-    private void ApplyBrush(Vector3 hitPoint, bool raise)
+    private void ApplyBrushContinuous(Vector3 hitPoint, bool raise, float delta)
     {
         if (_currentTerrain == null)
             return;
+        
+        GD.Print($"ApplyBrushContinuous called: raise={raise}, delta={delta}");
         
         // Update brush color
         if (_brushPreview?.MaterialOverride is StandardMaterial3D mat)
@@ -389,7 +438,7 @@ public partial class TerrainEditorPlugin : EditorPlugin
                 {
                     // Calculate falloff (stronger at center, weaker at edges)
                     float falloff = 1.0f - (distance / _brushRadius);
-                    float strength = _brushStrength * falloff * 0.016f; // Approximate delta time
+                    float strength = _brushStrength * falloff * delta;
 
                     // Store old position for potential undo/redo
                     var oldPos = graphNode.Position;
@@ -403,8 +452,7 @@ public partial class TerrainEditorPlugin : EditorPlugin
                         graphNode.Position -= Vector3.Up * strength;
                     }
                     
-                    // Manually trigger mesh updates since we're in the editor
-                    UpdateGraphNodeMeshes(graphNode);
+                    // Position setter now automatically emits signal
                     
                     morphedCount++;
                     affectedNodes.Add(graphNode);
@@ -426,17 +474,8 @@ public partial class TerrainEditorPlugin : EditorPlugin
     
     private void UpdateGraphNodeMeshes(GraphNode node)
     {
-        // Update all connected ground meshes for this node
-        if (node.ConnectedGroundMeshes != null)
-        {
-            foreach (var groundMesh in node.ConnectedGroundMeshes)
-            {
-                if (groundMesh != null && IsInstanceValid(groundMesh))
-                {
-                    groundMesh.UpdateMeshGeometry();
-                }
-            }
-        }
+        // Terrain handles mesh updates via signals now
+        // This method is no longer needed but kept for backward compatibility
     }
     
     private void CrackPanelAtPoint(Vector3 hitPoint, GodotObject collider)
@@ -458,17 +497,28 @@ public partial class TerrainEditorPlugin : EditorPlugin
         
         if (groundMesh != null)
         {
-            // Use GlobalPosition to ensure we're working in the same coordinate system as hitPoint
-            var posA = groundMesh.NodeA.GlobalPosition;
-            var posB = groundMesh.NodeB.GlobalPosition;
-            var posC = groundMesh.NodeC.GlobalPosition;
+            // Get the three nodes from Terrain's data structure
+            var triangleNodes = _currentTerrain.GetTriangleNodes(groundMesh);
+            if (triangleNodes == null)
+            {
+                GD.PrintErr("CrackPanelAtPoint: Failed to get triangle nodes from terrain");
+                return;
+            }
+            
+            var nodeA = triangleNodes.Value.a;
+            var nodeB = triangleNodes.Value.b;
+            var nodeC = triangleNodes.Value.c;
+            
+            // Use GlobalPosition for calculations
+            var posA = nodeA.GlobalPosition;
+            var posB = nodeB.GlobalPosition;
+            var posC = nodeC.GlobalPosition;
             
             GD.Print($"Cracking panel: {groundMesh.Name}");
             GD.Print($"  Corner nodes (global): A={posA}, B={posB}, C={posC}");
             GD.Print($"  Raycast hit point (global): {hitPoint}");
             
             // Calculate the exact point on the triangle's plane at the hit XZ location
-            // This ensures the new point lies exactly on the original triangle surface
             Vector3 interpolatedPoint = InterpolatePointOnTriangle(hitPoint, posA, posB, posC);
             
             GD.Print($"  Interpolated point on plane (global): {interpolatedPoint}");
@@ -478,14 +528,18 @@ public partial class TerrainEditorPlugin : EditorPlugin
             
             // Convert global position to local position relative to the Terrain
             Vector3 localPosition = _currentTerrain.ToLocal(interpolatedPoint);
-            newNode.Position = localPosition; // Set local position
+            newNode.Position = localPosition;
             newNode.Name = $"CrackedNode_{System.DateTime.Now.Ticks}";
+            newNode.Id = _currentTerrain.GetNextNodeId();
             
             _currentTerrain.AddChild(newNode, false, Node.InternalMode.Disabled);
             if (Engine.IsEditorHint())
             {
                 newNode.Owner = EditorInterface.Singleton.GetEditedSceneRoot();
             }
+            
+            // Connect to position change signal
+            newNode.PositionChanged += _currentTerrain.OnNodePositionChanged;
             
             GD.Print($"  New node created at global: {newNode.GlobalPosition}, local: {newNode.Position}");
             

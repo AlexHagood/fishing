@@ -5,11 +5,32 @@ using System.Linq;
 [Tool]
 public partial class Terrain : Node3D
 {
-	// [ExportToolButton("Generate")]
-	// public Callable ResetButton => Callable.From(Reset);
+	[ExportToolButton("Generate")]
+	public Callable ResetButton => Callable.From(Reset);
 
+	// === Core Data Structures ===
+	
+	// All nodes in the terrain
 	private List<GraphNode> nodes;
-	private int _nodeCount = 0;
+		private int _nodeCount = 0;
+	
+	// Node connectivity (adjacency list)
+	// Key: GraphNode, Value: Set of connected neighbor nodes
+	private Dictionary<GraphNode, HashSet<GraphNode>> _edges = new();
+	
+	// Triangle registry
+	// All ground meshes in the terrain
+	private List<GroundMesh> _triangles = new();
+	
+	// Triangle to its three nodes
+	// Key: GroundMesh, Value: tuple of (nodeA, nodeB, nodeC)
+	private Dictionary<GroundMesh, (GraphNode a, GraphNode b, GraphNode c)> _triangleNodes = new();
+	
+	// Inverse index: which triangles use which node
+	// Key: GraphNode, Value: Set of GroundMeshes that use this node as a vertex
+	private Dictionary<GraphNode, HashSet<GroundMesh>> _nodeToTriangles = new();
+	
+	// === Configuration ===
 	[Export]
 	public Vector3 TerrainSize = new Vector3(40, 3, 40);
 	[Export]
@@ -20,6 +41,25 @@ public partial class Terrain : Node3D
 	public Terrain()
 	{
 		nodes = new List<GraphNode>();
+	}
+
+	public GraphNode newNode(Vector3 position)
+	{
+		var node = new GraphNode
+		{
+			Id = _nodeCount++,
+			Position = position
+		};
+		AddChild(node);
+		
+		// Allow the node to be saved to the scene file
+		if (Engine.IsEditorHint())
+		{
+			node.Owner = GetTree().EditedSceneRoot;
+		}
+		
+		nodes.Add(node);
+		return node;
 	}
 
 
@@ -38,6 +78,7 @@ public partial class Terrain : Node3D
 		}
 		nodes.Clear();
 		_nodeCount = 0; // Reset node count
+		ClearDataStructures(); // Clear centralized data structures
 
 		// Regenerate terrain
 		var generatedNodes = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
@@ -54,23 +95,33 @@ public partial class Terrain : Node3D
 			GD.Print($"Applied {RelaxationIterations} iterations of Lloyd's relaxation.");
 		}
 		
-		var triangulatedNodes = DelaunayTriangulateXZ(generatedNodes);
-		ForEachTriangle(triangulatedNodes, (nodeA, nodeB, nodeC) =>
+		// Get edges from triangulation (new system - doesn't modify nodes)
+		var edges = DelaunayTriangulator.TriangulateAndGetEdges(generatedNodes);
+		
+		// Register edges in our centralized data structure
+		foreach (var (nodeAIdx, nodeBIdx) in edges)
 		{
-			var mesh = new GroundMesh(nodeA, nodeB, nodeC);
+			AddEdge(generatedNodes[nodeAIdx], generatedNodes[nodeBIdx]);
+		}
+		
+		// Create triangles from edges
+		ForEachTriangleFromEdges(generatedNodes, (nodeA, nodeB, nodeC) =>
+		{
+			var mesh = new GroundMesh(nodeA.Position, nodeB.Position, nodeC.Position);
 			AddChild(mesh);
 			
+			// Register triangle in centralized data structure
+			RegisterTriangle(mesh, nodeA, nodeB, nodeC);
+			
 			// In editor mode, set owner so terrain persists to scene file for game mode
-			// Important: Owner must be set AFTER AddChild and AFTER the GroundMesh has created its children
 			if (Engine.IsEditorHint())
 			{
-				// We need to defer this to ensure the mesh instance and collision shape are created first
 				CallDeferred(nameof(SetMeshOwner), mesh);
 			}
 		});
 
 		CreateDebugLine(Vector3.Zero, Vector3.Up * 10);
-		nodes.AddRange(triangulatedNodes);
+		nodes.AddRange(generatedNodes);
 
 		// Mark the scene as unsaved in the editor
 		if (Engine.IsEditorHint())
@@ -80,7 +131,7 @@ public partial class Terrain : Node3D
 #endif
 		}
 
-		GD.Print($"Terrain regenerated: {triangulatedNodes.Count} nodes triangulated.");
+		GD.Print($"Terrain regenerated: {generatedNodes.Count} nodes, {edges.Count} edges, {_triangles.Count} triangles.");
 	}
 
 	private void SetMeshOwner(GroundMesh mesh)
@@ -111,6 +162,41 @@ public partial class Terrain : Node3D
 		}
 
 		GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
+		
+		// Connect to all GraphNode position change signals
+		ConnectNodeSignals();
+	}
+	
+	// Connect to position change signals for all nodes
+	private void ConnectNodeSignals()
+	{
+		foreach (var node in nodes)
+		{
+			if (node != null && IsInstanceValid(node))
+			{
+				node.PositionChanged += OnNodePositionChanged;
+			}
+		}
+	}
+	
+	// Handle when a node's position changes - PUBLIC so editor plugin can connect
+	public void OnNodePositionChanged(GraphNode node)
+	{
+		// Update all triangles that use this node
+		if (_nodeToTriangles.TryGetValue(node, out var triangles))
+		{
+			foreach (var triangle in triangles)
+			{
+				if (triangle != null && IsInstanceValid(triangle))
+				{
+					// Get the three nodes for this triangle
+					if (_triangleNodes.TryGetValue(triangle, out var nodes))
+					{
+						triangle.UpdateMeshFromPositions(nodes.a.Position, nodes.b.Position, nodes.c.Position);
+					}
+				}
+			}
+		}
 	}
 
 	[Export(PropertyHint.Range, "0,10")]
@@ -130,10 +216,14 @@ public partial class Terrain : Node3D
 			float z = (float)(startLocation.Z + (rng.NextDouble() - 0.5) * spread.Z);
 			var node = new GraphNode
 			{
-				Name = $"Node_{_nodeCount++}",
+				Name = $"Node_{_nodeCount}",
+				Id = _nodeCount++,
 				Position = new Vector3(x, y, z)
 			};
 			AddChild(node);
+			
+			// Connect to position change signal
+			node.PositionChanged += OnNodePositionChanged;
 			
 			// Allow the node to be saved to the scene file
 			if (Engine.IsEditorHint())
@@ -148,72 +238,48 @@ public partial class Terrain : Node3D
 		return generatedNodes;
 	}
 
-
 	/// <summary>
-	/// Performs Delaunay triangulation on nodes and connects them
-	/// </summary>
-	/// <param name="graphNodes">List of nodes to triangulate</param>
-	/// <returns>The same list of nodes, now connected via Delaunay triangulation</returns>
-	public List<GraphNode> DelaunayTriangulateXZ(List<GraphNode> graphNodes)
-	{
-		return DelaunayTriangulator.TriangulateAndConnect(graphNodes);
-	}
-
-	/// <summary>
-	/// Iterates over every triangle based on the actual connections between nodes.
+	/// Iterates over every triangle based on centralized edge data.
 	/// Finds triangles by looking for sets of 3 nodes that are all connected to each other.
-	/// Uses node indices for efficient duplicate detection.
 	/// </summary>
-	/// <param name="graphNodes">List of nodes with connections</param>
+	/// <param name="graphNodes">List of all nodes</param>
 	/// <param name="action">Action to call for each triangle (nodeA, nodeB, nodeC)</param>
-	public void ForEachTriangle(List<GraphNode> graphNodes, Action<GraphNode, GraphNode, GraphNode> action)
+	public void ForEachTriangleFromEdges(List<GraphNode> graphNodes, Action<GraphNode, GraphNode, GraphNode> action)
 	{
 		if (graphNodes == null || graphNodes.Count < 3)
 		{
-			GD.Print("ForEachTriangle: Need at least 3 nodes to form triangles");
+			GD.Print("ForEachTriangleFromEdges: Need at least 3 nodes to form triangles");
 			return;
 		}
 
-		// Use a HashSet of sorted index tuples for efficient duplicate detection
-		var processedTriangles = new HashSet<(int, int, int)>();
+		// Use a HashSet of sorted node tuples for efficient duplicate detection
+		var processedTriangles = new HashSet<(GraphNode, GraphNode, GraphNode)>();
 		int triangleCount = 0;
 
-		// Create a lookup dictionary for fast node index retrieval
-		var nodeToIndex = new Dictionary<GraphNode, int>();
-		for (int i = 0; i < graphNodes.Count; i++)
+		// For each node, check all pairs of its neighbors to see if they form triangles
+		foreach (var nodeA in graphNodes)
 		{
-			nodeToIndex[graphNodes[i]] = i;
-		}
-
-		// For each node, check all pairs of its connections to see if they form triangles
-		for (int aIndex = 0; aIndex < graphNodes.Count; aIndex++)
-		{
-			var nodeA = graphNodes[aIndex];
-			if (nodeA.Connections == null || nodeA.Connections.Count < 2)
+			var neighbors = GetNeighbors(nodeA).ToList();
+			if (neighbors.Count < 2)
 				continue;
 
-			// Check all pairs of connections from nodeA
-			for (int i = 0; i < nodeA.Connections.Count; i++)
+			// Check all pairs of neighbors from nodeA
+			for (int i = 0; i < neighbors.Count; i++)
 			{
-				var nodeB = nodeA.Connections[i];
+				var nodeB = neighbors[i];
 				if (nodeB == nodeA) continue;
 
-				for (int j = i + 1; j < nodeA.Connections.Count; j++)
+				for (int j = i + 1; j < neighbors.Count; j++)
 				{
-					var nodeC = nodeA.Connections[j];
+					var nodeC = neighbors[j];
 					if (nodeC == nodeA || nodeC == nodeB) continue;
 
 					// Check if nodeB and nodeC are also connected to each other
-					if (nodeB.Connections != null && nodeB.Connections.Contains(nodeC))
+					if (_edges.TryGetValue(nodeB, out var nodeBNeighbors) && nodeBNeighbors.Contains(nodeC))
 					{
-						// Get indices and create sorted tuple for duplicate detection
-						var bIndex = nodeToIndex[nodeB];
-						var cIndex = nodeToIndex[nodeC];
-						
-						// Sort the indices to create a unique triangle key
-						var indices = new[] { aIndex, bIndex, cIndex };
-						Array.Sort(indices);
-						var triangleKey = (indices[0], indices[1], indices[2]);
+						// Sort nodes to create unique triangle key
+						var sortedNodes = new[] { nodeA, nodeB, nodeC }.OrderBy(n => n.Id).ToArray();
+						var triangleKey = (sortedNodes[0], sortedNodes[1], sortedNodes[2]);
 
 						// Check if we've already processed this triangle
 						if (!processedTriangles.Contains(triangleKey))
@@ -227,12 +293,8 @@ public partial class Terrain : Node3D
 			}
 		}
 
-		GD.Print($"ForEachTriangle: Processed {triangleCount} triangles from node connections");
+		GD.Print($"ForEachTriangleFromEdges: Processed {triangleCount} triangles from edge data");
 	}
-
-
-
-
 
 	/// <summary>
 	/// Creates a debug line as a pink cylinder between two 3D points. If addToScene is false, does not add to scene tree (for dynamic lines).
@@ -299,31 +361,46 @@ public partial class Terrain : Node3D
 		return meshInstance;
 	}
 
-	public void CrackPanel(GraphNode node, GroundMesh groundMesh)
+	public void CrackPanel(GraphNode newNode, GroundMesh groundMesh)
 	{
-		var line1 = CreateDebugLine(node.Position, groundMesh.NodeA.Position, true);
-		var line2 = CreateDebugLine(node.Position, groundMesh.NodeB.Position, true);
-		var line3 = CreateDebugLine(node.Position, groundMesh.NodeC.Position, true);
+		// Get the three nodes that form this triangle from our data structure
+		if (!_triangleNodes.TryGetValue(groundMesh, out var triangleNodes))
+		{
+			GD.PrintErr("CrackPanel: Ground mesh not found in triangle registry");
+			return;
+		}
+		
+		var nodeA = triangleNodes.a;
+		var nodeB = triangleNodes.b;
+		var nodeC = triangleNodes.c;
+		
+		// Create debug lines
+		var line1 = CreateDebugLine(newNode.Position, nodeA.Position, true);
+		var line2 = CreateDebugLine(newNode.Position, nodeB.Position, true);
+		var line3 = CreateDebugLine(newNode.Position, nodeC.Position, true);
 
-		groundMesh.NodeA.Connect(node);
-		groundMesh.NodeB.Connect(node);
-		groundMesh.NodeC.Connect(node);
+		// Add edges from new node to triangle corners
+		AddEdge(newNode, nodeA);
+		AddEdge(newNode, nodeB);
+		AddEdge(newNode, nodeC);
 
-		groundMesh.NodeA.RemoveGroundMeshReference(groundMesh);
-		groundMesh.NodeB.RemoveGroundMeshReference(groundMesh);
-		groundMesh.NodeC.RemoveGroundMeshReference(groundMesh);
+		// Unregister the old triangle
+		UnregisterTriangle(groundMesh);
+		groundMesh.QueueFree();
 
-		groundMesh.QueueFree(); // Remove the old mesh
-
-		// Create new triangles with correct winding order (counter-clockwise when viewed from above)
-		// Original was (A, B, C), so we maintain the same winding direction
-		GroundMesh groundMesh1 = new GroundMesh(groundMesh.NodeA, groundMesh.NodeB, node);
-		GroundMesh groundMesh2 = new GroundMesh(groundMesh.NodeB, groundMesh.NodeC, node);
-		GroundMesh groundMesh3 = new GroundMesh(groundMesh.NodeC, groundMesh.NodeA, node);
+		// Create new triangles with correct winding order
+		GroundMesh groundMesh1 = new GroundMesh(nodeA.Position, nodeB.Position, newNode.Position);
+		GroundMesh groundMesh2 = new GroundMesh(nodeB.Position, nodeC.Position, newNode.Position);
+		GroundMesh groundMesh3 = new GroundMesh(nodeC.Position, nodeA.Position, newNode.Position);
 
 		AddChild(groundMesh1);
 		AddChild(groundMesh2);
 		AddChild(groundMesh3);
+		
+		// Register new triangles
+		RegisterTriangle(groundMesh1, nodeA, nodeB, newNode);
+		RegisterTriangle(groundMesh2, nodeB, nodeC, newNode);
+		RegisterTriangle(groundMesh3, nodeC, nodeA, newNode);
 
 		// Set owners for persistence in editor
 		if (Engine.IsEditorHint() && IsInsideTree())
@@ -335,7 +412,6 @@ public partial class Terrain : Node3D
 				groundMesh2.Owner = editedRoot;
 				groundMesh3.Owner = editedRoot;
 				
-				// Also set owners for their children (MeshInstance, CollisionShape)
 				SetOwnerRecursive(groundMesh1, editedRoot);
 				SetOwnerRecursive(groundMesh2, editedRoot);
 				SetOwnerRecursive(groundMesh3, editedRoot);
@@ -352,6 +428,112 @@ public partial class Terrain : Node3D
 			child.Owner = owner;
 			SetOwnerRecursive(child, owner);
 		}
+	}
+
+	// === Data Structure Helper Methods ===
+	
+	/// <summary>
+	/// Add an edge (connection) between two nodes
+	/// </summary>
+	public void AddEdge(GraphNode a, GraphNode b)
+	{
+		if (!_edges.ContainsKey(a))
+			_edges[a] = new HashSet<GraphNode>();
+		if (!_edges.ContainsKey(b))
+			_edges[b] = new HashSet<GraphNode>();
+		
+		_edges[a].Add(b);
+		_edges[b].Add(a);
+	}
+	
+	/// <summary>
+	/// Get all neighbor nodes connected to the given node
+	/// </summary>
+	public IEnumerable<GraphNode> GetNeighbors(GraphNode node)
+	{
+		if (_edges.TryGetValue(node, out var neighbors))
+			return neighbors;
+		return Enumerable.Empty<GraphNode>();
+	}
+	
+	/// <summary>
+	/// Register a triangle mesh with its three vertex nodes
+	/// </summary>
+	public void RegisterTriangle(GroundMesh mesh, GraphNode a, GraphNode b, GraphNode c)
+	{
+		_triangles.Add(mesh);
+		_triangleNodes[mesh] = (a, b, c);
+		
+		// Update inverse index
+		if (!_nodeToTriangles.ContainsKey(a))
+			_nodeToTriangles[a] = new HashSet<GroundMesh>();
+		if (!_nodeToTriangles.ContainsKey(b))
+			_nodeToTriangles[b] = new HashSet<GroundMesh>();
+		if (!_nodeToTriangles.ContainsKey(c))
+			_nodeToTriangles[c] = new HashSet<GroundMesh>();
+		
+		_nodeToTriangles[a].Add(mesh);
+		_nodeToTriangles[b].Add(mesh);
+		_nodeToTriangles[c].Add(mesh);
+	}
+	
+	/// <summary>
+	/// Get all triangles that use the given node as a vertex
+	/// </summary>
+	public IEnumerable<GroundMesh> GetTrianglesUsingNode(GraphNode node)
+	{
+		if (_nodeToTriangles.TryGetValue(node, out var triangles))
+			return triangles;
+		return Enumerable.Empty<GroundMesh>();
+	}
+	
+	/// <summary>
+	/// Get the three nodes that form a triangle
+	/// </summary>
+	public (GraphNode a, GraphNode b, GraphNode c)? GetTriangleNodes(GroundMesh mesh)
+	{
+		if (_triangleNodes.TryGetValue(mesh, out var nodes))
+			return nodes;
+		return null;
+	}
+	
+	/// <summary>
+	/// Get the next available node ID
+	/// </summary>
+	public int GetNextNodeId()
+	{
+		return _nodeCount++;
+	}
+	
+	/// <summary>
+	/// Unregister a triangle (e.g., when cracking a panel)
+	/// </summary>
+	public void UnregisterTriangle(GroundMesh mesh)
+	{
+		if (_triangleNodes.TryGetValue(mesh, out var nodes))
+		{
+			// Remove from node-to-triangle index
+			if (_nodeToTriangles.ContainsKey(nodes.a))
+				_nodeToTriangles[nodes.a].Remove(mesh);
+			if (_nodeToTriangles.ContainsKey(nodes.b))
+				_nodeToTriangles[nodes.b].Remove(mesh);
+			if (_nodeToTriangles.ContainsKey(nodes.c))
+				_nodeToTriangles[nodes.c].Remove(mesh);
+		}
+		
+		_triangleNodes.Remove(mesh);
+		_triangles.Remove(mesh);
+	}
+	
+	/// <summary>
+	/// Clear all data structures (useful for Reset)
+	/// </summary>
+	public void ClearDataStructures()
+	{
+		_edges.Clear();
+		_triangles.Clear();
+		_triangleNodes.Clear();
+		_nodeToTriangles.Clear();
 	}
 
 }

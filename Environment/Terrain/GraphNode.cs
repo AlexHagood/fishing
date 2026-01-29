@@ -5,93 +5,61 @@ using System.Collections.Generic;
 [GlobalClass]
 public partial class GraphNode : Node3D
 {
-    public List<GraphNode> Connections { get; private set; }
+    [Export]
+    public int Id { get; set; }
+    
     public MeshInstance3D MeshInstance;
     private StandardMaterial3D material;
     private float animationTime = 0.0f;
     
-    // New: References to connected ground meshes and terrain
-    public List<GroundMesh> ConnectedGroundMeshes { get; private set; }
-    public Terrain ParentTerrain { get; set; }
+    // Signal emitted when this node's position changes
+    [Signal]
+    public delegate void PositionChangedEventHandler(GraphNode node);
     
-    public override void _Notification(int what)
+    // Custom Position property that emits signal on change
+    public new Vector3 Position
     {
-        if (what == NotificationTransformChanged)
+        get => base.Position;
+        set
         {
-            // Only update meshes if we're in the scene tree
-            if (IsInsideTree())
+            if (base.Position != value)
             {
-                UpdateConnectedMeshes();
-            }
-        }
-    }
-
-    private void UpdateConnectedMeshes()
-    {
-        // Update all connected ground meshes when this node moves
-        if (ConnectedGroundMeshes != null && ConnectedGroundMeshes.Count > 0)
-        {
-            foreach (var groundMesh in ConnectedGroundMeshes)
-            {
-                if (groundMesh != null && IsInstanceValid(groundMesh))
+                base.Position = value;
+                // Emit signal when position changes
+                if (IsInsideTree())
                 {
-                    try 
-                    {
-                        groundMesh.UpdateMeshGeometry();
-                    }
-                    catch (System.Exception ex)
-                    {
-                        GD.PrintErr($"Error updating ground mesh for node {Name}: {ex.Message}");
-                    }
+                    EmitSignal(SignalName.PositionChanged, this);
                 }
             }
         }
+    }
+    
+    // Override GetHashCode and Equals to use Id for dictionary keys
+    public override int GetHashCode()
+    {
+        return Id.GetHashCode();
+    }
+    
+    public override bool Equals(object obj)
+    {
+        if (obj is GraphNode other)
+        {
+            return Id == other.Id;
+        }
+        return false;
     }
 
     public GraphNode()
     {
         Name = "GraphNode";
-        Connections = new List<GraphNode>();
-        ConnectedGroundMeshes = new List<GroundMesh>();
     }
 
     public GraphNode(Vector3 position)
     {
         Name = "GraphNode";
         Position = position;
-        Connections = new List<GraphNode>();
-        ConnectedGroundMeshes = new List<GroundMesh>();
     }
 
-    public GraphNode(string nodeName)
-    {
-        Name = nodeName;
-        Connections = new List<GraphNode>();
-        ConnectedGroundMeshes = new List<GroundMesh>();
-    }
-
-    public GraphNode(Vector3 position, string nodeName = "GraphNode")
-    {
-        Name = nodeName;
-        Position = position;
-        Connections = new List<GraphNode>();
-        ConnectedGroundMeshes = new List<GroundMesh>();
-    }
-    
-    // Method to add a ground mesh reference
-    public void AddGroundMeshReference(GroundMesh groundMesh)
-    {
-        if (!ConnectedGroundMeshes.Contains(groundMesh))
-        {
-            ConnectedGroundMeshes.Add(groundMesh);
-        }
-    }
-    
-    // Method to remove a ground mesh reference
-    public void RemoveGroundMeshReference(GroundMesh groundMesh)
-    {
-        ConnectedGroundMeshes.Remove(groundMesh);
-    }
 
     private void SetupMeshInstance()
     {
@@ -124,20 +92,8 @@ public partial class GraphNode : Node3D
         // GraphNode doesn't need collision - only the GroundMesh triangles do
     }
 
-    public void Connect(GraphNode otherNode)
-    {
-        if (!Connections.Contains(otherNode))
-        {
-            Connections.Add(otherNode);
-            otherNode.Connections.Add(this);
-        }
-    }
-
     public override void _Ready()
     {
-        // Enable notification for transform changes
-        SetNotifyTransform(true);
-        
         // Set up mesh and collision if not already present (important for Tool mode)
         SetupMeshInstance();
         

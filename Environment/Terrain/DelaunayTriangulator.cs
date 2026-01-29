@@ -13,32 +13,23 @@ using TriangleNet.Topology;
 public static class DelaunayTriangulator
 {
     /// <summary>
-    /// Performs Delaunay triangulation on GraphNodes projected to XZ plane and connects them
+    /// Performs Delaunay triangulation on GraphNodes projected to XZ plane
+    /// Returns a list of edges (pairs of node indices) instead of modifying nodes directly
     /// </summary>
     /// <param name="nodes">List of GraphNodes to triangulate</param>
-    /// <param name="clearExistingConnections">Whether to clear existing connections before triangulating</param>
-    /// <returns>The same list of nodes, now connected via Delaunay triangulation</returns>
-    public static List<GraphNode> TriangulateAndConnect(List<GraphNode> nodes, bool clearExistingConnections = true)
+    /// <returns>List of edges as (nodeIndexA, nodeIndexB) tuples</returns>
+    public static List<(int, int)> TriangulateAndGetEdges(List<GraphNode> nodes)
     {
         if (nodes == null || nodes.Count < 3)
         {
             GD.Print($"DelaunayTriangulator: Need at least 3 nodes for triangulation, got {nodes?.Count ?? 0}");
-            return nodes ?? new List<GraphNode>();
-        }
-
-        // Clear existing connections if requested
-        if (clearExistingConnections)
-        {
-            foreach (var node in nodes)
-            {
-                node.Connections.Clear();
-            }
+            return new List<(int, int)>();
         }
 
         // Project to 2D and triangulate
         var triangles = Triangulate2D(nodes);
         
-        // Track unique edges to avoid duplicate connections
+        // Track unique edges to avoid duplicates
         var edges = new HashSet<(int, int)>();
         
         // Collect all edges from triangles
@@ -49,22 +40,20 @@ public static class DelaunayTriangulator
             AddUniqueEdge(edges, triangle.C, triangle.A);
         }
 
-        // Create connections based on unique edges only
-        foreach (var (nodeA, nodeB) in edges)
-        {
-            // Only add if not already connected (avoid duplicates)
-            if (!nodes[nodeA].Connections.Contains(nodes[nodeB]))
-            {
-                nodes[nodeA].Connections.Add(nodes[nodeB]);
-            }
-            if (!nodes[nodeB].Connections.Contains(nodes[nodeA]))
-            {
-                nodes[nodeB].Connections.Add(nodes[nodeA]);
-            }
-        }
-
         GD.Print($"DelaunayTriangulator: {triangles.Count} triangles, {edges.Count} edges created for {nodes.Count} nodes");
-        return nodes;
+        return edges.ToList();
+    }
+
+    /// <summary>
+    /// DEPRECATED: Use TriangulateAndGetEdges instead. 
+    /// This method modifies nodes directly which breaks the new centralized data structure model.
+    /// </summary>
+    [Obsolete("Use TriangulateAndGetEdges instead and register edges with Terrain")]
+    public static List<GraphNode> TriangulateAndConnect(List<GraphNode> nodes, bool clearExistingConnections = true)
+    {
+        // For backward compatibility, but should not be used
+        GD.PrintErr("TriangulateAndConnect is deprecated. Use TriangulateAndGetEdges instead.");
+        return nodes ?? new List<GraphNode>();
     }
 
     /// <summary>
