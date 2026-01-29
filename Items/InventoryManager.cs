@@ -7,7 +7,7 @@ using System.Drawing;
 using System.Linq;
 using System.Numerics;
 
-
+#nullable enable
 public class ItemInstance
 {
     public int InventoryId { get; set; }
@@ -38,6 +38,8 @@ public class Inventory
     {
         Size = size;
         Grid = new Dictionary<Vector2I, ItemInstance>();
+        HotbarItems = new List<ItemInstance?>() {null, null, null, null, null, null};
+
     }
 
     public List<ItemInstance> GetAllItems()
@@ -47,6 +49,10 @@ public class Inventory
             .Select(group => group.First())
             .ToList();
     }
+
+    public List<ItemInstance?> HotbarItems;
+
+
 }
 
 [GlobalClass]

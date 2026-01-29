@@ -8,6 +8,9 @@ public partial class Character : CharacterBody3D
     [Signal]
     public delegate void RotateRequestedEventHandler();
 
+    [Signal]
+    public delegate void HotbarSlotSelectedEventHandler(int slotIndex);
+
     [Export] public float Speed = 5.0f;
     [Export] public float JumpVelocity = 8.0f;
     [Export] public float Gravity = 20.0f;
@@ -25,8 +28,44 @@ public partial class Character : CharacterBody3D
     private PhysItem _heldPhysItem;
 
     private InventoryManager _inventoryManager;
+    private ToolScript _currentTool;
 
     public int inventoryId;
+    private int _hotbarSlot = 0;
+    public int HotbarSlot { 
+        get => _hotbarSlot;
+        private set 
+        {
+            _hotbarSlot = value;
+            ItemInstance? item = _inventoryManager.GetInventory(inventoryId).HotbarItems[value];
+
+            if (item != null)
+            {
+                GD.Print($"[Character] Hotbar slot {value} has item: {item.ItemData.Name}");
+                // Instantiate the tool script for the selected item
+                if (_currentTool != null)
+                {
+                    _currentTool.QueueFree();
+                    _currentTool = null;
+                }
+                if (item.ItemData.ToolScriptScene != null)
+                {
+                    _currentTool = item.ItemData.ToolScriptScene.Instantiate<ToolScript>();
+                    _currentTool.itemInstance = item;
+                    AddChild(_currentTool);
+                }
+            }
+            else
+            {
+                GD.Print($"[Character] Hotbar slot {value} is empty");
+                if (_currentTool != null)
+                {
+                    _currentTool.QueueFree();
+                    _currentTool = null;
+                }
+            }
+        }
+    }
 
     public override void _Ready()
     {
@@ -71,6 +110,25 @@ public partial class Character : CharacterBody3D
         // Handle mouse clicks for throw/drop physics items
         if (@event is InputEventMouseButton mouseButton)
         {
+            // Mouse wheel scrolling for hotbar (only when not in menu)
+            if (Input.MouseMode != Input.MouseModeEnum.Visible)
+            {
+                if (mouseButton.ButtonIndex == MouseButton.WheelUp && mouseButton.Pressed)
+                {
+                    HotbarSlot = (HotbarSlot + 1 + 6) % 6; // Wrap around: 0 -> 5
+                    EmitSignal(SignalName.HotbarSlotSelected, HotbarSlot);
+                    GD.Print($"Hotbar scrolled up to slot {HotbarSlot}");
+                    return; // Don't process other mouse actions
+                }
+                else if (mouseButton.ButtonIndex == MouseButton.WheelDown && mouseButton.Pressed)
+                {
+                    HotbarSlot = (HotbarSlot - 1 + 6) % 6; // Wrap around: 5 -> 0
+                    EmitSignal(SignalName.HotbarSlotSelected, HotbarSlot);
+                    GD.Print($"Hotbar scrolled down to slot {HotbarSlot}");
+                    return; // Don't process other mouse actions
+                }
+            }
+            
             // Don't process item actions in menu mode
             
             
@@ -81,6 +139,10 @@ public partial class Character : CharacterBody3D
                 {
                     ThrowPhysItem();
                 }
+                if (_currentTool != null)
+                {
+                    _currentTool.PrimaryFire(this);
+                }
             }
             // Right mouse button - drop
             else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
@@ -89,6 +151,21 @@ public partial class Character : CharacterBody3D
                 {
                     DropPhysItem();
                 }
+                if (_currentTool != null)
+                {
+                    _currentTool.SecondaryFire(this);
+                }
+            }
+        }
+
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo && Input.MouseMode != Input.MouseModeEnum.Visible)
+        {
+            if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
+            {
+                GD.Print("Hotbar key pressed: " + keyEvent.Keycode);
+                int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
+                HotbarSlot = slotIndex;
+                EmitSignal(SignalName.HotbarSlotSelected, slotIndex);
             }
         }
 
@@ -203,7 +280,7 @@ public partial class Character : CharacterBody3D
         camera.RotationDegrees = rotation;
     }
 
-    private GodotObject RaycastFromCamera(float range = 5.0f)
+    public GodotObject RaycastFromCamera(float range = 5.0f)
     {
         var spaceState = GetWorld3D().DirectSpaceState;
         var from = camera.GlobalTransform.Origin;
@@ -241,7 +318,7 @@ public partial class Character : CharacterBody3D
                 }
                 else
                 {
-                    GD.Print($"[Character] Too far away: {distance:F1}m");
+                    GD.Print($"[Character] Too far away for E: {distance:F1}m");
                 }
                 return;
             }
@@ -263,15 +340,8 @@ public partial class Character : CharacterBody3D
             {
                 float distance = GlobalPosition.DistanceTo(worldItem.GlobalPosition);
                 
-                if (distance <= worldItem.InteractRange)
-                {
-                    worldItem.InteractF(this);
-                }
-                else
-                {
-                    GD.Print($"[Character] Too far away: {distance:F1}m");
-                }
-                return;
+        
+                worldItem.InteractF(this);
             }
             nodeToCheck = nodeToCheck.GetParent();
         }

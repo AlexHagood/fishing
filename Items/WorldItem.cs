@@ -12,7 +12,7 @@ public partial class WorldItem : RigidBody3D
     /// </summary>
     [Export] public ItemDefinition InvItemData { get; set; }
     
-    [Export] public float InteractRange { get; set; } = 3.0f;
+    [Export] public float InteractRange { get; set; } = 5.0f;
     
     public virtual string HintE { get; protected set; } = "";
     public virtual string HintF { get; protected set; } = "";

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using Godot;
 
@@ -18,6 +19,8 @@ public partial class Gui : CanvasLayer
     private AudioStreamPlayer _dropAudio = null!;
     private AudioStreamPlayer _pickupAudio = null!;
 
+    HotbarUI _hotbarUI = null!;
+
     private bool _rotateHeld = false;
 
 
@@ -31,6 +34,10 @@ public partial class Gui : CanvasLayer
         var character = GetNode<Character>("/root/Main/Character/CharacterBody3D");
         character.InventoryRequested += OnInventoryRequested;
         character.RotateRequested += OnRotateRequested;
+        character.HotbarSlotSelected += OnHotbarSlotSelected;
+
+        _hotbarUI = GetNode<HotbarUI>("Hotbar");
+        _hotbarUI.inventoryId = character.inventoryId;
     }
     
     public override void _Input(InputEvent @event)
@@ -53,6 +60,38 @@ public partial class Gui : CanvasLayer
             // Only drop if we're clicking on empty space or a slot, not on another item
 
             GetViewport().SetInputAsHandled();
+        }
+
+        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
+        {
+            if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
+            {
+                int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
+                GD.Print("Hotbar key pressed: " + slotIndex);
+                Vector2 mousePos = GetViewport().GetMousePosition();
+                var slotUnder = GetSlotAtPosition(mousePos);
+                if (slotUnder != null)
+                {
+                    Vector2I slotPos = slotUnder.slotPosition;
+                    var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
+                    if (inv.Grid.ContainsKey(slotPos))
+                    {
+                        GD.Print($"[GUI] Hotbar key pressed over item at position: {inv.Grid[slotPos].ItemData.Name}");
+                        ItemInstance item = inv.Grid[slotPos];
+
+                        int i = inv.HotbarItems.IndexOf(item);
+                        GD.Print($"[GUI] Item is currently in hotbar at index: {i}");
+                        if (i != -1)
+                        {
+                            
+                            // Item is already in hotbar, swap positions
+                            inv.HotbarItems[i] = null;
+                        }
+                        inv.HotbarItems[slotIndex] = item;
+                        _hotbarUI.Refresh();
+                    }
+                }
+            }
         }
     }
     
@@ -116,6 +155,12 @@ public partial class Gui : CanvasLayer
                 _lastHoveredSlot = slotUnder;
             }
         }
+    }
+
+    public void OnHotbarSlotSelected(int slotIndex)
+    {
+        GD.Print($"[GUI] Hotbar slot selected: {slotIndex}");
+        _hotbarUI.HighlightSlot(slotIndex);
     }
     
     private InventorySlot? GetSlotAtPosition(Vector2 globalPosition)
@@ -231,6 +276,7 @@ public partial class Gui : CanvasLayer
         var inventoryScene = GD.Load<PackedScene>("res://UI/inventory.tscn");
         var inventoryWindow = inventoryScene.Instantiate<InventoryWindow>();
         inventoryWindow.inventoryId = id;
+        
         
         // Connect the ItemGrab signal using += syntax
         inventoryWindow.ItemGrab += OnItemGrabbed;
@@ -393,5 +439,15 @@ public partial class Gui : CanvasLayer
         }
         
         GD.Print($"[GUI] On Window opened. Total windows: {openWindows.Count}");
+    }
+
+    public override void _ExitTree()
+    {
+        var character = GetNode<Character>("/root/Main/Character/CharacterBody3D");
+        character.InventoryRequested += OnInventoryRequested;
+        character.RotateRequested += OnRotateRequested;
+        character.HotbarSlotSelected += OnHotbarSlotSelected;
+        
+        base._ExitTree();
     }
 }

@@ -5,8 +5,8 @@ using System.Linq;
 [Tool]
 public partial class Terrain : Node3D
 {
-	[ExportToolButton("Generate")]
-	public Callable ResetButton => Callable.From(Reset);
+	// [ExportToolButton("Generate")]
+	// public Callable ResetButton => Callable.From(Reset);
 
 	private List<GraphNode> nodes;
 	private int _nodeCount = 0;

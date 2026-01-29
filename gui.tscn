@@ -1,7 +1,8 @@
-[gd_scene load_steps=12 format=3 uid="uid://dwfv0b3dqr6fv"]
+[gd_scene load_steps=13 format=3 uid="uid://dwfv0b3dqr6fv"]
 
 [ext_resource type="Script" uid="uid://byy0guhpinbi6" path="res://UI/Gui.cs" id="1_jf511"]
 [ext_resource type="Texture2D" uid="uid://c1fykfvqv6fk8" path="res://Textures/crosshair.png" id="2_0wv8u"]
+[ext_resource type="Script" uid="uid://dxdofwkbdcug8" path="res://UI/HotbarUI.cs" id="3_67jta"]
 [ext_resource type="Script" uid="uid://ckhua5bg6r7af" path="res://Player/ButtonHints.cs" id="4_p8208"]
 [ext_resource type="Texture2D" uid="uid://ndp7yl03gurl" path="res://UI/keyboard_f_outline.png" id="5_axmix"]
 [ext_resource type="AudioStream" uid="uid://bhnd84rgcbrci" path="res://Sounds/pickup.ogg" id="6_0wv8u"]
@@ -99,6 +100,23 @@ grow_vertical = 0
 size_flags_horizontal = 3
 size_flags_vertical = 3
 columns = 6
+script = ExtResource("3_67jta")
+
+[node name="Slot0" type="Panel" parent="Hotbar"]
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 3
+theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
+
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot0"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot1" type="Panel" parent="Hotbar"]
 layout_mode = 2
@@ -106,11 +124,31 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot1"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Slot2" type="Panel" parent="Hotbar"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
+
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot2"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot3" type="Panel" parent="Hotbar"]
 layout_mode = 2
@@ -118,11 +156,31 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot3"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
+
 [node name="Slot4" type="Panel" parent="Hotbar"]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
+
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot4"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="Slot5" type="Panel" parent="Hotbar"]
 layout_mode = 2
@@ -130,11 +188,15 @@ size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
-[node name="Slot6" type="Panel" parent="Hotbar"]
-layout_mode = 2
-size_flags_horizontal = 3
-size_flags_vertical = 3
-theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot5"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+expand_mode = 1
+stretch_mode = 5
 
 [node name="ButtonHints" type="VBoxContainer" parent="."]
 custom_minimum_size = Vector2(60, 40)

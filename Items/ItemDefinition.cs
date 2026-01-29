@@ -19,7 +19,7 @@ public partial class ItemDefinition : Resource
     /// <summary>
     /// Size in inventory grid (e.g., 1x1, 2x1, 2x2)
     /// </summary>
-    [Export] public Vector2I Size { get; set; } = new Vector2I(1, 1);
+    [Export] public Vector2I Size { get; set; }
     
     /// <summary>
     /// Maximum stack size (1 = non-stackable)
@@ -35,6 +35,8 @@ public partial class ItemDefinition : Resource
     /// Returns true if the item can be stacked (StackSize > 1)
     /// </summary>
     public bool Stackable => StackSize > 1;
+
+    [Export] public PackedScene ToolScriptScene { get; set; }
     
 
 }

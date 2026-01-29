@@ -1,14 +1,7 @@
-[gd_scene load_steps=7 format=4 uid="uid://cksydhl1w3gte"]
+[gd_scene load_steps=6 format=4 uid="uid://dovtc3lfpwj5c"]
 
 [ext_resource type="Script" uid="uid://kill1sr1ygyw" path="res://Items/GameItem.cs" id="1_5aqrx"]
-[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="2_b5nqb"]
-
-[sub_resource type="Resource" id="Resource_d2get"]
-script = ExtResource("2_b5nqb")
-Name = "Pickaxe"
-Icon = "uid://bqkp6n0rvol73"
-Size = Vector2i(2, 3)
-metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"
+[ext_resource type="Resource" uid="uid://d1omxjw12mqo3" path="res://Items/Tools/Pickaxe/Pickaxe.tres" id="2_4nr41"]
 
 [sub_resource type="ArrayMesh" id="ArrayMesh_dg77c"]
 _surfaces = [{
@@ -29,7 +22,7 @@ points = PackedVector3Array(-0.657239, 2.06992, -0.036702, -0.000133991, 0.79998
 
 [node name="Pickaxe" type="RigidBody3D"]
 script = ExtResource("1_5aqrx")
-InvItemData = SubResource("Resource_d2get")
+InvItemData = ExtResource("2_4nr41")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.54703, 0)
