@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using Godot;
 
 public partial class FishingRodTool : ToolScript
@@ -19,8 +20,8 @@ public partial class FishingRodTool : ToolScript
     private const float MinLength = 0.5f;
     private const float MaxLength = 50.0f;
     private const float ReelSpeed = 3.0f; // units per second (continuous)
-    private const float CastForceForward = 3.0f;
-    private const float CastForceUp = 1.5f;
+    private const float CastForceForward = 10.0f;
+    private const float CastForceUp = 3f;
     
     // Spring physics for fishing line
     private const float SpringStiffness = 50.0f;
@@ -76,6 +77,9 @@ public partial class FishingRodTool : ToolScript
         // Make the mesh instance top-level so it doesn't inherit our transform
         _lineMeshInstance.TopLevel = true;
         AddChild(_lineMeshInstance);
+        
+        // Add this tool to the FishingRodTool group so water can find it
+        AddToGroup("FishingRodTool");
         
         // Position and rotation are now controlled by the hand bone and tool scene positioning
         // No need to set them here anymore
@@ -163,8 +167,15 @@ public partial class FishingRodTool : ToolScript
         // Apply spring physics to bobber when cast
         if (_state == FishingState.Cast && _bobber != null && IsInstanceValid(_bobber) && _rodTip != null)
         {
+            if (_hasLanded) 
+            {
             ApplySpringForce();
+            } else
+            {
+                _currentLength = _rodTip.GlobalPosition.DistanceTo(_bobber.GlobalPosition);
+            }
         }
+
     }
     
     private void ApplySpringForce()
@@ -300,10 +311,10 @@ public partial class FishingRodTool : ToolScript
         _currentLength = 3.0f;
     }
     
-    private void OnBobberLanded(Node body)
+    public void OnBobberLanded(Node body)
     {
         // Check if bobber hit water (Area3D named WaterVolume)
-        if (body is Area3D waterArea && waterArea.Name == "WaterVolume")
+        if (body is Area3D waterArea)
         {
             // Bobber hit water - set as landed and allow reeling immediately
             if (!_hasLanded)
@@ -343,16 +354,54 @@ public partial class FishingRodTool : ToolScript
         if (_lineMesh == null || _rodTip == null || _bobber == null || !IsInstanceValid(_bobber)) return;
         
         _lineMesh.ClearSurfaces();
-        _lineMesh.SurfaceBegin(Mesh.PrimitiveType.Lines);
+        _lineMesh.SurfaceBegin(Mesh.PrimitiveType.LineStrip);
+
         
         // Get global positions (mesh is top-level, so we use global directly)
         Vector3 tipPos = _rodTip.GlobalPosition;
-        Vector3 bobberPos = _bobber.GlobalPosition;
+        Vector3 bobberPos = _bobber.GlobalPosition + Vector3.Up * 0.1f; // Slightly above bobber center
+
+        Vector3 dir = (bobberPos - tipPos).Normalized();
+        Vector3 right = dir.Cross(Vector3.Up).Normalized();
+        Vector3 up = -right.Cross(dir).Normalized();
+
+        float distance = tipPos.DistanceTo(bobberPos);
+        float slack = Mathf.Max(0f, _currentLength - distance);
+
+        List<Vector3> linePoints = new List<Vector3>();
+
+        int segments = 9;
+        var space = GetWorld3D().DirectSpaceState;
+        for (int i = 0; i <= segments; i++)
+        {
+            float t = (float)i / segments;
+
+            Vector3 p = tipPos.Lerp(bobberPos, t);
+
+            float sagFactor = 4f * t * (1f - t);
+            p += up * slack * sagFactor;
+            
+
+            // --- Ground collision ---
+            var query = PhysicsRayQueryParameters3D.Create(
+                p,
+                p - up * 1
+            );
+            query.CollideWithAreas = false;
+
+            var hit = space.IntersectRay(query);
+
+            if (hit.Count > 0)
+            {
+                p = (Vector3)hit["position"];
+            }
+
+            _lineMesh.SurfaceAddVertex(p);
+        }
+                    
         
         // Set white color for the line
         _lineMesh.SurfaceSetColor(new Color(1, 1, 1));
-        _lineMesh.SurfaceAddVertex(tipPos);
-        _lineMesh.SurfaceAddVertex(bobberPos);
         
         _lineMesh.SurfaceEnd();
     }

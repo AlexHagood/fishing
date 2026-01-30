@@ -86,68 +86,58 @@ public partial class Water : Node3D
 	private void ApplyBuoyancy(RigidBody3D body, float delta)
 	{
 		// Get buoyancy value from GameItem if available
-		float buoyancy = 1.0f;
+		float buoyancy = 1.2f;
+
+		if (body.Name.ToString().Contains("Bobber", System.StringComparison.OrdinalIgnoreCase))
+		{
+			buoyancy = 1.5f; // Bobbers float!
+		}
 		
-		// if (body is Node3D gameItem && gameItem.ItemDef != null)
-		// {
-		// 	buoyancy = gameItem.ItemDef.Buoyancy;
-		// }
-		// // Check for "buoyant" group (for bobbers and other non-GameItem floaters)
-		// else if (body.IsInGroup("buoyant"))
-		// {
-		// 	buoyancy = 1.5f; // Floats well
-		// }
-		// // Check for bobbers by name (fallback)
-		// else if (body.Name.ToString().Contains("Bobber", System.StringComparison.OrdinalIgnoreCase))
-		// {
-		// 	buoyancy = 1.5f; // Bobbers float!
-		// }
+		// Get the object's size (rotation-independent)
+		float objectRadius = GetBodyRadius(body);
+		float objectCenterY = body.GlobalPosition.Y;
 		
-		// // Get the object's size (rotation-independent)
-		// float objectRadius = GetBodyRadius(body);
-		// float objectCenterY = body.GlobalPosition.Y;
+		// Calculate how deep the center is below the water surface
+		float depthBelowSurface = _waterSurfaceY - objectCenterY;
 		
-		// // Calculate how deep the center is below the water surface
-		// float depthBelowSurface = _waterSurfaceY - objectCenterY;
+		// Calculate submersion ratio based on center depth
+		// If center is above water by radius, submersion = 0
+		// If center is at water level, submersion = 0.5
+		// If center is below water by radius, submersion = 1.0
+		float submersionRatio = Mathf.Clamp((depthBelowSurface + objectRadius) / (objectRadius * 2.0f), 0.0f, 1.0f);
 		
-		// // Calculate submersion ratio based on center depth
-		// // If center is above water by radius, submersion = 0
-		// // If center is at water level, submersion = 0.5
-		// // If center is below water by radius, submersion = 1.0
-		// float submersionRatio = Mathf.Clamp((depthBelowSurface + objectRadius) / (objectRadius * 2.0f), 0.0f, 1.0f);
+		if (submersionRatio <= 0)
+			return; // Not submerged
 		
-		// if (submersionRatio <= 0)
-		// 	return; // Not submerged
+		// Physics: 
+		// Buoyancy force = buoyancy * gravity * mass * submersion
+		// For objects to float half-submerged, buoyancy should be ~1.0
+		float gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity", 9.8);
+		float buoyantForce = buoyancy * gravity * body.Mass * submersionRatio;
 		
-		// // Physics: 
-		// // Buoyancy force = buoyancy * gravity * mass * submersion
-		// // For objects to float half-submerged, buoyancy should be ~1.0
-		// float gravity = (float)ProjectSettings.GetSetting("physics/3d/default_gravity", 9.8);
-		// float buoyantForce = buoyancy * gravity * body.Mass * submersionRatio;
+		// Apply upward buoyancy force
+		body.ApplyCentralForce(Vector3.Up * buoyantForce);
 		
-		// // Apply upward buoyancy force
-		// body.ApplyCentralForce(Vector3.Up * buoyantForce);
+		// Apply water drag (resists movement)
+		float drag = 0.5f;
+		body.ApplyCentralForce(-body.LinearVelocity * drag * body.Mass);
 		
-		// // Apply water drag (resists movement)
-		// float drag = 0.5f;
-		// body.ApplyCentralForce(-body.LinearVelocity * drag * body.Mass);
+		// Apply angular drag (resists rotation)
+		float angularDrag = 0.3f;
+		body.ApplyTorque(-body.AngularVelocity * angularDrag * body.Mass);
 		
-		// // Apply angular drag (resists rotation)
-		// float angularDrag = 0.3f;
-		// body.ApplyTorque(-body.AngularVelocity * angularDrag * body.Mass);
-		
-		// // Surface damping to prevent bobbing
-		// float centerY = body.GlobalPosition.Y;
-		// float distanceFromSurface = Mathf.Abs(centerY - _waterSurfaceY);
-		// if (distanceFromSurface < objectRadius * 0.5f && body.LinearVelocity.Y > 0.5f)
-		// {
-		// 	// Damp vertical velocity near surface
-		// 	body.LinearVelocity = new Vector3(
-		// 		body.LinearVelocity.X,
-		// 		body.LinearVelocity.Y * 0.9f,
-		// 		body.LinearVelocity.Z
-		// 	);
-		// }
+		// Surface damping to prevent bobbing
+		float centerY = body.GlobalPosition.Y;
+		float distanceFromSurface = Mathf.Abs(centerY - _waterSurfaceY);
+		if (distanceFromSurface < objectRadius * 0.5f && body.LinearVelocity.Y > 0.5f)
+		{
+			// Damp vertical velocity near surface
+			body.LinearVelocity = new Vector3(
+				body.LinearVelocity.X,
+				body.LinearVelocity.Y * 0.9f,
+				body.LinearVelocity.Z
+			);
+		}
 	}
 	
 	private float GetBodyRadius(RigidBody3D body)

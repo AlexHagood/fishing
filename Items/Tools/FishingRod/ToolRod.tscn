@@ -1,13 +1,13 @@
-[gd_scene load_steps=8 format=3 uid="uid://c6guy00earepd"]
+[gd_scene load_steps=10 format=3 uid="uid://c6guy00earepd"]
 
 [ext_resource type="Script" uid="uid://ce7lvupegpwla" path="res://Items/Tools/FishingRod/FishingRodTool.cs" id="1_78gr2"]
 [ext_resource type="Shader" uid="uid://ckjxyhclureu8" path="res://Items/Tools/FishingRod/bobber.gdshader" id="2_0juja"]
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_vsbcf"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0juja"]
 albedo_color = Color(0.71352416, 0.3557741, 1.92523e-07, 1)
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_hndgl"]
-material = SubResource("StandardMaterial3D_vsbcf")
+material = SubResource("StandardMaterial3D_0juja")
 top_radius = 0.025
 bottom_radius = 0.025
 height = 3.0
@@ -23,6 +23,16 @@ height = 0.2
 radial_segments = 10
 rings = 5
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hndgl"]
+albedo_color = Color(1, 0, 0, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_1kyt6"]
+material = SubResource("StandardMaterial3D_hndgl")
+top_radius = 0.02
+bottom_radius = 0.02
+height = 0.05
+radial_segments = 6
+
 [sub_resource type="SphereShape3D" id="SphereShape3D_rrqor"]
 radius = 0.1
 
@@ -30,18 +40,24 @@ radius = 0.1
 script = ExtResource("1_78gr2")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0.8449857, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.845, 0)
 mesh = SubResource("CylinderMesh_hndgl")
 skeleton = NodePath("")
 
 [node name="Bobber" type="RigidBody3D" parent="."]
+collision_layer = 0
+collision_mask = 0
 freeze = true
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Bobber"]
 mesh = SubResource("SphereMesh_h55ml")
 
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Bobber/MeshInstance3D"]
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.093108825, 0)
+mesh = SubResource("CylinderMesh_1kyt6")
+
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Bobber"]
 shape = SubResource("SphereShape3D_rrqor")
 
 [node name="RodTip" type="Node3D" parent="."]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 1.4916314, 0)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3588967, 0)
