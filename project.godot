@@ -8,16 +8,22 @@
 
 config_version=5
 
+[animation]
+
+compatibility/default_parent_skeleton_in_mesh_instance_3d=true
+
 [application]
 
 config/name="Glop 3"
 run/main_scene="uid://cldbqjys6m8o0"
-config/features=PackedStringArray("4.5", "C#", "Forward Plus")
+config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="res://icon.svg"
 
 [autoload]
 
 InventoryManager="*res://Items/InventoryManager.cs"
+ChatManager="*res://ChatManager.cs"
+FishManager="*res://FishManager.cs"
 
 [display]
 

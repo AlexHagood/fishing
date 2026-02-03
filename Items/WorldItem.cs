@@ -5,7 +5,7 @@ using Godot;
 /// Provides E and F interaction methods that subclasses can override.
 /// </summary>
 [GlobalClass]
-public partial class WorldItem : RigidBody3D
+public partial class WorldItem : RigidBody3D, IInteractable
 {
     /// <summary>
     /// Reference to the inventory item definition (.tres resource)

@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3 uid="uid://bbpbjknf1p2eq"]
+
+[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="1_ekope"]
+
+[resource]
+script = ExtResource("1_ekope")
+Name = "Bluegill"
+Icon = "uid://24hiptuipe8q"
+Size = Vector2i(1, 1)
+metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

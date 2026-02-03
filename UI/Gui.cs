@@ -24,9 +24,32 @@ public partial class Gui : CanvasLayer
     private bool _rotateHeld = false;
 
 
+    private string HintTextF { get; set; } = "";
+
+    private string HintTextE { get; set; } = "";
+
+    private HBoxContainer _HintF;
+    private HBoxContainer _HintE;
+    private Label _HintFLabel;
+    private Label _HintELabel;
+
+    private PopupMenu _contextMenu;
+
+    private LineEdit chatEntry;
+
+    private TextEdit chatLog;
+
+    private ChatManager _chatManager;
+
+
     public override void _Ready()
     {
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+        _chatManager = GetNode<ChatManager>("/root/ChatManager");
+
+        // Connect to ChatManager's MessageAdded signal
+        _chatManager.MessageAdded += OnChatMessageReceived;
+
         _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
         _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
         
@@ -35,31 +58,133 @@ public partial class Gui : CanvasLayer
         character.InventoryRequested += OnInventoryRequested;
         character.RotateRequested += OnRotateRequested;
         character.HotbarSlotSelected += OnHotbarSlotSelected;
+        character.HintEUpdated += SetHintE;
+        character.HintFUpdated += SetHintF;
 
         _hotbarUI = GetNode<HotbarUI>("Hotbar");
         _hotbarUI.inventoryId = character.inventoryId;
+
+        _HintF = GetNode<HBoxContainer>("ButtonHints/F");
+        _HintE = GetNode<HBoxContainer>("ButtonHints/E");
+        _HintFLabel = _HintF.GetNode<Label>("Label");
+        _HintELabel = _HintE.GetNode<Label>("Label");
+
+        _contextMenu = GetNode<PopupMenu>("PopupMenu");
+        _contextMenu.AddItem("Drop", 0);
+        _contextMenu.AddItem("Rotate", 1);
+        _contextMenu.IdPressed += OnContextMenuItemSelected;
+
+        chatEntry = GetNode<LineEdit>("ChatContainer/ChatEntry");
+        chatLog = GetNode<TextEdit>("ChatContainer/ChatLog");
+
+        // Connect text submitted event for chat entry
+        chatEntry.TextSubmitted += OnChatMessageSubmitted;
     }
+
+    // Called when ChatManager emits MessageAdded signal
+    private void OnChatMessageReceived(string sender, string message)
+    {
+        string formattedMessage = $"[{System.DateTime.Now:HH:mm}] {sender}: {message}\n";
+        chatLog.Text += formattedMessage;
+        
+        // Scroll to bottom to show latest message
+        chatLog.ScrollVertical = (int)chatLog.GetVScrollBar().MaxValue;
+    }
+
+    // Called when user submits text in chat entry
+    private void OnChatMessageSubmitted(string text)
+    {
+        // Don't send empty messages
+        if (string.IsNullOrWhiteSpace(text))
+        {
+            chatEntry.Text = "";
+            return;
+        }
+
+        // Add the message to ChatManager (which will emit signal to all GUIs)
+        _chatManager.AddMessage("Player", text);
+        
+        // Clear the input field
+        chatEntry.Text = "";
+    }
+    
+    public void SetHintF(string hint)
+    {
+        // Null check in case signal fires before _Ready()
+        if (_HintF == null || _HintFLabel == null)
+            return;
+            
+        if (string.IsNullOrEmpty(hint))
+        {
+            _HintF.Visible = false;
+        }
+        else
+        {
+            _HintF.Visible = true;
+            _HintFLabel.Text = hint;
+        }
+    }
+
+    public void SetHintE(string hint)
+    {
+        // Null check in case signal fires before _Ready()
+        if (_HintE == null || _HintELabel == null)
+            return;
+            
+        if (string.IsNullOrEmpty(hint))
+        {
+            _HintE.Visible = false;
+        }
+        else
+        {
+            _HintE.Visible = true;
+            _HintELabel.Text = hint;
+        }
+    }
+
     
     public override void _Input(InputEvent @event)
     {
         // Handle click to drop item (click-to-pick, click-to-drop behavior)
         if (@event is InputEventMouseButton mouseButton &&  
-            mouseButton.Pressed && 
-            _draggedItem != null)
+            mouseButton.Pressed)
         {
-            if (mouseButton.ButtonIndex == MouseButton.Left)
-            {
-                GD.Print("[GUI] Left click detected for dropping item");
-                OnItemDropped(false);
-            }
-            else if (mouseButton.ButtonIndex == MouseButton.Right)
-            {
-                GD.Print("[GUI] Right click detected for dropping item");
-                OnItemDropped(true);
-            }
-            // Only drop if we're clicking on empty space or a slot, not on another item
 
-            GetViewport().SetInputAsHandled();
+            if (_draggedItem != null) {
+                if (mouseButton.ButtonIndex == MouseButton.Left)
+                {
+                    GD.Print("[GUI] Left click detected for dropping item");
+                    OnItemDropped(false);
+                }
+                else if (mouseButton.ButtonIndex == MouseButton.Right)
+                {
+                    GD.Print("[GUI] Right click detected for dropping item");
+                    OnItemDropped(true);
+                }
+                // Only drop if we're clicking on empty space or a slot, not on another item
+                GetViewport().SetInputAsHandled();
+            }
+
+            if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
+            {
+                // Show context menu at mouse position
+                Vector2 mousePos = GetViewport().GetMousePosition();
+                InventorySlot? slotUnder = GetSlotAtPosition(mousePos);
+                if (slotUnder != null)
+                {
+                    // Check if this slot actually has an item in it
+                    var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
+                    if (inv.Grid.ContainsKey(slotUnder.slotPosition))
+                    {
+                        GD.Print($"[GUI] Right-clicked on item - {inv.Grid[slotUnder.slotPosition].ItemData.Name}");
+                        // There's an item here - show context menu
+                        _contextMenu.Position = (Vector2I)mousePos;
+                        _contextMenu.Popup();
+                        GetViewport().SetInputAsHandled();
+                    }
+                }
+            }
+            
         }
 
         if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
@@ -208,6 +333,35 @@ public partial class Gui : CanvasLayer
     /// Get the detection point for the dragged item (32px offset from top-left corner)
     /// </summary>
 
+    private void OnContextMenuItemSelected(long id)
+    {
+        Vector2 mousePos = GetViewport().GetMousePosition();
+        var slotUnder = GetSlotAtPosition(mousePos);
+        
+        if (slotUnder == null)
+            return;
+            
+        var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
+        if (!inv.Grid.ContainsKey(slotUnder.slotPosition))
+            return;
+            
+        var itemAtSlot = inv.Grid[slotUnder.slotPosition];
+        
+        switch (id)
+        {
+            case 0: // Drop
+                GD.Print($"[GUI] Context menu: Drop item {itemAtSlot.ItemData.Name}");
+                _inventoryManager.DropItem(slotUnder.inventoryId, itemAtSlot);
+                RefreshInventoryWindows();
+                break;
+                
+            case 1: // Rotate
+                GD.Print($"[GUI] Context menu: Rotate item {itemAtSlot.ItemData.Name}");
+                _inventoryManager.RotateItem(itemAtSlot);
+                RefreshInventoryWindows();
+                break;
+        }
+    }
 
     public void OnInventoryRequested(int id)
     {

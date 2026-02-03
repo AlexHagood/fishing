@@ -104,6 +104,13 @@ public partial class Terrain : Node3D
 			AddEdge(generatedNodes[nodeAIdx], generatedNodes[nodeBIdx]);
 		}
 		
+		// Apply height smoothing to reduce spikiness
+		if (HeightSmoothingIterations > 0)
+		{
+			SmoothTerrainHeights(generatedNodes, HeightSmoothingIterations, HeightSmoothingStrength);
+			GD.Print($"Applied {HeightSmoothingIterations} iterations of height smoothing (strength: {HeightSmoothingStrength}).");
+		}
+		
 		// Create triangles from edges
 		ForEachTriangleFromEdges(generatedNodes, (nodeA, nodeB, nodeC) =>
 		{
@@ -201,6 +208,12 @@ public partial class Terrain : Node3D
 
 	[Export(PropertyHint.Range, "0,10")]
 	public int RelaxationIterations = 2; // Number of Lloyd's relaxation iterations to improve triangle quality
+	
+	[Export(PropertyHint.Range, "0,10")]
+	public int HeightSmoothingIterations = 3; // Number of height smoothing passes
+	
+	[Export(PropertyHint.Range, "0,1")]
+	public float HeightSmoothingStrength = 0.5f; // How much to blend with neighbors (0=none, 1=full average)
 
 	public List<GraphNode> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
 	{
@@ -253,6 +266,70 @@ public partial class Terrain : Node3D
 		
 		GD.Print($"{count} nodes generated with random distribution at {startLocation} with spread {spread}.");
 		return generatedNodes;
+	}
+	
+	/// <summary>
+	/// Smooths terrain heights by averaging each node's Y position with its neighbors.
+	/// Requires edges to already be registered in _edges dictionary.
+	/// </summary>
+	/// <param name="nodes">List of nodes to smooth</param>
+	/// <param name="iterations">Number of smoothing passes</param>
+	/// <param name="strength">Blend factor (0=no change, 1=full average)</param>
+	private void SmoothTerrainHeights(List<GraphNode> nodes, int iterations, float strength)
+	{
+		for (int iter = 0; iter < iterations; iter++)
+		{
+			// Store new heights temporarily to avoid order-dependent results
+			var newHeights = new Dictionary<GraphNode, float>();
+			
+			foreach (var node in nodes)
+			{
+				// Get neighbors from edge dictionary
+				if (!_edges.TryGetValue(node, out var neighbors) || neighbors.Count == 0)
+				{
+					newHeights[node] = node.Position.Y;
+					continue;
+				}
+				
+				// Calculate average height of neighbors
+				float avgHeight = 0f;
+				int validNeighbors = 0;
+				
+				foreach (var neighbor in neighbors)
+				{
+					if (neighbor != null && IsInstanceValid(neighbor))
+					{
+						avgHeight += neighbor.Position.Y;
+						validNeighbors++;
+					}
+				}
+				
+				if (validNeighbors > 0)
+				{
+					avgHeight /= validNeighbors;
+					
+					// Blend current height with average based on strength
+					float currentHeight = node.Position.Y;
+					float smoothedHeight = Mathf.Lerp(currentHeight, avgHeight, strength);
+					newHeights[node] = smoothedHeight;
+				}
+				else
+				{
+					newHeights[node] = node.Position.Y;
+				}
+			}
+			
+			// Apply new heights
+			foreach (var node in nodes)
+			{
+				if (newHeights.TryGetValue(node, out float newHeight))
+				{
+					var pos = node.Position;
+					pos.Y = newHeight;
+					node.Position = pos;
+				}
+			}
+		}
 	}
 
 	/// <summary>

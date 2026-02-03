@@ -32,6 +32,7 @@ public partial class ItemTile : TextureRect
         {
             Texture = GD.Load<Texture2D>(ItemInstance.ItemData.Icon);
         }
+        TooltipText = ItemInstance.ItemData.Name;
         StackLabel.Text = $"{ItemInstance.CurrentStackSize} / {ItemInstance.ItemData.StackSize}";
     }
 } 

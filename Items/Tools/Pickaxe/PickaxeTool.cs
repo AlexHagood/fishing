@@ -3,9 +3,6 @@ public partial class PickaxeTool : ToolScript
 {
     public override void _Ready()
     {
-        // Set the animation names for the base class to use
-        primaryAnimation = "SwordSlash";
-        secondaryAnimation = "";
         
         // Position and rotation are now controlled by the hand bone and tool scene positioning
         // Animations are now handled by the character, not the tool
@@ -32,7 +29,7 @@ public partial class PickaxeTool : ToolScript
         }
 
         GD.Print($"[PickaxeTool] Swinging pickaxe: {itemInstance.ItemData.Name}");
-        base.PrimaryFire(character);
+        character.animTree.Swing();
         
         // Character will play the animation automatically based on primaryAnimation field
         // Implement pickaxe swinging logic here (e.g., damage to rocks)

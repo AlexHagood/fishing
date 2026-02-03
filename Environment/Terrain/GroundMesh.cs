@@ -15,8 +15,14 @@ public partial class GroundMesh : StaticBody3D
     [Export]
     private Vector3 _vertexC;
     
-    // Static grass material to avoid recreating for every instance
+    // Slope-based material configuration
+    [Export(PropertyHint.Range, "0,90")]
+    private float _steepnessThreshold = 40.0f; // Angle in degrees where rock appears
+    
+    // Static materials to avoid recreating for every instance
     private static StandardMaterial3D _grassMaterial;
+    private static StandardMaterial3D _rockMaterial;
+    
     public static StandardMaterial3D GrassMaterial
     {
         get
@@ -26,6 +32,18 @@ public partial class GroundMesh : StaticBody3D
                 _grassMaterial = CreateGrassMaterial();
             }
             return _grassMaterial;
+        }
+    }
+    
+    public static StandardMaterial3D RockMaterial
+    {
+        get
+        {
+            if (_rockMaterial == null)
+            {
+                _rockMaterial = CreateRockMaterial();
+            }
+            return _rockMaterial;
         }
     }
     
@@ -60,10 +78,35 @@ public partial class GroundMesh : StaticBody3D
         if (MeshInstance == null)
         {
             MeshInstance = new MeshInstance3D();
-            MeshInstance.MaterialOverride = GrassMaterial;
             MeshInstance.Visible = true;
             MeshInstance.Mesh = new ArrayMesh();
             AddChild(MeshInstance);
+        }
+        
+        // Calculate triangle normal to determine steepness
+        var edge1 = relativeB - relativeA;
+        var edge2 = relativeC - relativeA;
+        var normal = edge2.Cross(edge1).Normalized();
+        
+        // Ensure normal points upward (Y component should be positive)
+        if (normal.Y < 0)
+        {
+            normal = -normal;
+        }
+        
+        // Calculate angle from vertical (0° = flat horizontal, 90° = vertical wall)
+        // Dot product with up vector: 1.0 = perfectly flat, 0.0 = vertical
+        var dotProduct = Mathf.Clamp(normal.Dot(Vector3.Up), 0, 1);
+        var angleFromVertical = Mathf.RadToDeg(Mathf.Acos(dotProduct));
+        
+        // Select material based on steepness
+        if (angleFromVertical > _steepnessThreshold)
+        {
+            MeshInstance.MaterialOverride = RockMaterial;
+        }
+        else
+        {
+            MeshInstance.MaterialOverride = GrassMaterial;
         }
         
         // Update mesh geometry
@@ -222,19 +265,32 @@ public partial class GroundMesh : StaticBody3D
         grassMaterial.AlbedoColor = new Color(0.3f, 0.6f, 0.2f, 1.0f);
         grassMaterial.Roughness = 0.9f;
         grassMaterial.Metallic = 0.0f;
-        grassMaterial.AlbedoTexture = CreateSimpleNoiseTexture();
+        grassMaterial.AlbedoTexture = CreateNoiseTexture(42, 0.3f, 0.6f, 0.2f); // Green grass
         grassMaterial.Uv1Triplanar = false;
         grassMaterial.Uv1Scale = new Vector3(1.0f, 1.0f, 1.0f);
         
         return grassMaterial;
     }
     
-    private static ImageTexture CreateSimpleNoiseTexture()
+    private static StandardMaterial3D CreateRockMaterial()
+    {
+        var rockMaterial = new StandardMaterial3D();
+        rockMaterial.AlbedoColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+        rockMaterial.Roughness = 0.95f;
+        rockMaterial.Metallic = 0.0f;
+        rockMaterial.AlbedoTexture = CreateNoiseTexture(123, 0.4f, 0.4f, 0.45f); // Gray rock
+        rockMaterial.Uv1Triplanar = false;
+        rockMaterial.Uv1Scale = new Vector3(1.0f, 1.0f, 1.0f);
+        
+        return rockMaterial;
+    }
+    
+    private static ImageTexture CreateNoiseTexture(int seed, float baseR, float baseG, float baseB)
     {
         const int textureSize = 32;
         var image = Image.CreateEmpty(textureSize, textureSize, false, Image.Format.Rgb8);
         
-        var random = new Random(42);
+        var random = new Random(seed);
         
         for (int y = 0; y < textureSize; y++)
         {
@@ -242,14 +298,20 @@ public partial class GroundMesh : StaticBody3D
             {
                 float variation = (float)(random.NextDouble() * 0.3 - 0.15);
                 
-                float r = Mathf.Clamp(0.3f + variation, 0.2f, 0.4f);
-                float g = Mathf.Clamp(0.6f + variation, 0.5f, 0.7f);
-                float b = Mathf.Clamp(0.2f + variation, 0.1f, 0.3f);
+                float r = Mathf.Clamp(baseR + variation, baseR - 0.1f, baseR + 0.1f);
+                float g = Mathf.Clamp(baseG + variation, baseG - 0.1f, baseG + 0.1f);
+                float b = Mathf.Clamp(baseB + variation, baseB - 0.1f, baseB + 0.1f);
                 
                 image.SetPixel(x, y, new Color(r, g, b, 1.0f));
             }
         }
         
         return ImageTexture.CreateFromImage(image);
+    }
+    
+    // Legacy method for backwards compatibility
+    private static ImageTexture CreateSimpleNoiseTexture()
+    {
+        return CreateNoiseTexture(42, 0.3f, 0.6f, 0.2f);
     }
 }

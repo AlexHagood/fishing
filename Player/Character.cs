@@ -1,5 +1,6 @@
 using System.Dynamic;
 using Godot;
+using TriangleNet.Tools;
 
 public partial class Character : CharacterBody3D
 {
@@ -11,6 +12,15 @@ public partial class Character : CharacterBody3D
 
     [Signal]
     public delegate void HotbarSlotSelectedEventHandler(int slotIndex);
+
+    [Signal]
+    public delegate void HintEUpdatedEventHandler(string hint);
+
+    [Signal]
+    public delegate void HintFUpdatedEventHandler(string hint);
+
+    [Signal]
+    public delegate void ToolAnimationEventHandler();
 
     [Export] public float Speed = 5.0f;
     [Export] public float JumpVelocity = 8.0f;
@@ -49,6 +59,14 @@ public partial class Character : CharacterBody3D
 
     private InventoryManager _inventoryManager;
     private ToolScript _currentTool;
+
+    public CharAnimations animTree;
+
+    public AudioStreamPlayer3D footstepsAudioPlayer;
+
+    public string Username = "Player";
+
+
 
     public int inventoryId;
     private int _hotbarSlot = 0;
@@ -103,21 +121,6 @@ public partial class Character : CharacterBody3D
         // Setup camera system
         SetupCameraSystem();
         
-        // Get AnimationPlayer
-        _animationPlayer = GetNode<AnimationPlayer>("AnimationPlayer");
-        
-        // Connect to animation_finished signal to track action animations
-        if (_animationPlayer != null)
-        {
-            _animationPlayer.AnimationFinished += OnAnimationFinished;
-        }
-        
-        // Start with idle animation
-        if (_animationPlayer != null && _animationPlayer.HasAnimation("Idle"))
-        {
-            _animationPlayer.Play("Idle");
-        }
-        
         // Get hand attachment for tools
         _rightHandAttachment = GetNodeOrNull<BoneAttachment3D>("CharacterArmature/Skeleton3D/RightHandAttachment");
         if (_rightHandAttachment == null)
@@ -143,6 +146,10 @@ public partial class Character : CharacterBody3D
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
         inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5));
+
+        animTree = GetNode<CharAnimations>("AnimationTree");
+        footstepsAudioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
+
         
 
     }
@@ -261,13 +268,6 @@ public partial class Character : CharacterBody3D
                 {
                     _currentTool.PrimaryFire(this);
                     // Play character animation for tool use if specified
-                    if (!string.IsNullOrEmpty(_currentTool.primaryAnimation) && _animationPlayer != null)
-                    {
-                        if (_animationPlayer.HasAnimation(_currentTool.primaryAnimation))
-                        {
-                            _animationPlayer.Play(_currentTool.primaryAnimation);
-                        }
-                    }
                 }
             }
             // Right mouse button - drop
@@ -281,13 +281,6 @@ public partial class Character : CharacterBody3D
                 {
                     _currentTool.SecondaryFire(this);
                     // Play character animation for tool secondary use if specified
-                    if (!string.IsNullOrEmpty(_currentTool.secondaryAnimation) && _animationPlayer != null)
-                    {
-                        if (_animationPlayer.HasAnimation(_currentTool.secondaryAnimation))
-                        {
-                            _animationPlayer.Play(_currentTool.secondaryAnimation);
-                        }
-                    }
                 }
             }
         }
@@ -371,6 +364,17 @@ public partial class Character : CharacterBody3D
 
         // Apply movement speed
         float currentSpeed = _isSprinting ? _sprintSpeed : _baseSpeed;
+
+        // Update animation blend based on movement state
+        if (direction.Length() > 0.1f) // Check if player is actually moving
+        {
+            animTree.WalkTarget = _isSprinting ? 1.0f : 0.5f;
+        }
+        else
+        {
+            animTree.WalkTarget = -1.0f; // Idle
+        }
+
         Velocity = new Vector3(
             direction.X * currentSpeed,
             Velocity.Y, // preserve vertical component for gravity/jump
@@ -383,8 +387,10 @@ public partial class Character : CharacterBody3D
 
         // Handle jump
         if (isOnFloor && Input.IsActionJustPressed("jump"))
+        {
             Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
-
+            animTree.Jump();
+        }
         // Move the character
         MoveAndSlide();
         isOnFloor = IsOnFloor();
@@ -415,47 +421,11 @@ public partial class Character : CharacterBody3D
         // Update camera position
         UpdateCameraPosition(delta);
         
-        // Update animations based on movement state
-        UpdateAnimations(direction);
+        
+        // Update interaction hints based on what player is looking at
+        UpdateInteractionHints();
     }
     
-    private void UpdateAnimations(Vector3 direction)
-    {
-        if (_animationPlayer == null) return;
-        
-        // Don't interrupt action animations (like attacks, tool use, etc.)
-        if (_isPlayingActionAnimation) return;
-        
-        // Determine which animation to play based on state
-        string targetAnimation = "Idle";
-        
-        // Check if in air (jumping/falling)
-        if (!isOnFloor)
-        {
-            targetAnimation = "Jump";
-        }
-        // Check if moving on ground
-        else if (direction.Length() > 0.1f)
-        {
-            if (_isSprinting)
-            {
-                targetAnimation = "Run";
-            }
-            else
-            {
-                targetAnimation = "Walk";
-            }
-        }
-        
-        // Only switch animation if it's different from current and animation exists
-        if (_animationPlayer.HasAnimation(targetAnimation) && 
-            _animationPlayer.CurrentAnimation != targetAnimation)
-        {
-            // Use smooth crossfade transition
-            // Play(name, customBlend, customSpeed, fromEnd)
-            _animationPlayer.Play(targetAnimation, AnimationBlendTime);
-        }
-    }
     
     private void HandleCameraRotation(double delta)
     {
@@ -553,6 +523,54 @@ public partial class Character : CharacterBody3D
         // No need to explicitly set tool visibility - it's always visible
     }
 
+    /// <summary>
+    /// Switch to using an external camera (e.g., vehicle camera)
+    /// </summary>
+    public void SetExternalCamera(Camera3D externalCamera)
+    {
+        if (externalCamera == null)
+        {
+            GD.PrintErr("[Character] Cannot set null external camera!");
+            return;
+        }
+
+        // Deactivate character cameras
+        if (_firstPersonCamera != null)
+            _firstPersonCamera.Current = false;
+        if (_thirdPersonCamera != null)
+            _thirdPersonCamera.Current = false;
+
+        // Activate the external camera
+        externalCamera.Current = true;
+        _activeCamera = externalCamera;
+
+        GD.Print("[Character] Switched to external camera");
+    }
+
+    /// <summary>
+    /// Restore the character's own camera (first person by default)
+    /// </summary>
+    public void RestoreCharacterCamera()
+    {
+        if (_firstPersonCamera == null)
+        {
+            GD.PrintErr("[Character] Cannot restore camera - first person camera not initialized!");
+            return;
+        }
+
+        _firstPersonCamera.Current = true;
+        if (_thirdPersonCamera != null)
+            _thirdPersonCamera.Current = false;
+        
+        _activeCamera = _firstPersonCamera;
+        
+        // Reset camera pitch
+        _cameraPitch = 0.0f;
+        _firstPersonCamera.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
+
+        GD.Print("[Character] Restored character camera");
+    }
+
     public GodotObject RaycastFromCamera(float range = 5.0f)
     {
         var spaceState = GetWorld3D().DirectSpaceState;
@@ -577,21 +595,30 @@ public partial class Character : CharacterBody3D
         if (collider == null)
             return;
 
-        // Look for WorldItem in the parent chain
+        // Look for IInteractable in the parent chain
         Node nodeToCheck = collider as Node;
         while (nodeToCheck != null)
         {
-            if (nodeToCheck is WorldItem worldItem && worldItem.CanInteract())
+            if (nodeToCheck is IInteractable interactable && interactable.CanInteract())
             {
-                float distance = GlobalPosition.DistanceTo(worldItem.GlobalPosition);
-                
-                if (distance <= worldItem.InteractRange)
+                // Cast to Node3D to get GlobalPosition for distance check
+                if (nodeToCheck is Node3D node3D)
                 {
-                    worldItem.InteractE(this);
+                    float distance = GlobalPosition.DistanceTo(node3D.GlobalPosition);
+                    
+                    if (distance <= interactable.InteractRange)
+                    {
+                        interactable.InteractE(this);
+                    }
+                    else
+                    {
+                        GD.Print($"[Character] Too far away for E: {distance:F1}m");
+                    }
                 }
                 else
                 {
-                    GD.Print($"[Character] Too far away for E: {distance:F1}m");
+                    // If not Node3D, just interact without distance check
+                    interactable.InteractE(this);
                 }
                 return;
             }
@@ -605,16 +632,32 @@ public partial class Character : CharacterBody3D
         if (collider == null)
             return;
 
-        // Look for WorldItem in the parent chain
+        // Look for IInteractable in the parent chain
         Node nodeToCheck = collider as Node;
         while (nodeToCheck != null)
         {
-            if (nodeToCheck is WorldItem worldItem && worldItem.CanInteract())
+            if (nodeToCheck is IInteractable interactable && interactable.CanInteract())
             {
-                float distance = GlobalPosition.DistanceTo(worldItem.GlobalPosition);
-                
-        
-                worldItem.InteractF(this);
+                // Cast to Node3D to get GlobalPosition for distance check
+                if (nodeToCheck is Node3D node3D)
+                {
+                    float distance = GlobalPosition.DistanceTo(node3D.GlobalPosition);
+                    
+                    if (distance <= interactable.InteractRange)
+                    {
+                        interactable.InteractF(this);
+                    }
+                    else
+                    {
+                        GD.Print($"[Character] Too far away for F: {distance:F1}m");
+                    }
+                }
+                else
+                {
+                    // If not Node3D, just interact without distance check
+                    interactable.InteractF(this);
+                }
+                return;
             }
             nodeToCheck = nodeToCheck.GetParent();
         }
@@ -659,47 +702,66 @@ public partial class Character : CharacterBody3D
         GD.Print($"[Character] Threw: {itemToThrow.Name}");
     }
 
-    /// <summary>
-    /// Play a character animation. Tools can call this to trigger animations.
-    /// </summary>
-    public void PlayAnimation(string animationName, float blendTime = -1, bool isActionAnimation = true)
-    {
-        if (_animationPlayer == null)
-        {
-            GD.PushWarning($"[Character] Cannot play animation '{animationName}' - AnimationPlayer not found");
-            return;
-        }
-
-        if (!_animationPlayer.HasAnimation(animationName))
-        {
-            GD.PushWarning($"[Character] Animation '{animationName}' not found");
-            return;
-        }
-
-        // Use provided blend time, or default to AnimationBlendTime
-        float actualBlendTime = blendTime >= 0 ? blendTime : AnimationBlendTime;
-        _animationPlayer.Play(animationName, actualBlendTime);
-        
-        // Mark as action animation to prevent movement animations from interrupting
-        if (isActionAnimation)
-        {
-            _isPlayingActionAnimation = true;
-        }
-        
-        GD.Print($"[Character] Playing animation: {animationName}");
-    }
     
     /// <summary>
-    /// Called when any animation finishes
+    /// Update interaction hint text based on what the player is currently looking at
     /// </summary>
-    private void OnAnimationFinished(StringName animName)
+    private void UpdateInteractionHints()
     {
-        GD.Print($"[Character] Animation finished: {animName}");
+        // Only update hints when not in menu mode
+        if (Input.MouseMode == Input.MouseModeEnum.Visible)
+        {
+            // Clear hints when in menu
+            EmitSignal(SignalName.HintEUpdated, "");
+            EmitSignal(SignalName.HintFUpdated, "");
+            return;
+        }
         
-        // Reset action animation flag
-        _isPlayingActionAnimation = false;
+        var collider = RaycastFromCamera(5.0f);
         
-        // Return to appropriate idle/movement animation
-        // The next _PhysicsProcess will handle this via UpdateAnimations
+        if (collider == null)
+        {
+            // Not looking at anything - clear hints
+            EmitSignal(SignalName.HintEUpdated, "");
+            EmitSignal(SignalName.HintFUpdated, "");
+            return;
+        }
+
+        // Look for WorldItem in the parent chain
+        Node nodeToCheck = collider as Node;
+        while (nodeToCheck != null)
+        {
+            if (nodeToCheck is WorldItem worldItem && worldItem.CanInteract())
+            {
+                float distance = GlobalPosition.DistanceTo(worldItem.GlobalPosition);
+                
+                // Check if within interaction range
+                if (distance <= worldItem.InteractRange)
+                {
+                    // Update hints with the item's hint text
+                    EmitSignal(SignalName.HintEUpdated, worldItem.HintE);
+                    EmitSignal(SignalName.HintFUpdated, worldItem.HintF);
+                }
+                else
+                {
+                    // Too far away - clear hints
+                    EmitSignal(SignalName.HintEUpdated, "");
+                    EmitSignal(SignalName.HintFUpdated, "");
+                }
+                return;
+            }
+            nodeToCheck = nodeToCheck.GetParent();
+        }
+        
+        // No WorldItem found - clear hints
+        EmitSignal(SignalName.HintEUpdated, "");
+        EmitSignal(SignalName.HintFUpdated, "");
     }
+
+    public void toolAnimationFire()
+    {
+        EmitSignal(SignalName.ToolAnimation);
+    }
+
+
 }

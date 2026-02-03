@@ -43,9 +43,19 @@ public partial class FishingRodTool : ToolScript
     private bool _isRightButtonHeld = false;
     
     private Character _character; // Reference to the character using this tool
+
+    MeshInstance3D _fishMesh;
+
+    private FishManager _fishManager;
+
+    private InventoryManager _inventoryManager;
+
+    ItemDefinition hookedItem;
     
     public override void _Ready()
     {
+        _fishManager = GetTree().Root.GetNode<FishManager>("FishManager");
+        _inventoryManager = GetTree().Root.GetNode<InventoryManager>("InventoryManager");
         base._Ready();
         GD.Print("[FishingRodTool] Ready");
         
@@ -77,6 +87,8 @@ public partial class FishingRodTool : ToolScript
         // Make the mesh instance top-level so it doesn't inherit our transform
         _lineMeshInstance.TopLevel = true;
         AddChild(_lineMeshInstance);
+        _fishMesh = GetNode<MeshInstance3D>("FishMesh");
+        _fishMesh.Visible = false;
         
         // Add this tool to the FishingRodTool group so water can find it
         AddToGroup("FishingRodTool");
@@ -88,23 +100,39 @@ public partial class FishingRodTool : ToolScript
     public override void PrimaryFire(Character character)
     {
         _character = character;
+
+        if (hookedItem != null)
+        {
+            bool res = _inventoryManager.TryPushItem(character.inventoryId, hookedItem);
+            if (!res)
+            {
+                hookedItem = null;
+            }  
+        }
         
         if (_state == FishingState.Idle)
         {
             // Cast the bobber
+            character.animTree.Cast();
+            GD.Print("[FishingRodTool] Casting bobber animation triggered");
             CastBobber();
         }
         else if (_state == FishingState.Cast)
         {
             // Mark that left button is held for continuous reeling
             _isLeftButtonHeld = true;
+            
         }
+
     }
     
     public override void SecondaryFire(Character character)
     {
         _character = character;
-        
+        if (hookedItem != null)
+        {
+            hookedItem = null;
+        }
         if (_state == FishingState.Cast)
         {
             // Mark that right button is held for continuous letting out
@@ -131,6 +159,12 @@ public partial class FishingRodTool : ToolScript
                 
                 if (isLeftHeld && !isRightHeld)
                 {
+                    // Reeling in - set animation target to 1
+                    if (_character != null)
+                    {
+                        _character.animTree.ReelTarget = 1.0f;
+                    }
+                    
                     // Reel in
                     _currentLength = Mathf.Max(MinLength, _currentLength - (ReelSpeed * (float)delta));
                     
@@ -142,9 +176,39 @@ public partial class FishingRodTool : ToolScript
                 }
                 else if (isRightHeld && !isLeftHeld)
                 {
+                    // Reeling out - set animation target to -1
+                    if (_character != null)
+                    {
+                        _character.animTree.ReelTarget = -1.0f;
+                    }
+                    
                     // Let out
                     _currentLength = Mathf.Min(MaxLength, _currentLength + (ReelSpeed * (float)delta));
                 }
+                else
+                {
+                    // Not reeling - set animation target to 0 (idle)
+                    if (_character != null)
+                    {
+                        _character.animTree.ReelTarget = 0.0f;
+                    }
+                }
+            }
+            else
+            {
+                // During cooldown, ensure reel animation is idle
+                if (_character != null)
+                {
+                    _character.animTree.ReelTarget = 0.0f;
+                }
+            }
+        }
+        else
+        {
+            // Not in Cast state - ensure reel animation is idle
+            if (_character != null)
+            {
+                _character.animTree.ReelTarget = 0.0f;
             }
         }
         
@@ -221,7 +285,26 @@ public partial class FishingRodTool : ToolScript
             return;
         }
         
-        GD.Print("[FishingRodTool] Casting bobber!");
+        GD.Print("[FishingRodTool] Starting cast animation - bobber will spawn in 0.9 seconds");
+        
+        // Delay the actual bobber spawn/launch by 0.9 seconds to sync with animation
+        GetTree().CreateTimer(0.9).Timeout += () => {
+            // Make sure we're still in a valid state
+            if (_character == null || _rodTip == null || _bobberTemplate == null)
+            {
+                GD.PushWarning("[FishingRodTool] Cast cancelled - character or rod no longer valid");
+                return;
+            }
+            
+            SpawnAndLaunchBobber();
+        };
+    }
+    
+    private void SpawnAndLaunchBobber()
+    {
+        _fishMesh.Visible = false;
+        
+        GD.Print("[FishingRodTool] Spawning and launching bobber!");
         
         // Duplicate the bobber template and add it to the world
         _bobber = _bobberTemplate.Duplicate() as RigidBody3D;
@@ -292,6 +375,40 @@ public partial class FishingRodTool : ToolScript
     private void ResetRod()
     {
         GD.Print("[FishingRodTool] Bobber fully reeled in - resetting rod");
+
+        hookedItem = _fishManager.GetFishingLoot();
+        if (hookedItem != null && hookedItem.Icon != null)
+        {
+            // Load the texture first, then get the image from it
+            Texture2D originalTexture = GD.Load<Texture2D>(hookedItem.Icon);
+            Image fishImage = originalTexture.GetImage();
+                    // Rotate the image
+                fishImage.Rotate90(ClockDirection.Clockwise);
+                    // Create a new texture from the rotated image
+                Texture2D fishTexture = ImageTexture.CreateFromImage(fishImage);
+                    
+                _fishMesh.Visible = true;
+                    
+                var mat = _fishMesh.GetActiveMaterial(0) as StandardMaterial3D;
+                if (mat == null)
+                {
+                    mat = new StandardMaterial3D();
+                    _fishMesh.SetMaterialOverride(mat);
+                }
+                mat.AlbedoTexture = fishTexture;
+        }
+        else
+        {
+            _fishMesh.Visible = true;
+        }
+
+        
+        
+        // Reset reel animation to idle
+        if (_character != null)
+        {
+            _character.animTree.ReelTarget = 0.0f;
+        }
         
         // Clean up bobber
         if (_bobber != null && IsInstanceValid(_bobber))

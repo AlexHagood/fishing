@@ -114,7 +114,7 @@ public partial class InventoryManager : Node
     }
 
     /// Check if an item fits in the inventory at any position and place it there
-    public bool TryPushItem(int inventoryId, ItemDefinition item, bool rotated)
+    public bool TryPushItem(int inventoryId, ItemDefinition item, bool rotated = false)
     {
         Inventory inv = _Inventories[inventoryId];
         for (int x = 0; x <= _Inventories[inventoryId].Size.X - item.Size.X; x++)

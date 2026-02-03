@@ -1,0 +1,10 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3 uid="uid://df7i1pq8xw3im"]
+
+[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="1_hj6oq"]
+
+[resource]
+script = ExtResource("1_hj6oq")
+Name = "Smallmouth Bass"
+Icon = "uid://d2jobbr65ff64"
+Size = Vector2i(2, 1)
+metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

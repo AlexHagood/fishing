@@ -246,3 +246,18 @@ stream = ExtResource("6_0wv8u")
 
 [node name="DropSound" type="AudioStreamPlayer" parent="."]
 stream = ExtResource("7_67jta")
+
+[node name="PopupMenu" type="PopupMenu" parent="."]
+
+[node name="ChatContainer" type="VBoxContainer" parent="."]
+offset_top = 550.0
+offset_right = 400.0
+offset_bottom = 950.0
+
+[node name="ChatLog" type="TextEdit" parent="ChatContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+editable = false
+
+[node name="ChatEntry" type="LineEdit" parent="ChatContainer"]
+layout_mode = 2

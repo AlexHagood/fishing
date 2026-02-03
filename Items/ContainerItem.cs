@@ -7,8 +7,8 @@ using Godot;
 [GlobalClass]
 public partial class ContainerItem : PhysItem
 {
-	public override string HintE { get; protected set; } = "Open";
-	public override string HintF { get; protected set; } = "Pick up";
+	public override string HintE { get; protected set; } = "Grab";
+	public override string HintF { get; protected set; } = "Open";
 
 	private InventoryManager _inventoryManager;
 

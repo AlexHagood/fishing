@@ -1,7 +1,8 @@
-[gd_scene load_steps=10 format=3 uid="uid://c6guy00earepd"]
+[gd_scene format=3 uid="uid://c6guy00earepd"]
 
 [ext_resource type="Script" uid="uid://ce7lvupegpwla" path="res://Items/Tools/FishingRod/FishingRodTool.cs" id="1_78gr2"]
 [ext_resource type="Shader" uid="uid://ckjxyhclureu8" path="res://Items/Tools/FishingRod/bobber.gdshader" id="2_0juja"]
+[ext_resource type="Texture2D" uid="uid://d2jobbr65ff64" path="res://Textures/fish/smallmouth.png" id="3_hndgl"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0juja"]
 albedo_color = Color(0.71352416, 0.3557741, 1.92523e-07, 1)
@@ -36,28 +37,42 @@ radial_segments = 6
 [sub_resource type="SphereShape3D" id="SphereShape3D_rrqor"]
 radius = 0.1
 
-[node name="Node3D" type="Node3D"]
+[sub_resource type="QuadMesh" id="QuadMesh_1kyt6"]
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h55ml"]
+transparency = 1
+albedo_texture = ExtResource("3_hndgl")
+billboard_mode = 2
+billboard_keep_scale = true
+
+[node name="Node3D" type="Node3D" unique_id=214598079]
 script = ExtResource("1_78gr2")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2006850120]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.845, 0)
 mesh = SubResource("CylinderMesh_hndgl")
 skeleton = NodePath("")
 
-[node name="Bobber" type="RigidBody3D" parent="."]
+[node name="Bobber" type="RigidBody3D" parent="." unique_id=2116631920]
 collision_layer = 0
 collision_mask = 0
 freeze = true
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Bobber"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Bobber" unique_id=1942442939]
 mesh = SubResource("SphereMesh_h55ml")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="Bobber/MeshInstance3D"]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="Bobber/MeshInstance3D" unique_id=1887251362]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.093108825, 0)
 mesh = SubResource("CylinderMesh_1kyt6")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Bobber"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="Bobber" unique_id=510423062]
 shape = SubResource("SphereShape3D_rrqor")
 
-[node name="RodTip" type="Node3D" parent="."]
+[node name="RodTip" type="Node3D" parent="." unique_id=150015468]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 2.3588967, 0)
+
+[node name="FishMesh" type="MeshInstance3D" parent="." unique_id=1617454063]
+transform = Transform3D(0.29907966, 0.102932945, -0.9266088, -0.6841093, -0.60478425, -0.302014, -0.59931743, 0.7417168, -0.117665894, 0.16945267, 1.7003303, 0.06192565)
+mesh = SubResource("QuadMesh_1kyt6")
+skeleton = NodePath("../RodTip")
+surface_material_override/0 = SubResource("StandardMaterial3D_h55ml")
