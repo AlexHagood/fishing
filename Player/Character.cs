@@ -64,6 +64,7 @@ public partial class Character : CharacterBody3D
 
     public AudioStreamPlayer3D footstepsAudioPlayer;
 
+    public string Username = "Player";
 
 
 
@@ -113,24 +114,12 @@ public partial class Character : CharacterBody3D
         }
     }
 
-    public override void _EnterTree()
-    {
-        SetMultiplayerAuthority(int.Parse(Name));
-        base._EnterTree();
-    }
-
     public override void _Ready()
     {
-        // Only setup input and camera for the local player
-        bool isLocalPlayer = IsMultiplayerAuthority();
-        
-        if (isLocalPlayer)
-        {
-            Input.MouseMode = Input.MouseModeEnum.Captured;
-        }
+        Input.MouseMode = Input.MouseModeEnum.Captured;
         
         // Setup camera system
-        SetupCameraSystem(isLocalPlayer);
+        SetupCameraSystem();
         
         // Get hand attachment for tools
         _rightHandAttachment = GetNodeOrNull<BoneAttachment3D>("CharacterArmature/Skeleton3D/RightHandAttachment");
@@ -149,13 +138,10 @@ public partial class Character : CharacterBody3D
         }
         
         // Create hold position for physics items (attached to active camera)
-        if (isLocalPlayer && _activeCamera != null)
-        {
-            _holdPosition = new Node3D();
-            _holdPosition.Name = "HoldPosition";
-            _activeCamera.AddChild(_holdPosition);
-            _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
-        }
+        _holdPosition = new Node3D();
+        _holdPosition.Name = "HoldPosition";
+        _activeCamera.AddChild(_holdPosition);
+        _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
         
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
@@ -164,13 +150,11 @@ public partial class Character : CharacterBody3D
         animTree = GetNode<CharAnimations>("AnimationTree");
         footstepsAudioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
 
-        GetNode<Label3D>("Nametag").Text = Name;
-
         
 
     }
     
-    private void SetupCameraSystem(bool isLocalPlayer)
+    private void SetupCameraSystem()
     {
         // Get camera target from scene (created in editor)
         _cameraTarget = GetNodeOrNull<Node3D>("CameraTarget");
@@ -196,23 +180,13 @@ public partial class Character : CharacterBody3D
         
         _thirdPersonCamera = GetNodeOrNull<Camera3D>("CameraTarget/SpringArm3D/Camera3D");
         
-        // Only activate cameras for the local player
+        // Start in first person if camera exists
         if (_firstPersonCamera != null && _thirdPersonCamera != null)
         {
-            if (isLocalPlayer)
-            {
-                _activeCamera = _firstPersonCamera;
-                _firstPersonCamera.Current = true;
-                _thirdPersonCamera.Current = false;
-                GD.Print("[Character] Camera system initialized for LOCAL player");
-            }
-            else
-            {
-                // Disable cameras for remote players
-                _firstPersonCamera.Current = false;
-                _thirdPersonCamera.Current = false;
-                GD.Print("[Character] Camera system disabled for REMOTE player");
-            }
+            _activeCamera = _firstPersonCamera;
+            _firstPersonCamera.Current = true;
+            _thirdPersonCamera.Current = false;
+            GD.Print("[Character] Camera system initialized successfully");
         }
         else
         {
@@ -252,10 +226,7 @@ public partial class Character : CharacterBody3D
     }
 
     public override void _Input(InputEvent @event)
-    {
-        if (!IsMultiplayerAuthority())
-            return;
-
+    {        
         if (@event is InputEventMouseMotion mouseMotion && Input.MouseMode != Input.MouseModeEnum.Visible)
         {
             mouseDelta = mouseMotion.Relative;
@@ -602,12 +573,6 @@ public partial class Character : CharacterBody3D
 
     public GodotObject RaycastFromCamera(float range = 5.0f)
     {
-        // Only raycast if we have an active camera (local player only)
-        if (_activeCamera == null)
-        {
-            return null;
-        }
-        
         var spaceState = GetWorld3D().DirectSpaceState;
         var from = _activeCamera.GlobalTransform.Origin;
         var to = from + _activeCamera.GlobalTransform.Basis.Z * -range;
