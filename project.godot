@@ -21,6 +21,7 @@ config/icon="res://icon.svg"
 
 [autoload]
 
+NetworkManager="*res://NetworkManager.cs"
 InventoryManager="*res://Items/InventoryManager.cs"
 ChatManager="*res://ChatManager.cs"
 FishManager="*res://FishManager.cs"

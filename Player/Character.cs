@@ -66,6 +66,17 @@ public partial class Character : CharacterBody3D
 
     public string Username = "Player";
 
+    private int _playerId;
+    public int PlayerId
+    {
+        get => _playerId;
+        set
+        {
+            _playerId = value;
+            // Authority is set by NetworkManager after node is added to tree
+        }
+    }
+
 
 
     public int inventoryId;
@@ -114,8 +125,42 @@ public partial class Character : CharacterBody3D
         }
     }
 
+
     public override void _Ready()
     {
+        // Configure MultiplayerSynchronizer to only sync from authority
+        var synchronizer = GetNodeOrNull<MultiplayerSynchronizer>("MultiplayerSynchronizer");
+        if (synchronizer != null)
+        {
+            // Set the synchronizer to use this node's authority
+            synchronizer.SetMultiplayerAuthority(GetMultiplayerAuthority());
+            GD.Print($"[Character {Name}] MultiplayerSynchronizer authority set to {synchronizer.GetMultiplayerAuthority()}");
+        }
+        
+        // Initialize animation tree for ALL characters (local and remote)
+        animTree = GetNode<CharAnimations>("AnimationTree");
+        footstepsAudioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
+        
+        // Get mesh for visibility control (ALL characters need this)
+        _playerBodyMesh = GetNodeOrNull<MeshInstance3D>("CharacterArmature/Skeleton3D/Body");
+        
+        // Early return for non-authority characters (remote players on your screen)
+        GD.Print($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with authority {IsMultiplayerAuthority()}");
+        if (!IsMultiplayerAuthority())
+        {
+            GD.Print($"[Character {Multiplayer.GetUniqueId()}] {Name} is remote player, skipping initialization");
+            // Make sure remote characters are visible
+            if (_playerBodyMesh != null)
+            {
+                _playerBodyMesh.Visible = true;
+                GD.Print($"[Character] Remote player mesh set to visible");
+            }
+            return;
+        }
+        
+        GD.Print($"[Character {Multiplayer.GetUniqueId()}] {Name} is local authority player, initializing...");
+        
+        // Only the local authority character controls mouse mode
         Input.MouseMode = Input.MouseModeEnum.Captured;
         
         // Setup camera system
@@ -136,19 +181,22 @@ public partial class Character : CharacterBody3D
             // Use the hand attachment itself as fallback
             _toolPosition = _rightHandAttachment;
         }
+
+        if (IsMultiplayerAuthority())
+        {
+            _holdPosition = new Node3D();
+            _holdPosition.Name = "HoldPosition";
+            _activeCamera.AddChild(_holdPosition);
+            _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
+
+        }
         
         // Create hold position for physics items (attached to active camera)
-        _holdPosition = new Node3D();
-        _holdPosition.Name = "HoldPosition";
-        _activeCamera.AddChild(_holdPosition);
-        _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
+
         
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
         inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5));
-
-        animTree = GetNode<CharAnimations>("AnimationTree");
-        footstepsAudioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
 
         
 
@@ -156,6 +204,7 @@ public partial class Character : CharacterBody3D
     
     private void SetupCameraSystem()
     {
+        GD.Print($"[Character] Setting up camera system...");
         // Get camera target from scene (created in editor)
         _cameraTarget = GetNodeOrNull<Node3D>("CameraTarget");
         if (_cameraTarget == null)
@@ -192,17 +241,17 @@ public partial class Character : CharacterBody3D
         {
             GD.PrintErr("[Character] ERROR: Camera system failed to initialize - missing camera nodes!");
         }
+
+        GD.Print($"{_firstPersonCamera}");
         
         // Initialize camera angles
         _cameraPitch = 0.0f;
         
-        // Try to find player body mesh (not the armature, just the visible mesh!)
-        _playerBodyMesh = GetNodeOrNull<MeshInstance3D>("CharacterArmature/Skeleton3D/Body");
-        
+        // Hide local player's body in first person
         if (_playerBodyMesh != null)
         {
             setMeshVisibility(false); // Hide body in first person by default (tool stays visible!)
-            GD.Print("[Character] Found player body mesh: " + _playerBodyMesh.Name);
+            GD.Print("[Character] Local player body hidden for first person view");
         }
         else
         {
@@ -226,7 +275,16 @@ public partial class Character : CharacterBody3D
     }
 
     public override void _Input(InputEvent @event)
-    {        
+    {
+        if (!IsMultiplayerAuthority())
+            return;
+        
+        // Debug: Log first input event to verify input is working
+        if (Engine.GetFramesDrawn() % 300 == 0 && @event is InputEventKey)
+        {
+            GD.Print($"[Character {Name}] Received input event. MouseMode: {Input.MouseMode}");
+        }
+
         if (@event is InputEventMouseMotion mouseMotion && Input.MouseMode != Input.MouseModeEnum.Visible)
         {
             mouseDelta = mouseMotion.Relative;
@@ -289,7 +347,7 @@ public partial class Character : CharacterBody3D
         {
             if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
             {
-                GD.Print("Hotbar key pressed: " + keyEvent.Keycode);
+                GD.Print("Char - Hotbar key pressed: " + keyEvent.Keycode);
                 int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
                 HotbarSlot = slotIndex;
                 EmitSignal(SignalName.HotbarSlotSelected, slotIndex);
@@ -341,11 +399,24 @@ public partial class Character : CharacterBody3D
 
     public override void _PhysicsProcess(double delta)
     {
+
+
+        if (Engine.GetPhysicsFrames() % 60 == 0)
+        {
+            GD.Print($"[Character {Name}] Physics processing - Peer ID: {Multiplayer.GetUniqueId()}, Authority: {GetMultiplayerAuthority()}, {IsMultiplayerAuthority()}");
+        }
+
+        if (!IsMultiplayerAuthority())
+            return;
+
+
         Vector3 direction = Vector3.Zero;
 
         if (Input.IsActionPressed("fwd"))
         {
             direction -= Transform.Basis.Z;
+            if (Engine.GetPhysicsFrames() % 60 == 0)
+                GD.Print($"[Character {Name}] FWD pressed!");
         }
         if (Input.IsActionPressed("back"))
         {
@@ -361,18 +432,23 @@ public partial class Character : CharacterBody3D
         }
 
         direction = direction.Normalized();
+        
+
 
         // Apply movement speed
         float currentSpeed = _isSprinting ? _sprintSpeed : _baseSpeed;
 
         // Update animation blend based on movement state
-        if (direction.Length() > 0.1f) // Check if player is actually moving
+        if (animTree != null)
         {
-            animTree.WalkTarget = _isSprinting ? 1.0f : 0.5f;
-        }
-        else
-        {
-            animTree.WalkTarget = -1.0f; // Idle
+            if (direction.Length() > 0.1f) // Check if player is actually moving
+            {
+                animTree.WalkTarget = _isSprinting ? 1.0f : 0.5f;
+            }
+            else
+            {
+                animTree.WalkTarget = -1.0f; // Idle
+            }
         }
 
         Velocity = new Vector3(
@@ -380,6 +456,13 @@ public partial class Character : CharacterBody3D
             Velocity.Y, // preserve vertical component for gravity/jump
             direction.Z * currentSpeed
         );
+
+        if (Engine.GetPhysicsFrames() % 60 == 0 && direction.Length() > 0)
+        {
+            GD.Print($"[Character {Name}] Direction: {direction}, Sprint: {_isSprinting}, Velocity: {Velocity} ");
+        }
+
+
 
         // Apply gravity
         if (!isOnFloor)
@@ -389,7 +472,10 @@ public partial class Character : CharacterBody3D
         if (isOnFloor && Input.IsActionJustPressed("jump"))
         {
             Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
-            animTree.Jump();
+            if (animTree != null)
+            {
+                animTree.Jump();
+            }
         }
         // Move the character
         MoveAndSlide();

@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://cx223jkmjqjoh"]
+[gd_scene format=3 uid="uid://cx223jkmjqjoh"]
 
 [ext_resource type="Script" uid="uid://en5vyvs7nroe" path="res://Items/PhysItem.cs" id="1_mk5al"]
 
@@ -10,12 +10,23 @@ albedo_color = Color(0.78039217, 0, 0.15294118, 1)
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_ys7tt"]
 points = PackedVector3Array(0.5, 0.5, 0.5, 0.5, 0.5, -0.5, -0.5, 0.5, 0.5, 0.5, -0.5, 0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5, 0.5, -0.5, -0.5, -0.5)
 
-[node name="Box" type="RigidBody3D"]
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_mk5al"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+properties/1/path = NodePath(".:rotation")
+properties/1/spawn = true
+properties/1/replication_mode = 1
+
+[node name="Box" type="RigidBody3D" unique_id=1203120025]
 script = ExtResource("1_mk5al")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=422405739]
 mesh = SubResource("BoxMesh_ttk8k")
 surface_material_override/0 = SubResource("StandardMaterial3D_kg5e7")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=739608820]
 shape = SubResource("ConvexPolygonShape3D_ys7tt")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=690123393]
+replication_config = SubResource("SceneReplicationConfig_mk5al")

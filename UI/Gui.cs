@@ -44,41 +44,41 @@ public partial class Gui : CanvasLayer
 
     public override void _Ready()
     {
-        _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
-        _chatManager = GetNode<ChatManager>("/root/ChatManager");
+        // _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+        // _chatManager = GetNode<ChatManager>("/root/ChatManager");
 
-        // Connect to ChatManager's MessageAdded signal
-        _chatManager.MessageAdded += OnChatMessageReceived;
+        // // Connect to ChatManager's MessageAdded signal
+        // _chatManager.MessageAdded += OnChatMessageReceived;
 
-        _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
-        _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
+        // _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
+        // _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
         
-        // Connect to Character's signals
-        var character = GetNode<Character>("/root/Main/Character");
-        character.InventoryRequested += OnInventoryRequested;
-        character.RotateRequested += OnRotateRequested;
-        character.HotbarSlotSelected += OnHotbarSlotSelected;
-        character.HintEUpdated += SetHintE;
-        character.HintFUpdated += SetHintF;
+        // // Connect to Character's signals
+        // var character = GetNode<Character>("/root/Main/Character");
+        // character.InventoryRequested += OnInventoryRequested;
+        // character.RotateRequested += OnRotateRequested;
+        // character.HotbarSlotSelected += OnHotbarSlotSelected;
+        // character.HintEUpdated += SetHintE;
+        // character.HintFUpdated += SetHintF;
 
-        _hotbarUI = GetNode<HotbarUI>("Hotbar");
-        _hotbarUI.inventoryId = character.inventoryId;
+        // _hotbarUI = GetNode<HotbarUI>("Hotbar");
+        // _hotbarUI.inventoryId = character.inventoryId;
 
-        _HintF = GetNode<HBoxContainer>("ButtonHints/F");
-        _HintE = GetNode<HBoxContainer>("ButtonHints/E");
-        _HintFLabel = _HintF.GetNode<Label>("Label");
-        _HintELabel = _HintE.GetNode<Label>("Label");
+        // _HintF = GetNode<HBoxContainer>("ButtonHints/F");
+        // _HintE = GetNode<HBoxContainer>("ButtonHints/E");
+        // _HintFLabel = _HintF.GetNode<Label>("Label");
+        // _HintELabel = _HintE.GetNode<Label>("Label");
 
-        _contextMenu = GetNode<PopupMenu>("PopupMenu");
-        _contextMenu.AddItem("Drop", 0);
-        _contextMenu.AddItem("Rotate", 1);
-        _contextMenu.IdPressed += OnContextMenuItemSelected;
+        // _contextMenu = GetNode<PopupMenu>("PopupMenu");
+        // _contextMenu.AddItem("Drop", 0);
+        // _contextMenu.AddItem("Rotate", 1);
+        // _contextMenu.IdPressed += OnContextMenuItemSelected;
 
-        chatEntry = GetNode<LineEdit>("ChatContainer/ChatEntry");
-        chatLog = GetNode<TextEdit>("ChatContainer/ChatLog");
+        // chatEntry = GetNode<LineEdit>("ChatContainer/ChatEntry");
+        // chatLog = GetNode<TextEdit>("ChatContainer/ChatLog");
 
-        // Connect text submitted event for chat entry
-        chatEntry.TextSubmitted += OnChatMessageSubmitted;
+        // // Connect text submitted event for chat entry
+        // chatEntry.TextSubmitted += OnChatMessageSubmitted;
     }
 
     // Called when ChatManager emits MessageAdded signal
@@ -192,7 +192,7 @@ public partial class Gui : CanvasLayer
             if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
             {
                 int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
-                GD.Print("Hotbar key pressed: " + slotIndex);
+                GD.Print("GUI - Hotbar key pressed: " + slotIndex);
                 Vector2 mousePos = GetViewport().GetMousePosition();
                 var slotUnder = GetSlotAtPosition(mousePos);
                 if (slotUnder != null)
