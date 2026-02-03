@@ -23,6 +23,7 @@ public partial class Gui : CanvasLayer
 
     private bool _rotateHeld = false;
 
+    private Character? _localPlayer = null;
 
     private string HintTextF { get; set; } = "";
 
@@ -53,16 +54,10 @@ public partial class Gui : CanvasLayer
         _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
         _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
         
-        // Connect to Character's signals
-        var character = GetNode<Character>("/root/Main/Character");
-        character.InventoryRequested += OnInventoryRequested;
-        character.RotateRequested += OnRotateRequested;
-        character.HotbarSlotSelected += OnHotbarSlotSelected;
-        character.HintEUpdated += SetHintE;
-        character.HintFUpdated += SetHintF;
-
         _hotbarUI = GetNode<HotbarUI>("Hotbar");
-        _hotbarUI.inventoryId = character.inventoryId;
+        
+        // Wait for local player to spawn, then connect
+        CallDeferred(nameof(ConnectToLocalPlayer));
 
         _HintF = GetNode<HBoxContainer>("ButtonHints/F");
         _HintE = GetNode<HBoxContainer>("ButtonHints/E");
@@ -106,6 +101,44 @@ public partial class Gui : CanvasLayer
         
         // Clear the input field
         chatEntry.Text = "";
+    }
+    
+    private void ConnectToLocalPlayer()
+    {
+        // Find the player character that has multiplayer authority for this peer
+        var playersNode = GetNodeOrNull("/root/Main/Players");
+        if (playersNode == null)
+        {
+            GD.PrintErr("[GUI] /root/Main/Players node not found! Retrying in 0.1s...");
+            GetTree().CreateTimer(0.1).Timeout += ConnectToLocalPlayer;
+            return;
+        }
+
+        // Get the local multiplayer ID
+        int localPeerId = Multiplayer.GetUniqueId();
+        
+        // Look for the character with our peer ID as the name
+        Character? localCharacter = playersNode.GetNodeOrNull<Character>(localPeerId.ToString());
+        
+        if (localCharacter == null)
+        {
+            GD.Print($"[GUI] Local player {localPeerId} not spawned yet, retrying in 0.1s...");
+            GetTree().CreateTimer(0.1).Timeout += ConnectToLocalPlayer;
+            return;
+        }
+
+        _localPlayer = localCharacter;
+        GD.Print($"[GUI] Connected to local player: {_localPlayer.Name}");
+        
+        // Connect to Character's signals
+        _localPlayer.InventoryRequested += OnInventoryRequested;
+        _localPlayer.RotateRequested += OnRotateRequested;
+        _localPlayer.HotbarSlotSelected += OnHotbarSlotSelected;
+        _localPlayer.HintEUpdated += SetHintE;
+        _localPlayer.HintFUpdated += SetHintF;
+        
+        // Set hotbar inventory ID
+        _hotbarUI.inventoryId = _localPlayer.inventoryId;
     }
     
     public void SetHintF(string hint)
