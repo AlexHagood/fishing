@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3 uid="uid://cdx2u0a1rvmah"]
+
+[ext_resource type="PackedScene" uid="uid://c6guy00earepd" path="res://Items/Tools/FishingRod/ToolRod.tscn" id="1_3qa0w"]
+[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="2_6i4f2"]
+
+[resource]
+script = ExtResource("2_6i4f2")
+Name = "Rod"
+Icon = "uid://b31bomn1xak2y"
+Size = Vector2i(1, 4)
+ScenePath = "uid://bso6pmegp53om"
+ToolScriptScene = ExtResource("1_3qa0w")
+metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

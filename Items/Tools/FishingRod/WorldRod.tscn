@@ -1,10 +1,10 @@
-[gd_scene load_steps=8 format=3 uid="uid://bso6pmegp53om"]
+[gd_scene format=3 uid="uid://bso6pmegp53om"]
 
 [ext_resource type="Script" uid="uid://kill1sr1ygyw" path="res://Items/GameItem.cs" id="1_1q82x"]
 [ext_resource type="PackedScene" uid="uid://c6guy00earepd" path="res://Items/Tools/FishingRod/ToolRod.tscn" id="2_jhj2s"]
 [ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="2_p4o6j"]
 
-[sub_resource type="Resource" id="Resource_jhj2s"]
+[sub_resource type="Resource" id="Resource_p4o6j"]
 script = ExtResource("2_p4o6j")
 Name = "Rod"
 Icon = "uid://b31bomn1xak2y"
@@ -25,16 +25,16 @@ height = 3.0
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_jyuhk"]
 points = PackedVector3Array(0.038084112, 1.5070094, 0.010035753, -0.03200934, -1.5070094, -0.017985161, -0.03200934, -1.5070094, 0.02405307, -0.03200934, 1.5070094, -0.017985161, 0.02405307, -1.5070094, -0.03200934, 0.010035753, -1.5070094, 0.038084112, -0.03200934, 1.5070094, 0.02405307, 0.02405307, 1.5070094, -0.03200934, 0.038084112, -1.5070094, 0.010035753, 0.010035753, 1.5070094, 0.038084112)
 
-[node name="WorldRod" type="RigidBody3D"]
+[node name="WorldRod" type="RigidBody3D" unique_id=1005772763]
 freeze = true
 script = ExtResource("1_1q82x")
-InvItemData = SubResource("Resource_jhj2s")
+InvItemData = SubResource("Resource_p4o6j")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=784837101]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0, 0)
 mesh = SubResource("CylinderMesh_lg1v0")
 skeleton = NodePath("")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=849492373]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0, 0)
 shape = SubResource("ConvexPolygonShape3D_jyuhk")
