@@ -1,6 +1,7 @@
 using System.Dynamic;
 using Godot;
 using TriangleNet.Tools;
+using TriangleNet.Voronoi.Legacy;
 
 public partial class Character : CharacterBody3D
 {
@@ -58,6 +59,7 @@ public partial class Character : CharacterBody3D
     private Camera3D _thirdPersonCamera;
 
     private InventoryManager _inventoryManager;
+    private InputHandler _inputHandler;
     private ToolScript _currentTool;
 
     public CharAnimations animTree;
@@ -65,17 +67,6 @@ public partial class Character : CharacterBody3D
     public AudioStreamPlayer3D footstepsAudioPlayer;
 
     public string Username = "Player";
-
-    private int _playerId;
-    public int PlayerId
-    {
-        get => _playerId;
-        set
-        {
-            _playerId = value;
-            // Authority is set by NetworkManager after node is added to tree
-        }
-    }
 
 
 
@@ -111,6 +102,13 @@ public partial class Character : CharacterBody3D
                     _currentTool.itemInstance = item;
                     // Add tool as child of hand attachment, not character root
                     _toolPosition.AddChild(_currentTool);
+                    
+                    // Only replicate if this is the authority character
+                    if (IsMultiplayerAuthority())
+                    {
+                        GD.Print("Sending tool equip signal");
+                        Rpc(MethodName.EquipToolRpc, item.ItemData.ToolScriptScene.ResourcePath);
+                    }
                 }
             }
             else
@@ -120,22 +118,72 @@ public partial class Character : CharacterBody3D
                 {
                     _currentTool.QueueFree();
                     _currentTool = null;
+                    
+                    // Only replicate if this is the authority character
+                    if (IsMultiplayerAuthority())
+                    {
+                        GD.Print("Sending tool unequip signal");
+                        Rpc(MethodName.EquipToolRpc, "");
+                    }
                 }
             }
+        }
+    }
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void EquipToolRpc(string toolScriptPath)
+    {
+        GD.Print($"[Character] EquipToolRpc called with path: {toolScriptPath}");
+
+        // Remove any existing equipped mesh
+        foreach (var child in _toolPosition.GetChildren())
+        {
+            if (child is MeshInstance3D)
+                child.QueueFree();
+        }
+
+        // Equip new tool mesh if path is provided
+        if (!string.IsNullOrEmpty(toolScriptPath))
+        {
+            var packedScene = ResourceLoader.Load<PackedScene>(toolScriptPath);
+            if (packedScene != null)
+            {
+                var tool = packedScene.Instantiate<ToolScript>();
+                if (tool != null && !string.IsNullOrEmpty(tool.MeshPath))
+                {
+                    var meshResource = ResourceLoader.Load<Mesh>(tool.MeshPath.ToString());
+                    if (meshResource != null)
+                    {
+                        var meshInstance = new MeshInstance3D();
+                        meshInstance.Mesh = meshResource;
+                        _toolPosition.AddChild(meshInstance);
+                        GD.Print($"[Character] Equipped tool mesh from RPC: {tool.MeshPath}");
+                    }
+                    else
+                    {
+                        GD.PrintErr($"[Character] Could not load mesh at path: {tool.MeshPath}");
+                    }
+                }
+                tool.QueueFree(); // Clean up the temporary tool instance
+            }
+            else
+            {
+                GD.PrintErr($"[Character] Could not load PackedScene at path: {toolScriptPath}");
+            }
+        }
+        else
+        {
+            GD.Print("[Character] Unequipped tool from RPC");
         }
     }
 
 
     public override void _Ready()
     {
-        // Configure MultiplayerSynchronizer to only sync from authority
-        var synchronizer = GetNodeOrNull<MultiplayerSynchronizer>("MultiplayerSynchronizer");
-        if (synchronizer != null)
-        {
-            // Set the synchronizer to use this node's authority
-            synchronizer.SetMultiplayerAuthority(GetMultiplayerAuthority());
-            GD.Print($"[Character {Name}] MultiplayerSynchronizer authority set to {synchronizer.GetMultiplayerAuthority()}");
-        }
+
+        var nametag = GetNode<Label3D>("Nametag");
+        nametag.Text = Name;
+
+        GD.Print($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with am i OP? {IsMultiplayerAuthority()}");
         
         // Initialize animation tree for ALL characters (local and remote)
         animTree = GetNode<CharAnimations>("AnimationTree");
@@ -143,28 +191,12 @@ public partial class Character : CharacterBody3D
         
         // Get mesh for visibility control (ALL characters need this)
         _playerBodyMesh = GetNodeOrNull<MeshInstance3D>("CharacterArmature/Skeleton3D/Body");
+        _playerBodyMesh.Visible = true;
         
         // Early return for non-authority characters (remote players on your screen)
         GD.Print($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with authority {IsMultiplayerAuthority()}");
-        if (!IsMultiplayerAuthority())
-        {
-            GD.Print($"[Character {Multiplayer.GetUniqueId()}] {Name} is remote player, skipping initialization");
-            // Make sure remote characters are visible
-            if (_playerBodyMesh != null)
-            {
-                _playerBodyMesh.Visible = true;
-                GD.Print($"[Character] Remote player mesh set to visible");
-            }
-            return;
-        }
         
         GD.Print($"[Character {Multiplayer.GetUniqueId()}] {Name} is local authority player, initializing...");
-        
-        // Only the local authority character controls mouse mode
-        Input.MouseMode = Input.MouseModeEnum.Captured;
-        
-        // Setup camera system
-        SetupCameraSystem();
         
         // Get hand attachment for tools
         _rightHandAttachment = GetNodeOrNull<BoneAttachment3D>("CharacterArmature/Skeleton3D/RightHandAttachment");
@@ -182,21 +214,33 @@ public partial class Character : CharacterBody3D
             _toolPosition = _rightHandAttachment;
         }
 
+        _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+
+
         if (IsMultiplayerAuthority())
         {
+            SetupCameraSystem();
             _holdPosition = new Node3D();
             _holdPosition.Name = "HoldPosition";
             _activeCamera.AddChild(_holdPosition);
+            _activeCamera.Current = true;
             _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
-
+            animTree.ReelTarget = 0;
+            inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5));
+            GetNode<Gui>("/root/Main/GUI").init(this);
+            
+            // Connect to InputHandler signals for local authority player
+            _inputHandler = GetNode<InputHandler>("/root/InputHandler");
+            ConnectInputSignals();
         }
+
+
         
         // Create hold position for physics items (attached to active camera)
 
         
-        _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
-
-        inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5));
+        
+        
 
         
 
@@ -204,7 +248,7 @@ public partial class Character : CharacterBody3D
     
     private void SetupCameraSystem()
     {
-        GD.Print($"[Character] Setting up camera system...");
+        GD.Print($"[Character] Setting up camera system on {Multiplayer.GetUniqueId()} for node {Name} - {IsMultiplayerAuthority()}");
         // Get camera target from scene (created in editor)
         _cameraTarget = GetNodeOrNull<Node3D>("CameraTarget");
         if (_cameraTarget == null)
@@ -233,7 +277,7 @@ public partial class Character : CharacterBody3D
         if (_firstPersonCamera != null && _thirdPersonCamera != null)
         {
             _activeCamera = _firstPersonCamera;
-            _firstPersonCamera.Current = true;
+            _activeCamera.SetCurrent(true);
             _thirdPersonCamera.Current = false;
             GD.Print("[Character] Camera system initialized successfully");
         }
@@ -247,16 +291,108 @@ public partial class Character : CharacterBody3D
         // Initialize camera angles
         _cameraPitch = 0.0f;
         
-        // Hide local player's body in first person
-        if (_playerBodyMesh != null)
+    }
+
+    private void ConnectInputSignals()
+    {
+        GD.Print("[Character] Connecting to InputHandler signals");
+        
+        // Mouse and camera
+        _inputHandler.MouseMotion += OnMouseMotion;
+        _inputHandler.MouseClick += OnMouseClick;
+        _inputHandler.CameraToggled += OnCameraToggled;
+        
+        // Hotbar
+        _inputHandler.HotbarSlotSelected += OnHotbarSlotSelected;
+        _inputHandler.HotbarScroll += OnHotbarScroll;
+        
+        // Interactions
+        _inputHandler.InteractEPressed += OnInteractEPressed;
+        _inputHandler.InteractFPressed += OnInteractFPressed;
+        
+        // UI
+        _inputHandler.InventoryToggled += OnInventoryToggled;
+        _inputHandler.ItemRotateRequested += OnItemRotateRequested;
+    }
+
+    // Input signal handlers
+    private void OnMouseMotion(Vector2 relative)
+    {
+        mouseDelta = relative;
+    }
+
+    private void OnMouseClick(MouseButton button, bool isPressed)
+    {
+        if (!isPressed) return;
+        
+        if (button == MouseButton.Left)
         {
-            setMeshVisibility(false); // Hide body in first person by default (tool stays visible!)
-            GD.Print("[Character] Local player body hidden for first person view");
+            if (_heldPhysItem != null)
+            {
+                ThrowPhysItem();
+            }
+            if (_currentTool != null)
+            {
+                _currentTool.PrimaryFire(this);
+            }
+        }
+        else if (button == MouseButton.Right)
+        {
+            if (_heldPhysItem != null)
+            {
+                DropPhysItem();
+            }
+            if (_currentTool != null)
+            {
+                _currentTool.SecondaryFire(this);
+            }
+        }
+    }
+
+    private void OnHotbarSlotSelected(int slotIndex)
+    {
+        HotbarSlot = slotIndex;
+        
+        EmitSignal(SignalName.HotbarSlotSelected, slotIndex);
+    }
+
+    private void OnHotbarScroll(int direction)
+    {
+        if (direction > 0)
+        {
+            HotbarSlot = (HotbarSlot + 1) % 6;
         }
         else
         {
-            GD.Print("[Character] No player body mesh found - will not hide in first person");
+            HotbarSlot = (HotbarSlot - 1 + 6) % 6;
         }
+        EmitSignal(SignalName.HotbarSlotSelected, HotbarSlot);
+        GD.Print($"[Character] Hotbar scrolled to slot {HotbarSlot}");
+    }
+
+    private void OnCameraToggled()
+    {
+        ToggleCameraMode();
+    }
+
+    private void OnInteractEPressed()
+    {
+        TryInteractE();
+    }
+
+    private void OnInteractFPressed()
+    {
+        TryInteractF();
+    }
+
+    private void OnInventoryToggled()
+    {
+        OpenInventory(inventoryId);
+    }
+
+    private void OnItemRotateRequested()
+    {
+        EmitSignal(SignalName.RotateRequested);
     }
 
     public void OpenInventory(int id)
@@ -274,166 +410,22 @@ public partial class Character : CharacterBody3D
         }
     }
 
-    public override void _Input(InputEvent @event)
-    {
-        if (!IsMultiplayerAuthority())
-            return;
-        
-        // Debug: Log first input event to verify input is working
-        if (Engine.GetFramesDrawn() % 300 == 0 && @event is InputEventKey)
-        {
-            GD.Print($"[Character {Name}] Received input event. MouseMode: {Input.MouseMode}");
-        }
-
-        if (@event is InputEventMouseMotion mouseMotion && Input.MouseMode != Input.MouseModeEnum.Visible)
-        {
-            mouseDelta = mouseMotion.Relative;
-        }
-
-        // Handle mouse clicks for throw/drop physics items
-        if (@event is InputEventMouseButton mouseButton)
-        {
-            // Mouse wheel scrolling for hotbar (only when not in menu)
-            if (Input.MouseMode != Input.MouseModeEnum.Visible)
-            {
-                if (mouseButton.ButtonIndex == MouseButton.WheelUp && mouseButton.Pressed)
-                {
-                    HotbarSlot = (HotbarSlot + 1 + 6) % 6; // Wrap around: 0 -> 5
-                    EmitSignal(SignalName.HotbarSlotSelected, HotbarSlot);
-                    GD.Print($"Hotbar scrolled up to slot {HotbarSlot}");
-                    return; // Don't process other mouse actions
-                }
-                else if (mouseButton.ButtonIndex == MouseButton.WheelDown && mouseButton.Pressed)
-                {
-                    HotbarSlot = (HotbarSlot - 1 + 6) % 6; // Wrap around: 5 -> 0
-                    EmitSignal(SignalName.HotbarSlotSelected, HotbarSlot);
-                    GD.Print($"Hotbar scrolled down to slot {HotbarSlot}");
-                    return; // Don't process other mouse actions
-                }
-            }
-            
-            // Don't process item actions in menu mode
-            
-            
-            // Left mouse button - throw
-            if (mouseButton.ButtonIndex == MouseButton.Left && mouseButton.Pressed)
-            {
-                if (_heldPhysItem != null)
-                {
-                    ThrowPhysItem();
-                }
-                if (_currentTool != null)
-                {
-                    _currentTool.PrimaryFire(this);
-                    // Play character animation for tool use if specified
-                }
-            }
-            // Right mouse button - drop
-            else if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed)
-            {
-                if (_heldPhysItem != null)
-                {
-                    DropPhysItem();
-                }
-                if (_currentTool != null)
-                {
-                    _currentTool.SecondaryFire(this);
-                    // Play character animation for tool secondary use if specified
-                }
-            }
-        }
-
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo && Input.MouseMode != Input.MouseModeEnum.Visible)
-        {
-            if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
-            {
-                GD.Print("Char - Hotbar key pressed: " + keyEvent.Keycode);
-                int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
-                HotbarSlot = slotIndex;
-                EmitSignal(SignalName.HotbarSlotSelected, slotIndex);
-            }
-        }
-
-        // Tab or I key - toggle inventory
-        if (Input.IsActionJustPressed("inventory"))
-        {
-            GD.Print($"Trying to open inventory {inventoryId}");
-            OpenInventory(inventoryId);
-            return;
-        }
-
-        // R key - rotate item in inventory
-        if (Input.IsActionJustPressed("rotate"))
-        {
-            EmitSignal(SignalName.RotateRequested);
-        }
-        
-        // C key - toggle camera mode
-        if (Input.IsActionJustPressed("camera"))
-        {
-            ToggleCameraMode();
-        }
-
-        // E key - interact with WorldItem (don't allow in menu mode)
-        if (Input.IsActionJustPressed("interact"))
-        {
-            TryInteractE();
-        }
-
-        // F key - interact with WorldItem (don't allow in menu mode)
-        if (Input.IsActionJustPressed("pickup"))
-        {
-            TryInteractF();
-        }
-        
-        // Sprint input handling (don't allow in menu mode)
-        if (Input.IsActionPressed("sprint"))
-        {
-            _isSprinting = true;
-        }
-        else
-        {
-            _isSprinting = false;
-        }
-    }
-
     public override void _PhysicsProcess(double delta)
     {
 
-
-        if (Engine.GetPhysicsFrames() % 60 == 0)
-        {
-            GD.Print($"[Character {Name}] Physics processing - Peer ID: {Multiplayer.GetUniqueId()}, Authority: {GetMultiplayerAuthority()}, {IsMultiplayerAuthority()}");
-        }
-
         if (!IsMultiplayerAuthority())
             return;
 
-
+        // Get movement input from InputHandler
+        Vector2 inputDir = _inputHandler.GetMovementInput();
         Vector3 direction = Vector3.Zero;
 
-        if (Input.IsActionPressed("fwd"))
-        {
-            direction -= Transform.Basis.Z;
-            if (Engine.GetPhysicsFrames() % 60 == 0)
-                GD.Print($"[Character {Name}] FWD pressed!");
-        }
-        if (Input.IsActionPressed("back"))
-        {
-            direction += Transform.Basis.Z;
-        }
-        if (Input.IsActionPressed("left"))
-        {
-            direction -= Transform.Basis.X;
-        }
-        if (Input.IsActionPressed("right"))
-        {
-            direction += Transform.Basis.X;
-        }
-
+        // Convert 2D input to 3D direction relative to character rotation
+        direction = Transform.Basis.Z * inputDir.Y + Transform.Basis.X * inputDir.X;
         direction = direction.Normalized();
-        
 
+        // Get sprint state from InputHandler
+        _isSprinting = _inputHandler.IsSprintPressed();
 
         // Apply movement speed
         float currentSpeed = _isSprinting ? _sprintSpeed : _baseSpeed;
@@ -462,14 +454,12 @@ public partial class Character : CharacterBody3D
             GD.Print($"[Character {Name}] Direction: {direction}, Sprint: {_isSprinting}, Velocity: {Velocity} ");
         }
 
-
-
         // Apply gravity
         if (!isOnFloor)
             Velocity = new Vector3(Velocity.X, Velocity.Y - Gravity * (float)delta, Velocity.Z);
 
-        // Handle jump
-        if (isOnFloor && Input.IsActionJustPressed("jump"))
+        // Handle jump using InputHandler
+        if (isOnFloor && _inputHandler.IsJumpJustPressed())
         {
             Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
             if (animTree != null)
@@ -659,6 +649,11 @@ public partial class Character : CharacterBody3D
 
     public GodotObject RaycastFromCamera(float range = 5.0f)
     {
+        if (_activeCamera == null)
+        {
+            GD.PrintErr("[Character] Cannot raycast - active camera not initialized!");
+            return null;
+        }
         var spaceState = GetWorld3D().DirectSpaceState;
         var from = _activeCamera.GlobalTransform.Origin;
         var to = from + _activeCamera.GlobalTransform.Basis.Z * -range;

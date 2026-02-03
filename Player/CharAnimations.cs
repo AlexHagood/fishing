@@ -29,18 +29,32 @@ public partial class CharAnimations : AnimationTree
 	Set("parameters/Walking/blend_position", _walkValue);
     }
 
+	
 	public void Jump()
     {
+		Rpc("FireRemoteAnimation", "Jump");
         Set("parameters/Jump/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
     }
 
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	public void Swing()
     {
+		Rpc("FireRemoteAnimation", "Swing");
         Set("parameters/Swing/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
     }
 
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	public void Cast()
 	{
+		Rpc("FireRemoteAnimation", "Cast");
 		Set("parameters/Cast/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
 	}
+	
+	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+	public void FireRemoteAnimation(string anim)
+	{
+		GD.Print($"[CharAnimations] Firing remote animation on {Multiplayer.GetUniqueId()} from {Multiplayer.GetRemoteSenderId()}: {anim}");
+		Set("parameters/" + anim + "/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
+	}
+
 }

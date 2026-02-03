@@ -1,6 +1,6 @@
-[gd_scene load_steps=2 format=3 uid="uid://bk8ja346yxa6l"]
+[gd_scene format=3 uid="uid://bk8ja346yxa6l"]
 
 [ext_resource type="Script" uid="uid://cicaebvb5gobd" path="res://Environment/Terrain/Terrain.cs" id="1_206su"]
 
-[node name="Terrain" type="Node3D"]
+[node name="Terrain" type="Node3D" unique_id=1753444874]
 script = ExtResource("1_206su")

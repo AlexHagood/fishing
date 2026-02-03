@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=3 uid="uid://3a84qv8rpke2"]
+[gd_scene format=3 uid="uid://3a84qv8rpke2"]
 
 [sub_resource type="BoxMesh" id="BoxMesh_1hlqy"]
 
@@ -6,15 +6,15 @@
 
 [sub_resource type="CSharpScript" id="CSharpScript_4hjcf"]
 
-[node name="PickupableCube" type="RigidBody3D"]
+[node name="PickupableCube" type="RigidBody3D" unique_id=562366195]
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1891558035]
 mesh = SubResource("BoxMesh_1hlqy")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1403475763]
 shape = SubResource("BoxShape3D_1xlka")
 
-[node name="PickupableItem" type="Node" parent="."]
+[node name="PickupableItem" type="Node" parent="." unique_id=2049854425]
 script = SubResource("CSharpScript_4hjcf")
 IsPickupable = true
 PickupRange = 3.0

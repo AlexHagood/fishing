@@ -14,15 +14,21 @@ public partial class NetworkManager : Node
     public override void _Ready()
     {
         ParseCommandLineArgs();
+
+        DisplayServer.WindowSetTitle("Fishing game");
         
         // Server listens for new connections and spawns players
         Multiplayer.PeerConnected += OnPeerConnected;
+        
     }
     
     private void OnPeerConnected(long peerId)
     {
-        GD.Print($"[NetworkManager] Peer {peerId} connected");
-        
+        GD.Print($"[NetworkManager {Multiplayer.GetUniqueId()}] Peer {peerId} connected");
+
+        var pnode = GetNode("/root/Main/Players");
+        var players = pnode.GetChildren();
+
         // Only server spawns players
         if (Multiplayer.IsServer())
         {
@@ -30,6 +36,9 @@ public partial class NetworkManager : Node
         }
 
     }
+
+
+
 
     private void ParseCommandLineArgs()
     {
@@ -83,7 +92,7 @@ public partial class NetworkManager : Node
 
     public void SpawnPlayer(long peerId)
     {
-        GD.Print("[NetworkManager] SpawnPlayer called.");
+        GD.Print($"[NetworkManager] SpawnPlayer called for {peerId}.");
         if (!Multiplayer.IsServer())
         {
             GD.PrintErr("[NetworkManager] SpawnPlayer called on client, ignoring.");
@@ -91,50 +100,25 @@ public partial class NetworkManager : Node
         }
         GD.Print($"[NetworkManager] Spawning player with peer ID: {peerId}");
         
-        var scene = ResourceLoader.Load<PackedScene>("res://Player/character.tscn");
-        if (scene == null)
+        // Try to use MultiplayerSpawner if it exists
+        var spawner = GetNode<MultiplayerSpawner>("/root/Main/MultiplayerSpawner");
+
+            // Create spawn data
+        var spawnData = new Godot.Collections.Dictionary
         {
-            GD.PrintErr($"[NetworkManager] Failed to load scene at path: res://Player/character.tscn");
-            return;
-        }
-        var newPlayer = scene.Instantiate<Character>();
+            { "peer_id", peerId }
+        };
 
-        newPlayer.Name = peerId.ToString();
+        var player = spawner.Spawn(spawnData);
 
-        // Add to Players node
-        var playersNode = GetNode("/root/Main/Players");
-        playersNode.AddChild(newPlayer, true);
+        GD.Print($"Spawned player {player.Name}");
         
-        // Set authority on server AFTER adding to tree
-        newPlayer.SetMultiplayerAuthority((int)peerId);
+        // Fallback to manual spawning if no spawner exists
         
-        GD.Print($"[NetworkManager] Spawned player {peerId} on server, authority is {newPlayer.GetMultiplayerAuthority()}");
+        GD.Print($"[NetworkManager {Multiplayer.GetUniqueId()}] Spawned player {peerId} on server, authority is {player.GetMultiplayerAuthority()}");
         
         // Use RPC to tell ALL clients (including this one if it's also a client) to set authority
-        Rpc(MethodName.ClientSetPlayerAuthority, peerId.ToString(), (int)peerId);
     }
     
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void ClientSetPlayerAuthority(string playerName, int authorityPeerId)
-    {
-        GD.Print($"[NetworkManager] ClientSetPlayerAuthority RPC: {playerName} -> {authorityPeerId} (I am peer {Multiplayer.GetUniqueId()})");
-        
-        var playersNode = GetNodeOrNull("/root/Main/Players");
-        if (playersNode == null)
-        {
-            GD.PrintErr("[NetworkManager] Players node not found!");
-            return;
-        }
-        
-        var player = playersNode.GetNodeOrNull<Character>(playerName);
-        if (player == null)
-        {
-            GD.PrintErr($"[NetworkManager] Player {playerName} not found!");
-            return;
-        }
-        
-        player.SetMultiplayerAuthority(authorityPeerId);
-        GD.Print($"[NetworkManager] Set authority for {playerName} to {authorityPeerId}. IsAuthority: {player.IsMultiplayerAuthority()}");
-    }
     
 }

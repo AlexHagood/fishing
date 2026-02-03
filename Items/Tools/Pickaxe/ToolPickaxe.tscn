@@ -1,4 +1,4 @@
-[gd_scene load_steps=4 format=4 uid="uid://c1eiejlh0hahb"]
+[gd_scene format=4 uid="uid://c1eiejlh0hahb"]
 
 [ext_resource type="Script" uid="uid://bm2kaxg1umne7" path="res://Items/Tools/Pickaxe/PickaxeTool.cs" id="1_tne74"]
 
@@ -16,11 +16,11 @@ _surfaces = [{
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_38u25"]
 albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
 
-[node name="ToolPickaxe" type="Node3D"]
+[node name="ToolPickaxe" type="Node3D" unique_id=1216465180]
 script = ExtResource("1_tne74")
+MeshPath = NodePath("MeshInstance3D")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=675685783]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2385862, 0)
 mesh = SubResource("ArrayMesh_1vd7m")
-skeleton = NodePath("")
 surface_material_override/0 = SubResource("StandardMaterial3D_38u25")

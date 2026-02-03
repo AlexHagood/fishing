@@ -8,10 +8,6 @@
 
 config_version=5
 
-[animation]
-
-compatibility/default_parent_skeleton_in_mesh_instance_3d=true
-
 [application]
 
 config/name="Glop 3"
@@ -25,6 +21,7 @@ NetworkManager="*res://NetworkManager.cs"
 InventoryManager="*res://Items/InventoryManager.cs"
 ChatManager="*res://ChatManager.cs"
 FishManager="*res://FishManager.cs"
+InputHandler="*res://InputHandler.cs"
 
 [display]
 

@@ -47,11 +47,11 @@ billboard_keep_scale = true
 
 [node name="Node3D" type="Node3D" unique_id=214598079]
 script = ExtResource("1_78gr2")
+MeshPath = NodePath("MeshInstance3D")
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=2006850120]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0.845, 0)
 mesh = SubResource("CylinderMesh_hndgl")
-skeleton = NodePath("")
 
 [node name="Bobber" type="RigidBody3D" parent="." unique_id=2116631920]
 collision_layer = 0

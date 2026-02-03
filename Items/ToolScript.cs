@@ -4,6 +4,9 @@ public partial class ToolScript: Node3D
 {
     public ItemInstance itemInstance;
     
+    [Export]
+    public NodePath MeshPath;
+    
     public virtual void PrimaryFire(Character character)
     {
         GD.Print($"[ToolScript] PrimaryFire - by item {itemInstance.ItemData.Name}");

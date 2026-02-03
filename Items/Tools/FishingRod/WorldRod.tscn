@@ -33,7 +33,6 @@ InvItemData = SubResource("Resource_p4o6j")
 [node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=784837101]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0, 0)
 mesh = SubResource("CylinderMesh_lg1v0")
-skeleton = NodePath("")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=849492373]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.017139196, 0, 0)

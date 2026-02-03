@@ -1,4 +1,4 @@
-[gd_scene load_steps=9 format=3 uid="uid://dp7c2svp2ouk"]
+[gd_scene format=3 uid="uid://dp7c2svp2ouk"]
 
 [ext_resource type="Script" uid="uid://brv0whwiag0kr" path="res://Environment/Water/Water.cs" id="1_7wcun"]
 [ext_resource type="AudioStream" uid="uid://cwhenookrpddq" path="res://Sounds/splash.mp3" id="2_splash"]
@@ -141,17 +141,17 @@ shader_parameter/uv2_offset = Vector3(0, 0, 0)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_seble"]
 
-[node name="Water" type="Node3D"]
+[node name="Water" type="Node3D" unique_id=1872377656]
 script = ExtResource("1_7wcun")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=1068279544]
 mesh = SubResource("BoxMesh_5vw27")
 surface_material_override/0 = SubResource("ShaderMaterial_efxa6")
 
-[node name="WaterVolume" type="Area3D" parent="."]
+[node name="WaterVolume" type="Area3D" parent="." unique_id=1341781817]
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterVolume"]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="WaterVolume" unique_id=1908540953]
 shape = SubResource("BoxShape3D_seble")
 
-[node name="SplashPlayer" type="AudioStreamPlayer3D" parent="WaterVolume"]
+[node name="SplashPlayer" type="AudioStreamPlayer3D" parent="WaterVolume" unique_id=141898820]
 stream = ExtResource("2_splash")

@@ -1,4 +1,4 @@
-[gd_scene load_steps=5 format=3 uid="uid://bnltlhxo8hu34"]
+[gd_scene format=3 uid="uid://bnltlhxo8hu34"]
 
 [ext_resource type="Shader" uid="uid://c2sdmw22wybh6" path="res://Environment/Sky/sky.gdshader" id="1_d2u4w"]
 
@@ -33,7 +33,7 @@ ambient_light_source = 3
 ambient_light_color = Color(0.4, 0.45, 0.5, 1)
 ambient_light_energy = 0.5
 
-[node name="SkyBox" type="Node3D"]
+[node name="SkyBox" type="Node3D" unique_id=1710666683]
 
-[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+[node name="WorldEnvironment" type="WorldEnvironment" parent="." unique_id=1752971055]
 environment = SubResource("Environment_0xm2m")

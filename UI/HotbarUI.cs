@@ -58,6 +58,7 @@ public partial class HotbarUI : Control
 
     public void Refresh()
     {
+        GD.Print($"[HotbarUI] Refreshing hotbar UI from inventory {inventoryId}");
         List<ItemInstance?> hotbarItems = _inventoryManager.GetInventory(inventoryId).HotbarItems;
         for (int i = 0; i < hotbarSize; i++)
         {
@@ -66,9 +67,11 @@ public partial class HotbarUI : Control
             TextureRect slotTexture = slotPanel.GetNode<TextureRect>("TextureRect");
             if (itemInstance != null)
             {
+                GD.Print($"[HotbarUI] Refreshing hotbar slot filled {i}");
                 slotTexture.Texture = GD.Load<Texture2D>(itemInstance.ItemData.Icon);
             } else
             {
+                GD.Print($"[HotbarUI] Refreshing hotbar slot empty {i}");
                 slotTexture.Texture = null;
             }
         }

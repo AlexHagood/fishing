@@ -1,4 +1,4 @@
-[gd_scene load_steps=6 format=4 uid="uid://dovtc3lfpwj5c"]
+[gd_scene format=4 uid="uid://dovtc3lfpwj5c"]
 
 [ext_resource type="Script" uid="uid://kill1sr1ygyw" path="res://Items/GameItem.cs" id="1_5aqrx"]
 [ext_resource type="Resource" uid="uid://d1omxjw12mqo3" path="res://Items/Tools/Pickaxe/Pickaxe.tres" id="2_4nr41"]
@@ -20,16 +20,15 @@ albedo_color = Color(0.780877, 0.515819, 0.152365, 1)
 [sub_resource type="ConvexPolygonShape3D" id="ConvexPolygonShape3D_3wep2"]
 points = PackedVector3Array(-0.657239, 2.06992, -0.036702, -0.000133991, 0.799983, -0.05, -0.0353627, 0.799983, -0.03536, -0.0500527, 0.799983, -2.34321e-06, -0.657239, 2.06992, 0.0633044, -0.00911123, 2.22661, -0.036702, -0.000133991, 2.14896, -0.05, 0.732325, 2.07202, -0.036702, 0.0352308, 0.799983, -0.03536, -0.0353627, 0.799983, 0.0353443, -0.000133991, 0.799983, 0.0499953, 0.732325, 2.07202, 0.0633044, -0.00911123, 2.22661, 0.0633044, 0.0499208, 0.799983, -2.34321e-06, 0.0352308, 0.799983, 0.0353443)
 
-[node name="Pickaxe" type="RigidBody3D"]
+[node name="Pickaxe" type="RigidBody3D" unique_id=1952413951]
 script = ExtResource("1_5aqrx")
 InvItemData = ExtResource("2_4nr41")
 
-[node name="MeshInstance3D" type="MeshInstance3D" parent="."]
+[node name="MeshInstance3D" type="MeshInstance3D" parent="." unique_id=791112224]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.54703, 0)
 mesh = SubResource("ArrayMesh_dg77c")
-skeleton = NodePath("")
 surface_material_override/0 = SubResource("StandardMaterial3D_dfgps")
 
-[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1952883078]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.54442, 0)
 shape = SubResource("ConvexPolygonShape3D_3wep2")

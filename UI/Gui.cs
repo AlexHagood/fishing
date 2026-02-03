@@ -40,45 +40,56 @@ public partial class Gui : CanvasLayer
     private TextEdit chatLog;
 
     private ChatManager _chatManager;
+    private InputHandler _inputHandler = null!;
 
 
     public override void _Ready()
     {
-        // _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
-        // _chatManager = GetNode<ChatManager>("/root/ChatManager");
-
-        // // Connect to ChatManager's MessageAdded signal
-        // _chatManager.MessageAdded += OnChatMessageReceived;
-
-        // _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
-        // _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
         
-        // // Connect to Character's signals
-        // var character = GetNode<Character>("/root/Main/Character");
-        // character.InventoryRequested += OnInventoryRequested;
-        // character.RotateRequested += OnRotateRequested;
-        // character.HotbarSlotSelected += OnHotbarSlotSelected;
-        // character.HintEUpdated += SetHintE;
-        // character.HintFUpdated += SetHintF;
+    }
 
-        // _hotbarUI = GetNode<HotbarUI>("Hotbar");
-        // _hotbarUI.inventoryId = character.inventoryId;
+    public void init(Character character)
+    {
+        _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+        _chatManager = GetNode<ChatManager>("/root/ChatManager");
+        _inputHandler = GetNode<InputHandler>("/root/InputHandler");
 
-        // _HintF = GetNode<HBoxContainer>("ButtonHints/F");
-        // _HintE = GetNode<HBoxContainer>("ButtonHints/E");
-        // _HintFLabel = _HintF.GetNode<Label>("Label");
-        // _HintELabel = _HintE.GetNode<Label>("Label");
+        // Connect to ChatManager's MessageAdded signal
+        _chatManager.MessageAdded += OnChatMessageReceived;
 
-        // _contextMenu = GetNode<PopupMenu>("PopupMenu");
-        // _contextMenu.AddItem("Drop", 0);
-        // _contextMenu.AddItem("Rotate", 1);
-        // _contextMenu.IdPressed += OnContextMenuItemSelected;
+        _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
+        _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
+        
+        // Connect to Character's signals
+        character.InventoryRequested += OnInventoryRequested;
+        character.RotateRequested += OnRotateRequested;
+        character.HotbarSlotSelected += OnHotbarSlotSelected;
+        character.HintEUpdated += SetHintE;
+        character.HintFUpdated += SetHintF;
 
-        // chatEntry = GetNode<LineEdit>("ChatContainer/ChatEntry");
-        // chatLog = GetNode<TextEdit>("ChatContainer/ChatLog");
+        _hotbarUI = GetNode<HotbarUI>("Hotbar");
+        _hotbarUI.inventoryId = character.inventoryId;
 
-        // // Connect text submitted event for chat entry
-        // chatEntry.TextSubmitted += OnChatMessageSubmitted;
+        _HintF = GetNode<HBoxContainer>("ButtonHints/F");
+        _HintE = GetNode<HBoxContainer>("ButtonHints/E");
+        _HintFLabel = _HintF.GetNode<Label>("Label");
+        _HintELabel = _HintE.GetNode<Label>("Label");
+
+        _contextMenu = GetNode<PopupMenu>("PopupMenu");
+        _contextMenu.AddItem("Drop", 0);
+        _contextMenu.AddItem("Rotate", 1);
+        _contextMenu.IdPressed += OnContextMenuItemSelected;
+
+        chatEntry = GetNode<LineEdit>("ChatContainer/ChatEntry");
+        chatLog = GetNode<TextEdit>("ChatContainer/ChatLog");
+
+        // Connect text submitted event for chat entry
+        chatEntry.TextSubmitted += OnChatMessageSubmitted;
+        
+        // Connect to InputHandler signals for UI-specific input
+        _inputHandler.HotbarSlotSelected += OnInputHandlerHotbarSlotSelected;
+        _inputHandler.ItemRotateRequested += OnInputHandlerRotateRequested;
+        
     }
 
     // Called when ChatManager emits MessageAdded signal
@@ -142,6 +153,52 @@ public partial class Gui : CanvasLayer
         }
     }
 
+    // InputHandler signal handlers
+    private void OnInputHandlerHotbarSlotSelected(int slotIndex)
+    {
+        // Only handle this in UI context (when inventory is open)
+        if (_inputHandler.CurrentContext != InputHandler.InputContext.UI)
+            return;
+
+        GD.Print($"[GUI] InputHandler hotbar key pressed: {slotIndex}");
+        Vector2 mousePos = GetViewport().GetMousePosition();
+        var slotUnder = GetSlotAtPosition(mousePos);
+        
+        if (slotUnder != null)
+        {
+            Vector2I slotPos = slotUnder.slotPosition;
+            var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
+            
+            if (inv.Grid.ContainsKey(slotPos))
+            {
+                GD.Print($"[GUI] Hotbar key pressed over item at position: {inv.Grid[slotPos].ItemData.Name}");
+                ItemInstance item = inv.Grid[slotPos];
+
+                int i = inv.HotbarItems.IndexOf(item);
+                GD.Print($"[GUI] Item is currently in hotbar at index: {i}");
+                
+                if (i != -1)
+                {
+                    // Item is already in hotbar, swap positions
+                    inv.HotbarItems[i] = null;
+                }
+                
+                inv.HotbarItems[slotIndex] = item;
+                _hotbarUI.Refresh();
+            }
+        }
+    }
+
+    private void OnInputHandlerRotateRequested()
+    {
+        // Toggle rotate state
+        _rotateHeld = !_rotateHeld;
+        GD.Print($"[GUI] Rotate toggled: {_rotateHeld}");
+        
+        // Then handle the actual rotation (call the existing handler)
+        HandleRotateAction();
+    }
+
     
     public override void _Input(InputEvent @event)
     {
@@ -185,38 +242,6 @@ public partial class Gui : CanvasLayer
                 }
             }
             
-        }
-
-        if (@event is InputEventKey keyEvent && keyEvent.Pressed && !keyEvent.Echo)
-        {
-            if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
-            {
-                int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
-                GD.Print("GUI - Hotbar key pressed: " + slotIndex);
-                Vector2 mousePos = GetViewport().GetMousePosition();
-                var slotUnder = GetSlotAtPosition(mousePos);
-                if (slotUnder != null)
-                {
-                    Vector2I slotPos = slotUnder.slotPosition;
-                    var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
-                    if (inv.Grid.ContainsKey(slotPos))
-                    {
-                        GD.Print($"[GUI] Hotbar key pressed over item at position: {inv.Grid[slotPos].ItemData.Name}");
-                        ItemInstance item = inv.Grid[slotPos];
-
-                        int i = inv.HotbarItems.IndexOf(item);
-                        GD.Print($"[GUI] Item is currently in hotbar at index: {i}");
-                        if (i != -1)
-                        {
-                            
-                            // Item is already in hotbar, swap positions
-                            inv.HotbarItems[i] = null;
-                        }
-                        inv.HotbarItems[slotIndex] = item;
-                        _hotbarUI.Refresh();
-                    }
-                }
-            }
         }
     }
     
@@ -286,6 +311,7 @@ public partial class Gui : CanvasLayer
     {
         GD.Print($"[GUI] Hotbar slot selected: {slotIndex}");
         _hotbarUI.HighlightSlot(slotIndex);
+        _hotbarUI.Refresh(); // Update thumbnails when slot changes
     }
     
     private InventorySlot? GetSlotAtPosition(Vector2 globalPosition)
@@ -379,7 +405,13 @@ public partial class Gui : CanvasLayer
 
     private void OnRotateRequested()
     {
-        // Case 1: If we're dragging an item, rotate the drag ghost and update the dragged item
+        // Called from Character signal - just handle the rotation action
+        HandleRotateAction();
+    }
+
+    private void HandleRotateAction()
+    {
+        // Case 1: If we're dragging an item, rotate the drag ghost
         if (_draggedItem != null && _dragGhost != null)
         {
             // XOR: if IsRotated and _rotateHeld match, rotate left; if they differ, rotate right
@@ -564,7 +596,7 @@ public partial class Gui : CanvasLayer
         {
             window.QueueFree();
         }   
-        
+        _inputHandler.CurrentContext = InputHandler.InputContext.Gameplay;
         GD.Print($"[GUI] Windows closed. Total windows: {openWindows.Count}");
     }
 
@@ -575,7 +607,8 @@ public partial class Gui : CanvasLayer
         // If no windows are open, recapture the mouse for 3D view
         if (openWindows.Count == 0)
         {
-            Input.MouseMode = Input.MouseModeEnum.Captured;
+            _inputHandler.CurrentContext = InputHandler.InputContext.Gameplay;
+
         }
         
         GD.Print($"[GUI] Window closed. Total windows: {openWindows.Count}");
@@ -589,7 +622,7 @@ public partial class Gui : CanvasLayer
         // If this is the first window, release mouse capture for UI interaction
         if (openWindows.Count > 0)
         {
-            Input.MouseMode = Input.MouseModeEnum.Visible;
+            _inputHandler.CurrentContext = InputHandler.InputContext.UI;
         }
         
         GD.Print($"[GUI] On Window opened. Total windows: {openWindows.Count}");

@@ -1,4 +1,4 @@
-[gd_scene load_steps=13 format=3 uid="uid://dwfv0b3dqr6fv"]
+[gd_scene format=3 uid="uid://dwfv0b3dqr6fv"]
 
 [ext_resource type="Script" uid="uid://byy0guhpinbi6" path="res://UI/Gui.cs" id="1_jf511"]
 [ext_resource type="Texture2D" uid="uid://c1fykfvqv6fk8" path="res://Textures/crosshair.png" id="2_0wv8u"]
@@ -48,10 +48,10 @@ _data = {
 [sub_resource type="StyleBoxFlat" id="StyleBoxFlat_gkx6s"]
 bg_color = Color(0.227451, 0.737255, 0.0156863, 0.196078)
 
-[node name="GUI" type="CanvasLayer"]
+[node name="GUI" type="CanvasLayer" unique_id=1105509617]
 script = ExtResource("1_jf511")
 
-[node name="Crosshair" type="TextureRect" parent="."]
+[node name="Crosshair" type="TextureRect" parent="." unique_id=723045901]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -66,7 +66,7 @@ grow_vertical = 2
 texture = ExtResource("2_0wv8u")
 stretch_mode = 2
 
-[node name="PickupBar" type="ProgressBar" parent="."]
+[node name="PickupBar" type="ProgressBar" parent="." unique_id=1184162418]
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
@@ -80,12 +80,10 @@ grow_horizontal = 2
 grow_vertical = 2
 show_percentage = false
 
-[node name="AnimationPlayer" type="AnimationPlayer" parent="PickupBar"]
-libraries = {
-&"": SubResource("AnimationLibrary_px5sl")
-}
+[node name="AnimationPlayer" type="AnimationPlayer" parent="PickupBar" unique_id=1734389582]
+libraries/ = SubResource("AnimationLibrary_px5sl")
 
-[node name="Hotbar" type="GridContainer" parent="."]
+[node name="Hotbar" type="GridContainer" parent="." unique_id=1732400671]
 custom_minimum_size = Vector2(300, 100)
 anchors_preset = 7
 anchor_left = 0.5
@@ -102,13 +100,13 @@ size_flags_vertical = 3
 columns = 6
 script = ExtResource("3_67jta")
 
-[node name="Slot0" type="Panel" parent="Hotbar"]
+[node name="Slot0" type="Panel" parent="Hotbar" unique_id=438734295]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
-[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot0"]
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot0" unique_id=1333241956]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -118,13 +116,13 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot1" type="Panel" parent="Hotbar"]
+[node name="Slot1" type="Panel" parent="Hotbar" unique_id=1774307886]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
-[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot1"]
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot1" unique_id=1351164226]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -134,13 +132,13 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot2" type="Panel" parent="Hotbar"]
+[node name="Slot2" type="Panel" parent="Hotbar" unique_id=138766931]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
-[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot2"]
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot2" unique_id=1929846402]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -150,13 +148,13 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot3" type="Panel" parent="Hotbar"]
+[node name="Slot3" type="Panel" parent="Hotbar" unique_id=986313505]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
-[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot3"]
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot3" unique_id=1900338349]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -166,13 +164,13 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot4" type="Panel" parent="Hotbar"]
+[node name="Slot4" type="Panel" parent="Hotbar" unique_id=496487177]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
-[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot4"]
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot4" unique_id=113157426]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -182,13 +180,13 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="Slot5" type="Panel" parent="Hotbar"]
+[node name="Slot5" type="Panel" parent="Hotbar" unique_id=378880024]
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 3
 theme_override_styles/panel = SubResource("StyleBoxFlat_gkx6s")
 
-[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot5"]
+[node name="TextureRect" type="TextureRect" parent="Hotbar/Slot5" unique_id=1886531810]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
@@ -198,7 +196,7 @@ grow_vertical = 2
 expand_mode = 1
 stretch_mode = 5
 
-[node name="ButtonHints" type="VBoxContainer" parent="."]
+[node name="ButtonHints" type="VBoxContainer" parent="." unique_id=286866689]
 custom_minimum_size = Vector2(60, 40)
 anchors_preset = 8
 anchor_left = 0.5
@@ -213,51 +211,51 @@ grow_horizontal = 2
 grow_vertical = 2
 script = ExtResource("4_p8208")
 
-[node name="F" type="HBoxContainer" parent="ButtonHints"]
+[node name="F" type="HBoxContainer" parent="ButtonHints" unique_id=1468289827]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Key" type="TextureRect" parent="ButtonHints/F"]
+[node name="Key" type="TextureRect" parent="ButtonHints/F" unique_id=1986324242]
 layout_mode = 2
 texture = ExtResource("5_axmix")
 expand_mode = 2
 stretch_mode = 4
 
-[node name="Label" type="Label" parent="ButtonHints/F"]
+[node name="Label" type="Label" parent="ButtonHints/F" unique_id=99349256]
 layout_mode = 2
 text = "Pickup"
 
-[node name="E" type="HBoxContainer" parent="ButtonHints"]
+[node name="E" type="HBoxContainer" parent="ButtonHints" unique_id=1806599129]
 layout_mode = 2
 size_flags_vertical = 3
 
-[node name="Key" type="TextureRect" parent="ButtonHints/E"]
+[node name="Key" type="TextureRect" parent="ButtonHints/E" unique_id=642169241]
 layout_mode = 2
 texture = ExtResource("6_7u6ry")
 expand_mode = 2
 stretch_mode = 5
 
-[node name="Label" type="Label" parent="ButtonHints/E"]
+[node name="Label" type="Label" parent="ButtonHints/E" unique_id=354994174]
 layout_mode = 2
 text = "Grab"
 
-[node name="PickupSound" type="AudioStreamPlayer" parent="."]
+[node name="PickupSound" type="AudioStreamPlayer" parent="." unique_id=260418490]
 stream = ExtResource("6_0wv8u")
 
-[node name="DropSound" type="AudioStreamPlayer" parent="."]
+[node name="DropSound" type="AudioStreamPlayer" parent="." unique_id=489608655]
 stream = ExtResource("7_67jta")
 
-[node name="PopupMenu" type="PopupMenu" parent="."]
+[node name="PopupMenu" type="PopupMenu" parent="." unique_id=675510949]
 
-[node name="ChatContainer" type="VBoxContainer" parent="."]
+[node name="ChatContainer" type="VBoxContainer" parent="." unique_id=783032385]
 offset_top = 550.0
 offset_right = 400.0
 offset_bottom = 950.0
 
-[node name="ChatLog" type="TextEdit" parent="ChatContainer"]
+[node name="ChatLog" type="TextEdit" parent="ChatContainer" unique_id=1036441217]
 layout_mode = 2
 size_flags_vertical = 3
 editable = false
 
-[node name="ChatEntry" type="LineEdit" parent="ChatContainer"]
+[node name="ChatEntry" type="LineEdit" parent="ChatContainer" unique_id=1227064330]
 layout_mode = 2
