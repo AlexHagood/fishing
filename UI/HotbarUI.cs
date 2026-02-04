@@ -67,11 +67,9 @@ public partial class HotbarUI : Control
             TextureRect slotTexture = slotPanel.GetNode<TextureRect>("TextureRect");
             if (itemInstance != null)
             {
-                GD.Print($"[HotbarUI] Refreshing hotbar slot filled {i}");
                 slotTexture.Texture = GD.Load<Texture2D>(itemInstance.ItemData.Icon);
             } else
             {
-                GD.Print($"[HotbarUI] Refreshing hotbar slot empty {i}");
                 slotTexture.Texture = null;
             }
         }

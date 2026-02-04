@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Linq;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 #nullable enable
 public class ItemInstance
@@ -26,7 +27,6 @@ public class ItemInstance
             return ItemData.Size;
         }
     }
-
 }
 
 public class Inventory
@@ -34,12 +34,12 @@ public class Inventory
     public Vector2I Size { get; set; }
     public Dictionary<Vector2I, ItemInstance> Grid { get; set; }
 
-    public Inventory(Vector2I size)
+    public Inventory(Vector2I size, int id)
     {
         Size = size;
         Grid = new Dictionary<Vector2I, ItemInstance>();
         HotbarItems = new List<ItemInstance?>() {null, null, null, null, null, null};
-
+        Id = id;
     }
 
     public List<ItemInstance> GetAllItems()
@@ -52,24 +52,176 @@ public class Inventory
 
     public List<ItemInstance?> HotbarItems;
 
+    public int Id;
 
+    public string Serialize()
+    {
+        var dto = InventoryDTO.FromInventory(this);
+        return dto.ToJson();
+    }
 }
 
 [GlobalClass]
 public partial class InventoryManager : Node
 {
     private Dictionary<int, Inventory> _Inventories = new Dictionary<int, Inventory>();
+    
+    // Cache for fast item lookup by instance ID
+    private Dictionary<int, ItemInstance> _itemInstances = new Dictionary<int, ItemInstance>();
 
-    int inventoryCount = 0;
+    int inventoryCount = 1;
     
     private int _itemCount = 0;
     private int ItemCount => _itemCount++;
 
+    public override void _Ready()
+    {
+        if (Multiplayer.IsServer())
+        {
+            Multiplayer.PeerConnected += SendInventoryState;
+            // Create default inventory for server/authority
+            GD.Print("Creating inventory state for server/authority");
+            CreateInventory(new Vector2I(5,5));
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void LoadInventoryState(string serializedInventories)
+    {
+        GD.Print($"{Multiplayer.GetUniqueId()} loading inventory state from authority");
+        var state = InventoryManagerStateDTO.FromJson(serializedInventories);
+        if (state == null)
+            throw new InvalidOperationException("Failed to deserialize inventory state");
+
+        // Clear existing state
+        _Inventories.Clear();
+        _itemInstances.Clear();
+        
+        // Restore item counter
+        _itemCount = state.NextItemId;
+        
+        // Restore all inventories
+        foreach (var invDTO in state.Inventories)
+        {
+            var inventory = invDTO.ToInventory();
+            _Inventories[inventory.Id] = inventory;
+            
+            // Register all items in cache
+            foreach (var item in inventory.GetAllItems())
+            {
+                _itemInstances[item.InstanceId] = item;
+            }
+        }
+        
+        GD.Print($"Loaded {state.Inventories.Count} inventories with {_itemInstances.Count} total items");
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void MoveItemRpc(int toInventoryId, int instanceId, Vector2I position, bool rotation)
+    {
+        ItemInstance item = IdToInstance(instanceId);
+        TryTransferItemPosition(toInventoryId, item, position, rotation);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void DropItemRpc(int instanceId)
+    {
+        ItemInstance item = IdToInstance(instanceId);
+        DropItem(item.InventoryId, item);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void RotateItemRpc(int instanceId)
+    {
+        ItemInstance item = IdToInstance(instanceId);
+        RotateItem(item);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void CreateInventoryRpc(Vector2I size)
+    {
+        CreateInventory(size);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void TryPushItemRpc(int inventoryId,string itemDefPath)
+    {
+        ItemDefinition itemDef = PathToDef(itemDefPath);
+        TryPushItem(inventoryId, itemDef);
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void MoveCountRpc(int toInventoryId, int instanceId, Vector2I position, bool rotateAgain, int count)
+    {
+        ItemInstance item = IdToInstance(instanceId);
+        TrySplitStack(toInventoryId, item, count, position, rotateAgain);
+    }
+
+
+    
+
+    private void SendInventoryState(long peerId)
+    {
+
+        CreateInventory(new Vector2I(5, 5), (int)peerId); // Inventory for new player
+
+        var state = new InventoryManagerStateDTO
+        {
+            Inventories = _Inventories.Values
+                .Select(inv => InventoryDTO.FromInventory(inv))
+                .ToList(),
+            NextItemId = _itemCount
+        };
+        string serializedState = state.ToJson();
+        RpcId(peerId, nameof(LoadInventoryState), serializedState);
+    }
+
+
+    private ItemDefinition PathToDef(string path)
+    {
+        ItemDefinition? item = GD.Load<ItemDefinition>(path);
+        if (item == null)
+            throw new InvalidOperationException($"Failed to load ItemInstance from path: {path}");
+        return item;
+    }
+    
+    private string DefToPath(ItemDefinition item)
+    {
+        return item.ResourcePath;
+    }
+
+    // Fast O(1) lookup using cache
+    private ItemInstance IdToInstance(int id)
+    {
+        if (!_itemInstances.TryGetValue(id, out ItemInstance? item))
+            throw new InvalidOperationException($"No ItemInstance with ID {id} found");
+        return item;
+    }
+    
+    // Register item in cache when created
+    private void RegisterItem(ItemInstance item)
+    {
+        _itemInstances[item.InstanceId] = item;
+    }
+    
+    // Remove item from cache when destroyed
+    private void UnregisterItem(int instanceId)
+    {
+        _itemInstances.Remove(instanceId);
+    }
+
+
     public int CreateInventory(Vector2I size)
     {
-        _Inventories[inventoryCount] = new Inventory(size);
+        _Inventories[inventoryCount] = new Inventory(size, inventoryCount);
         inventoryCount++;
         return inventoryCount - 1;
+    }
+
+    public int CreateInventory(Vector2I size, int inventoryId)
+    {
+        _Inventories[inventoryId] = new Inventory(size, inventoryId);
+        return inventoryId;
     }
 
     public Inventory GetInventory(int inventoryId)
@@ -110,6 +262,9 @@ public partial class InventoryManager : Node
             }
         }
 
+        // Unregister from cache
+        UnregisterItem(item.InstanceId);
+
         return item.ItemData.ScenePath;
     }
 
@@ -143,6 +298,7 @@ public partial class InventoryManager : Node
                             CurrentStackSize = 1,
                             GridPosition = position,
                         };
+                        RegisterItem(newItemInstance);
                         AddInstanceToInventory(newItemInstance);
                         return true; // Successfully placed
                     }
@@ -320,6 +476,7 @@ public partial class InventoryManager : Node
                     IsRotated = item.IsRotated ^ rotateAgain,
                     GridPosition = targetPosition,
                 };
+                RegisterItem(newItemInstance);
                 AddInstanceToInventory(newItemInstance);
                 item.CurrentStackSize -= splitCount;
                 
@@ -407,24 +564,31 @@ public partial class InventoryManager : Node
     }
 
     /// <summary>
-    /// Find an item instance by its unique instance ID across all inventories
+    /// Find an item instance by its unique instance ID (uses cache for O(1) lookup)
     /// </summary>
-    public ItemInstance FindItemByInstanceId(int instanceId)
+    public ItemInstance? FindItemByInstanceId(int instanceId)
     {
-        return _Inventories.Values
-            .SelectMany(inv => inv.GetAllItems())
-            .FirstOrDefault(item => item.InstanceId == instanceId);
+        _itemInstances.TryGetValue(instanceId, out ItemInstance? item);
+        return item;
     }
 
     /// <summary>
     /// Find an item instance by its instance ID in a specific inventory
     /// </summary>
-    public ItemInstance FindItemByInstanceId(int inventoryId, int instanceId)
+    public ItemInstance? FindItemByInstanceId(int inventoryId, int instanceId)
     {
-        if (!_Inventories.ContainsKey(inventoryId))
+        if (!_itemInstances.TryGetValue(instanceId, out ItemInstance? item))
             return null;
-
-        return _Inventories[inventoryId].GetAllItems()
-            .FirstOrDefault(item => item.InstanceId == instanceId);
+        
+        // Verify it's in the specified inventory
+        return item.InventoryId == inventoryId ? item : null;
+    }
+    
+    /// <summary>
+    /// Get all items currently tracked in the system
+    /// </summary>
+    public IEnumerable<ItemInstance> GetAllItems()
+    {
+        return _itemInstances.Values;
     }
 }

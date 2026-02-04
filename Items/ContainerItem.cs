@@ -16,7 +16,7 @@ public partial class ContainerItem : PhysItem
 	public override void _Ready()
 	{
 		_inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
-		_containerInventoryId = _inventoryManager.CreateInventory(new Vector2I(4, 3));
+		//_containerInventoryId = _inventoryManager.CreateInventory(new Vector2I(4, 3));
 		GD.Print("Created tacklebox with Id " + _containerInventoryId);
 		base._Ready();
 	}

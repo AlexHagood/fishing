@@ -93,6 +93,7 @@ public partial class Gui : CanvasLayer
     }
 
     // Called when ChatManager emits MessageAdded signal
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void OnChatMessageReceived(string sender, string message)
     {
         string formattedMessage = $"[{System.DateTime.Now:HH:mm}] {sender}: {message}\n";
@@ -113,7 +114,7 @@ public partial class Gui : CanvasLayer
         }
 
         // Add the message to ChatManager (which will emit signal to all GUIs)
-        _chatManager.AddMessage("Player", text);
+        Rpc("OnChatMessageReceived", Multiplayer.GetUniqueId().ToString(), text);
         
         // Clear the input field
         chatEntry.Text = "";
@@ -378,12 +379,14 @@ public partial class Gui : CanvasLayer
             case 0: // Drop
                 GD.Print($"[GUI] Context menu: Drop item {itemAtSlot.ItemData.Name}");
                 _inventoryManager.DropItem(slotUnder.inventoryId, itemAtSlot);
+                Rpc("DropItemRpc", itemAtSlot.InstanceId);
                 RefreshInventoryWindows();
                 break;
                 
             case 1: // Rotate
                 GD.Print($"[GUI] Context menu: Rotate item {itemAtSlot.ItemData.Name}");
                 _inventoryManager.RotateItem(itemAtSlot);
+                Rpc("RotateItemRpc", itemAtSlot.InstanceId);
                 RefreshInventoryWindows();
                 break;
         }
@@ -445,6 +448,7 @@ public partial class Gui : CanvasLayer
                 if (_inventoryManager.CanRotateItem(itemAtSlot))
                 {
                     _inventoryManager.RotateItem(itemAtSlot);
+                    Rpc("RotateItemRpc", itemAtSlot.InstanceId);
                     RefreshInventoryWindows();
                     GD.Print($"[GUI] Rotated item {itemAtSlot.InstanceId} in place. IsRotated: {itemAtSlot.IsRotated}");
                 }
@@ -520,6 +524,8 @@ public partial class Gui : CanvasLayer
                     _draggedItem.ItemInstance,
                     targetSlot.slotPosition,
                     _rotateHeld);
+                Rpc("MoveCountRpc", targetSlot.inventoryId, _draggedItem.ItemInstance.InstanceId, targetSlot.slotPosition, _rotateHeld, res);
+
 
                 } 
                 else 
@@ -530,6 +536,7 @@ public partial class Gui : CanvasLayer
                         1,
                         targetSlot.slotPosition,
                         _rotateHeld);
+                    Rpc("MoveCountRpc", targetSlot.inventoryId, _draggedItem.ItemInstance.InstanceId, targetSlot.slotPosition, _rotateHeld, res);
                 }
                 if (res > 0)
                 {

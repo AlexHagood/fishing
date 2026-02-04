@@ -29,6 +29,7 @@ public partial class GameItem : WorldItem
 		
 		if (added)
 		{
+			Rpc("TryPushItemRpc", character.inventoryId, InvItemData.ResourcePath);
 			GD.Print($"[GameItem] Picked up {InvItemData.Name} into inventory");
 			QueueFree(); // Remove the world item
 		}

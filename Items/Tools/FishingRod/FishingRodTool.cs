@@ -103,11 +103,9 @@ public partial class FishingRodTool : ToolScript
 
         if (hookedItem != null)
         {
-            bool res = _inventoryManager.TryPushItem(character.inventoryId, hookedItem);
-            if (!res)
-            {
-                hookedItem = null;
-            }  
+            _inventoryManager.TryPushItem(character.inventoryId, hookedItem);
+            Rpc("TryPushItemRpc", character.inventoryId, hookedItem.ResourcePath);
+            hookedItem = null;
         }
         
         if (_state == FishingState.Idle)

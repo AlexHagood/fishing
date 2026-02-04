@@ -71,111 +71,85 @@ public partial class Character : CharacterBody3D
 
 
     public int inventoryId;
+    
+    // Make hotbar slot public for multiplayer synchronization
+    // Export is on the backing field for proper Godot editor integration
+    [Export]
     private int _hotbarSlot = 0;
-    public int HotbarSlot { 
+    
+    public int HotbarSlot 
+    { 
         get => _hotbarSlot;
-        private set 
+        set 
         {
+            if (_hotbarSlot == value) return; // No change
+            
             _hotbarSlot = value;
             
-            // Safety check: ensure inventory manager is initialized
-            if (_inventoryManager == null)
-            {
-                GD.PushWarning("[Character] InventoryManager not initialized yet, deferring hotbar update");
-                return;
-            }
-            
-            ItemInstance? item = _inventoryManager.GetInventory(inventoryId).HotbarItems[value];
-
-            if (item != null)
-            {
-                GD.Print($"[Character] Hotbar slot {value} has item: {item.ItemData.Name}");
-                // Instantiate the tool script for the selected item
-                if (_currentTool != null)
-                {
-                    _currentTool.QueueFree();
-                    _currentTool = null;
-                }
-                if (item.ItemData.ToolScriptScene != null && _toolPosition != null)
-                {
-                    _currentTool = item.ItemData.ToolScriptScene.Instantiate<ToolScript>();
-                    _currentTool.itemInstance = item;
-                    // Add tool as child of hand attachment, not character root
-                    _toolPosition.AddChild(_currentTool);
-                    
-                    // Only replicate if this is the authority character
-                    if (IsMultiplayerAuthority())
-                    {
-                        GD.Print("Sending tool equip signal");
-                        Rpc(MethodName.EquipToolRpc, item.ItemData.ToolScriptScene.ResourcePath);
-                    }
-                }
-            }
-            else
-            {
-                GD.Print($"[Character] Hotbar slot {value} is empty");
-                if (_currentTool != null)
-                {
-                    _currentTool.QueueFree();
-                    _currentTool = null;
-                    
-                    // Only replicate if this is the authority character
-                    if (IsMultiplayerAuthority())
-                    {
-                        GD.Print("Sending tool unequip signal");
-                        Rpc(MethodName.EquipToolRpc, "");
-                    }
-                }
-            }
+            // Update tool equipment when hotbar slot changes
+            UpdateEquippedTool(_hotbarSlot);
+            Rpc("UpdateEquippedTool", _hotbarSlot);
         }
     }
+    
+    /// <summary>
+    /// Updates the equipped tool based on the current hotbar slot.
+    /// Works for both local authority and remote players.
+    /// </summary>
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void EquipToolRpc(string toolScriptPath)
+    private void UpdateEquippedTool(int slot)
     {
-        GD.Print($"[Character] EquipToolRpc called with path: {toolScriptPath}");
-
-        // Remove any existing equipped mesh
-        foreach (var child in _toolPosition.GetChildren())
+        // Safety check: ensure inventory manager is initialized
+        if (_inventoryManager == null)
         {
-            if (child is MeshInstance3D)
-                child.QueueFree();
+            GD.PushWarning("[Character] InventoryManager not initialized yet, deferring hotbar update");
+            return;
         }
+        
+        // For remote players, we only show the visual mesh, not the full tool script
+        GD.Print($"{Name} Updating equipped tool. Rpc call? " + (Multiplayer.GetRemoteSenderId() != 0) + $"Hotbar Slot: {slot}");
+        
+        ItemInstance? item = _inventoryManager.GetInventory(inventoryId).HotbarItems[slot];
 
-        // Equip new tool mesh if path is provided
-        if (!string.IsNullOrEmpty(toolScriptPath))
+        if (item != null)
         {
-            var packedScene = ResourceLoader.Load<PackedScene>(toolScriptPath);
-            if (packedScene != null)
+            GD.Print($"[Character {Name}] Hotbar slot {slot} has item: {item.ItemData.Name}");
+            
+            // Remove old tool
+            if (_currentTool != null)
             {
-                var tool = packedScene.Instantiate<ToolScript>();
-                if (tool != null && !string.IsNullOrEmpty(tool.MeshPath))
-                {
-                    var meshResource = ResourceLoader.Load<Mesh>(tool.MeshPath.ToString());
-                    if (meshResource != null)
-                    {
-                        var meshInstance = new MeshInstance3D();
-                        meshInstance.Mesh = meshResource;
-                        _toolPosition.AddChild(meshInstance);
-                        GD.Print($"[Character] Equipped tool mesh from RPC: {tool.MeshPath}");
-                    }
-                    else
-                    {
-                        GD.PrintErr($"[Character] Could not load mesh at path: {tool.MeshPath}");
-                    }
-                }
-                tool.QueueFree(); // Clean up the temporary tool instance
+                _currentTool.QueueFree();
+                _currentTool = null;
             }
-            else
-            {
-                GD.PrintErr($"[Character] Could not load PackedScene at path: {toolScriptPath}");
-            }
+                
+
+            _currentTool = item.ItemData.ToolScriptScene.Instantiate<ToolScript>();
+            _currentTool.itemInstance = item;
+            _toolPosition.AddChild(_currentTool);
+            GD.Print("[Character] Authority player equipped tool with full functionality");
+
+            // For remote players: just show the mesh
         }
         else
         {
-            GD.Print("[Character] Unequipped tool from RPC");
+            GD.Print($"[Character] Hotbar slot {slot} is empty");
+            if (_currentTool != null)
+            {
+                _currentTool.QueueFree();
+                _currentTool = null;
+            }
+            
+            // Remove any mesh instances for remote players
+            if (_toolPosition != null)
+            {
+                foreach (var child in _toolPosition.GetChildren())
+                {
+                    child.QueueFree();
+                }
+            }
         }
     }
-
+    
 
     public override void _Ready()
     {
@@ -216,7 +190,8 @@ public partial class Character : CharacterBody3D
 
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
-
+        inventoryId = 1;
+        
         if (IsMultiplayerAuthority())
         {
             SetupCameraSystem();
@@ -226,7 +201,7 @@ public partial class Character : CharacterBody3D
             _activeCamera.Current = true;
             _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
             animTree.ReelTarget = 0;
-            inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5));
+            
             GetNode<Gui>("/root/Main/GUI").init(this);
             
             // Connect to InputHandler signals for local authority player
