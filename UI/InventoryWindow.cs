@@ -26,6 +26,7 @@ public partial class InventoryWindow : UIWindow
         // Get the content container from the base UIWindow
         var contentContainer = GetNode<PanelContainer>("Panel/VBoxContainer/Content");
         Vector2I InventorySize = inventoryManager.GetInventorySize(inventoryId);
+        inventoryManager.InventoryUpdate += RefreshItems;
         // Create and add the GridContainer to the content area
         _gridContainer = new GridContainer();
         _gridContainer.AddThemeConstantOverride("v_separation", 0);
@@ -80,7 +81,7 @@ public partial class InventoryWindow : UIWindow
         Vector2I InventorySize = inventoryManager.GetInventorySize(inventoryId);
         
         // Get all items and recreate their tiles
-        List<ItemInstance> items = inventoryManager.GetInventory(inventoryId).GetAllItems();
+        List<ItemInstance> items = inventoryManager.GetInventory(inventoryId).Items;
         foreach (var item in items)
         {
             GD.Print($"Refreshing item in inventory: {item.ItemData.Name} (ID: {item.InstanceId})");

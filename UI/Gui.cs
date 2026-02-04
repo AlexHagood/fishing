@@ -43,6 +43,7 @@ public partial class Gui : CanvasLayer
     private InputHandler _inputHandler = null!;
 
 
+
     public override void _Ready()
     {
         
@@ -170,10 +171,10 @@ public partial class Gui : CanvasLayer
             Vector2I slotPos = slotUnder.slotPosition;
             var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
             
-            if (inv.Grid.ContainsKey(slotPos))
+            if (inv.GetItemAtPosition(slotPos) != null)
             {
-                GD.Print($"[GUI] Hotbar key pressed over item at position: {inv.Grid[slotPos].ItemData.Name}");
-                ItemInstance item = inv.Grid[slotPos];
+                GD.Print($"[GUI] Hotbar key pressed over item at position: {inv.GetItemAtPosition(slotPos)!.ItemData.Name}");
+                ItemInstance item = inv.GetItemAtPosition(slotPos)!;
 
                 int i = inv.HotbarItems.IndexOf(item);
                 GD.Print($"[GUI] Item is currently in hotbar at index: {i}");
@@ -232,9 +233,9 @@ public partial class Gui : CanvasLayer
                 {
                     // Check if this slot actually has an item in it
                     var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
-                    if (inv.Grid.ContainsKey(slotUnder.slotPosition))
+                    if (inv.GetItemAtPosition(slotUnder.slotPosition) != null)
                     {
-                        GD.Print($"[GUI] Right-clicked on item - {inv.Grid[slotUnder.slotPosition].ItemData.Name}");
+                        GD.Print($"[GUI] Right-clicked on item - {inv.GetItemAtPosition(slotUnder.slotPosition)!.ItemData.Name}");
                         // There's an item here - show context menu
                         _contextMenu.Position = (Vector2I)mousePos;
                         _contextMenu.Popup();
@@ -288,12 +289,10 @@ public partial class Gui : CanvasLayer
                     _highlightedSlots = slotUnder.GetSlotsForSize(targetSize);
                     
                     // Check if it fits with target rotation and ignore self
-                    int spaceAvailable = _inventoryManager.CheckItemFits(
-                        slotUnder.inventoryId,
-                        _draggedItem.ItemInstance.ItemData,
+                    int spaceAvailable = _inventoryManager.GetInventory(slotUnder.inventoryId).GetSpaceAt(
+                        _draggedItem.ItemInstance,
                         slotUnder.slotPosition,
-                        _draggedItem.ItemInstance.IsRotated ^ _rotateHeld,
-                        _draggedItem.ItemInstance.InstanceId);
+                        _rotateHeld);
                     
                     bool validSlot = spaceAvailable > 0;
                     foreach (var slot in _highlightedSlots)
@@ -369,25 +368,21 @@ public partial class Gui : CanvasLayer
             return;
             
         var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
-        if (!inv.Grid.ContainsKey(slotUnder.slotPosition))
+        if (inv.GetItemAtPosition(slotUnder.slotPosition) == null)
             return;
             
-        var itemAtSlot = inv.Grid[slotUnder.slotPosition];
+        var itemAtSlot = inv.GetItemAtPosition(slotUnder.slotPosition);
         
         switch (id)
         {
             case 0: // Drop
                 GD.Print($"[GUI] Context menu: Drop item {itemAtSlot.ItemData.Name}");
-                _inventoryManager.DropItem(slotUnder.inventoryId, itemAtSlot);
-                Rpc("DropItemRpc", itemAtSlot.InstanceId);
-                RefreshInventoryWindows();
+                _inventoryManager.RequestDeleteItem(itemAtSlot);
                 break;
                 
             case 1: // Rotate
                 GD.Print($"[GUI] Context menu: Rotate item {itemAtSlot.ItemData.Name}");
-                _inventoryManager.RotateItem(itemAtSlot);
-                Rpc("RotateItemRpc", itemAtSlot.InstanceId);
-                RefreshInventoryWindows();
+                _inventoryManager.RequestItemRotate(itemAtSlot);
                 break;
         }
     }
@@ -440,17 +435,15 @@ public partial class Gui : CanvasLayer
         if (slotUnder != null)
         {
             var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
-            if (inv.Grid.ContainsKey(slotUnder.slotPosition))
+            if (inv.GetItemAtPosition(slotUnder.slotPosition) != null)
             {
-                var itemAtSlot = inv.Grid[slotUnder.slotPosition];
+                var itemAtSlot = inv.GetItemAtPosition(slotUnder.slotPosition);
                 
                 // Check if we can rotate it in place
                 if (_inventoryManager.CanRotateItem(itemAtSlot))
                 {
-                    _inventoryManager.RotateItem(itemAtSlot);
-                    Rpc("RotateItemRpc", itemAtSlot.InstanceId);
-                    RefreshInventoryWindows();
-                    GD.Print($"[GUI] Rotated item {itemAtSlot.InstanceId} in place. IsRotated: {itemAtSlot.IsRotated}");
+                    _inventoryManager.RequestItemRotate(itemAtSlot);
+                    GD.Print($"[GUI] Requested rotated item {itemAtSlot.InstanceId} in place. IsRotated: {itemAtSlot.IsRotated}");
                 }
                 else
                 {
@@ -502,50 +495,41 @@ public partial class Gui : CanvasLayer
         // Get the slot under the detection point
         Vector2 detectionPoint = _dragGhost.Position + new Vector2(32, 32);
         var targetSlot = GetSlotAtPosition(detectionPoint);
-        
+        Inventory targetInv = _inventoryManager.GetInventory(targetSlot.inventoryId);
+        Vector2I targetPos = targetSlot.slotPosition;
+
+        ItemInstance itemInstance = _draggedItem.ItemInstance;
         if (targetSlot != null)
         {
             // Check if the item fits in the target position
-            bool canPlace = _inventoryManager.CheckItemFits(
-                targetSlot.inventoryId,
-                _draggedItem.ItemInstance,
-                targetSlot.slotPosition);
-            
-            if (canPlace)
+            int canPlace = targetInv.GetSpaceAt(
+                itemInstance,
+                 targetPos,
+                 _rotateHeld);
+            if (canPlace > 0)
             {
-                int res;
                 if (!split)
                 {
-                GD.Print($"[GUI] Dropping item at position: {targetSlot.slotPosition}");
+                    GD.Print("Left click, drop all");
 
-                // Move the item in the inventory manager
-                res = _inventoryManager.TryTransferItemPosition(
-                    targetSlot.inventoryId,
-                    _draggedItem.ItemInstance,
-                    targetSlot.slotPosition,
-                    _rotateHeld);
-                Rpc("MoveCountRpc", targetSlot.inventoryId, _draggedItem.ItemInstance.InstanceId, targetSlot.slotPosition, _rotateHeld, res);
-
-
-                } 
-                else 
-                {
-                    res = _inventoryManager.TrySplitStack(
+                    _inventoryManager.RequestItemMove(
+                        itemInstance,
                         targetSlot.inventoryId,
-                        _draggedItem.ItemInstance,
-                        1,
                         targetSlot.slotPosition,
-                        _rotateHeld);
-                    Rpc("MoveCountRpc", targetSlot.inventoryId, _draggedItem.ItemInstance.InstanceId, targetSlot.slotPosition, _rotateHeld, res);
+                        _rotateHeld,
+                        canPlace);
                 }
-                if (res > 0)
+                else
                 {
-                    _dragGhost.Count -= res;
-                    _dropAudio.Play();
+
+                    GD.Print("[GUI] Trying to place 1");
+                    _inventoryManager.RequestItemMove(
+                        itemInstance,
+                        targetSlot.inventoryId,
+                        targetSlot.slotPosition,
+                        _rotateHeld,
+                        1);
                 }
-                
-                // Refresh both inventory windows
-                RefreshInventoryWindows();
             }
             else
             {
@@ -556,13 +540,7 @@ public partial class Gui : CanvasLayer
         {
             GD.Print("[GUI] Dropped outside inventory - returning item");
         }
-        if (_dragGhost.Count <= 0)
-        {
-            GD.Print("[GUI] All items dropped from stack");
-            CleanupDragState();
-        }
-        
-        // Clean up drag state
+        CleanupDragState();
     }
     
     private void CleanupDragState()

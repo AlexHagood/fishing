@@ -8,207 +8,190 @@ using System.Text.Json.Serialization;
 #nullable enable
 
 /// <summary>
-/// Serializable representation of an ItemInstance for network transmission
+/// Data Transfer Objects for serializing/deserializing inventory state to JSON
 /// </summary>
-public class ItemInstanceDTO
+namespace InventoryState
 {
-    [JsonPropertyName("instance_id")]
-    public int InstanceId { get; set; }
-    
-    [JsonPropertyName("inventory_id")]
-    public int InventoryId { get; set; }
-    
-    [JsonPropertyName("item_resource_path")]
-    public string ItemResourcePath { get; set; } = "";
-    
-    [JsonPropertyName("stack_size")]
-    public int StackSize { get; set; }
-    
-    [JsonPropertyName("grid_x")]
-    public int GridX { get; set; }
-    
-    [JsonPropertyName("grid_y")]
-    public int GridY { get; set; }
-    
-    [JsonPropertyName("is_rotated")]
-    public bool IsRotated { get; set; }
-
-    /// <summary>
-    /// Convert ItemInstance to DTO
-    /// </summary>
-    public static ItemInstanceDTO FromItemInstance(ItemInstance item)
+    public class ItemInstanceDTO
     {
-        return new ItemInstanceDTO
+        public int InventoryId { get; set; }
+        public int InstanceId { get; set; }
+        public string ItemDataPath { get; set; } = "";
+        public int CurrentStackSize { get; set; }
+        public int GridPositionX { get; set; }
+        public int GridPositionY { get; set; }
+        public bool IsRotated { get; set; }
+
+        public static ItemInstanceDTO FromItemInstance(ItemInstance item)
         {
-            InstanceId = item.InstanceId,
-            InventoryId = item.InventoryId,
-            ItemResourcePath = item.ItemData.ResourcePath,
-            StackSize = item.CurrentStackSize,
-            GridX = item.GridPosition.X,
-            GridY = item.GridPosition.Y,
-            IsRotated = item.IsRotated
-        };
-    }
+            return new ItemInstanceDTO
+            {
+                InventoryId = item.InventoryId,
+                InstanceId = item.InstanceId,
+                ItemDataPath = item.ItemData.ResourcePath,
+                CurrentStackSize = item.CurrentStackSize,
+                GridPositionX = item.GridPosition.X,
+                GridPositionY = item.GridPosition.Y,
+                IsRotated = item.IsRotated
+            };
+        }
 
-    /// <summary>
-    /// Convert DTO back to ItemInstance
-    /// </summary>
-    public ItemInstance ToItemInstance()
-    {
-        var itemDef = GD.Load<ItemDefinition>(ItemResourcePath);
-        if (itemDef == null)
-            throw new InvalidOperationException($"Failed to load ItemDefinition from path: {ItemResourcePath}");
-
-        return new ItemInstance
+        public ItemInstance ToItemInstance()
         {
-            InstanceId = InstanceId,
-            InventoryId = InventoryId,
-            ItemData = itemDef,
-            CurrentStackSize = StackSize,
-            GridPosition = new Vector2I(GridX, GridY),
-            IsRotated = IsRotated
-        };
+            var itemData = GD.Load<ItemDefinition>(ItemDataPath);
+            if (itemData == null)
+            {
+                throw new Exception($"Failed to load ItemDefinition from path: {ItemDataPath}");
+            }
+
+            return new ItemInstance
+            {
+                InventoryId = InventoryId,
+                InstanceId = InstanceId,
+                ItemData = itemData,
+                CurrentStackSize = CurrentStackSize,
+                GridPosition = new Vector2I(GridPositionX, GridPositionY),
+                IsRotated = IsRotated
+            };
+        }
     }
 
-    /// <summary>
-    /// Serialize to JSON string
-    /// </summary>
-    public string ToJson()
+    public class InventoryDTO
     {
-        return JsonSerializer.Serialize(this);
+        public int SizeX { get; set; }
+        public int SizeY { get; set; }
+        public List<ItemInstanceDTO> Items { get; set; } = new();
+        public List<int?> HotbarItemIds { get; set; } = new();
+        public int Id { get; set; }
+
+        public static InventoryDTO FromInventory(Inventory inventory)
+        {
+            return new InventoryDTO
+            {
+                SizeX = inventory.Size.X,
+                SizeY = inventory.Size.Y,
+                Items = inventory.Items.Select(ItemInstanceDTO.FromItemInstance).ToList(),
+                HotbarItemIds = inventory.HotbarItems.Select(item => item?.InstanceId).ToList(),
+                Id = inventory.Id
+            };
+        }
+
+        public Inventory ToInventory()
+        {
+            var inventory = new Inventory(new Vector2I(SizeX, SizeY), Id);
+            inventory.Items = Items.Select(dto => dto.ToItemInstance()).ToList();
+            
+            // Reconstruct hotbar references (will be populated after all items are loaded)
+            inventory.HotbarItems = new List<ItemInstance?>();
+            for (int i = 0; i < HotbarItemIds.Count; i++)
+            {
+                inventory.HotbarItems.Add(null);
+            }
+            
+            return inventory;
+        }
     }
 
-    /// <summary>
-    /// Deserialize from JSON string
-    /// </summary>
-    public static ItemInstanceDTO? FromJson(string json)
+    public class InventoryManagerStateDTO
     {
-        return JsonSerializer.Deserialize<ItemInstanceDTO>(json);
+        public Dictionary<int, InventoryDTO> Inventories { get; set; } = new();
+        public int InventoryCount { get; set; }
+        public int ItemCount { get; set; }
+
+        public static InventoryManagerStateDTO FromInventoryManager(
+            Dictionary<int, Inventory> inventories, 
+            int inventoryCount, 
+            int itemCount)
+        {
+            return new InventoryManagerStateDTO
+            {
+                Inventories = inventories.ToDictionary(
+                    kvp => kvp.Key,
+                    kvp => InventoryDTO.FromInventory(kvp.Value)
+                ),
+                InventoryCount = inventoryCount,
+                ItemCount = itemCount
+            };
+        }
     }
 }
 
 /// <summary>
-/// Serializable representation of an Inventory for network transmission
+/// Extension methods for InventoryManager to serialize/deserialize state
 /// </summary>
-public class InventoryDTO
+public static class InventoryManagerExtensions
 {
-    [JsonPropertyName("inventory_id")]
-    public int InventoryId { get; set; }
-    
-    [JsonPropertyName("size_x")]
-    public int SizeX { get; set; }
-    
-    [JsonPropertyName("size_y")]
-    public int SizeY { get; set; }
-    
-    [JsonPropertyName("items")]
-    public List<ItemInstanceDTO> Items { get; set; } = new();
-    
-    [JsonPropertyName("hotbar_instance_ids")]
-    public List<int?> HotbarInstanceIds { get; set; } = new();
+    private static readonly JsonSerializerOptions JsonOptions = new JsonSerializerOptions
+    {
+        WriteIndented = true,
+        DefaultIgnoreCondition = JsonIgnoreCondition.Never
+    };
 
     /// <summary>
-    /// Convert Inventory to DTO
+    /// Converts the entire inventory manager state to a JSON string
     /// </summary>
-    public static InventoryDTO FromInventory(Inventory inventory)
+    public static string GetStateAsJson(
+        this InventoryManager manager,
+        Dictionary<int, Inventory> inventories,
+        int inventoryCount,
+        int itemCount)
     {
-        return new InventoryDTO
-        {
-            InventoryId = inventory.Id,
-            SizeX = inventory.Size.X,
-            SizeY = inventory.Size.Y,
-            Items = inventory.GetAllItems()
-                .Select(ItemInstanceDTO.FromItemInstance)
-                .ToList(),
-            HotbarInstanceIds = inventory.HotbarItems
-                .Select(item => item?.InstanceId)
-                .ToList()
-        };
+        var state = InventoryState.InventoryManagerStateDTO.FromInventoryManager(
+            inventories, 
+            inventoryCount, 
+            itemCount
+        );
+        return JsonSerializer.Serialize(state, JsonOptions);
     }
 
     /// <summary>
-    /// Reconstruct Inventory from DTO (does not add to grid - use InventoryManager methods)
+    /// Loads inventory manager state from a JSON string and returns the reconstructed data
     /// </summary>
-    public Inventory ToInventory()
+    public static (Dictionary<int, Inventory> inventories, Dictionary<int, ItemInstance> itemInstances, int inventoryCount, int itemCount) 
+        LoadStateFromJson(string json)
     {
-        var inventory = new Inventory(new Vector2I(SizeX, SizeY), InventoryId);
-        
-        // Reconstruct items and place in grid
-        var itemInstances = new Dictionary<int, ItemInstance>();
-        
-        foreach (var itemDTO in Items)
+        var state = JsonSerializer.Deserialize<InventoryState.InventoryManagerStateDTO>(json);
+        if (state == null)
         {
-            var item = itemDTO.ToItemInstance();
-            itemInstances[item.InstanceId] = item;
+            throw new Exception("Failed to deserialize inventory state");
+        }
 
-            // Fill grid cells for this item
-            for (int x = 0; x < item.Size.X; x++)
+        var inventories = new Dictionary<int, Inventory>();
+        var itemInstances = new Dictionary<int, ItemInstance>();
+
+        // First pass: reconstruct inventories and items
+        foreach (var kvp in state.Inventories)
+        {
+            var inventory = kvp.Value.ToInventory();
+            inventories[kvp.Key] = inventory;
+
+            // Add all items to the cache
+            foreach (var item in inventory.Items)
             {
-                for (int y = 0; y < item.Size.Y; y++)
+                itemInstances[item.InstanceId] = item;
+            }
+        }
+
+        // Second pass: reconstruct hotbar references
+        foreach (var kvp in state.Inventories)
+        {
+            var inventory = inventories[kvp.Key];
+            var hotbarIds = kvp.Value.HotbarItemIds;
+
+            for (int i = 0; i < hotbarIds.Count; i++)
+            {
+                var hotbarId = hotbarIds[i];
+                if (hotbarId.HasValue && itemInstances.ContainsKey(hotbarId.Value))
                 {
-                    var pos = new Vector2I(item.GridPosition.X + x, item.GridPosition.Y + y);
-                    inventory.Grid[pos] = item;
+                    inventory.HotbarItems[i] = itemInstances[hotbarId.Value];
+                }
+                else
+                {
+                    inventory.HotbarItems[i] = null;
                 }
             }
         }
 
-        // Reconstruct hotbar references
-        inventory.HotbarItems = HotbarInstanceIds
-            .Select(id => id.HasValue && itemInstances.ContainsKey(id.Value) 
-                ? itemInstances[id.Value] 
-                : null)
-            .ToList();
-
-        return inventory;
-    }
-
-    /// <summary>
-    /// Serialize to JSON string
-    /// </summary>
-    public string ToJson()
-    {
-        return JsonSerializer.Serialize(this, new JsonSerializerOptions 
-        { 
-            WriteIndented = false 
-        });
-    }
-
-    /// <summary>
-    /// Deserialize from JSON string
-    /// </summary>
-    public static InventoryDTO? FromJson(string json)
-    {
-        return JsonSerializer.Deserialize<InventoryDTO>(json);
-    }
-}
-
-/// <summary>
-/// Serializable representation of all inventories in InventoryManager
-/// </summary>
-public class InventoryManagerStateDTO
-{
-    [JsonPropertyName("inventories")]
-    public List<InventoryDTO> Inventories { get; set; } = new();
-    
-    [JsonPropertyName("next_item_id")]
-    public int NextItemId { get; set; }
-
-    /// <summary>
-    /// Serialize to JSON string
-    /// </summary>
-    public string ToJson()
-    {
-        return JsonSerializer.Serialize(this, new JsonSerializerOptions 
-        { 
-            WriteIndented = false 
-        });
-    }
-
-    /// <summary>
-    /// Deserialize from JSON string
-    /// </summary>
-    public static InventoryManagerStateDTO? FromJson(string json)
-    {
-        return JsonSerializer.Deserialize<InventoryManagerStateDTO>(json);
+        return (inventories, itemInstances, state.InventoryCount, state.ItemCount);
     }
 }

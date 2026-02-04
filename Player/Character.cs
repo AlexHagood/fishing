@@ -68,14 +68,17 @@ public partial class Character : CharacterBody3D
 
     public string Username = "Player";
 
+    private int _inventoryId = 0;
 
-
+    [Export]
     public int inventoryId;
-    
     // Make hotbar slot public for multiplayer synchronization
     // Export is on the backing field for proper Godot editor integration
     [Export]
     private int _hotbarSlot = 0;
+
+    [Signal]
+    public delegate void WorldItemPickedUpEventHandler();
     
     public int HotbarSlot 
     { 
@@ -190,8 +193,15 @@ public partial class Character : CharacterBody3D
 
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
-        inventoryId = 1;
+
+
         
+        inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5), int.Parse(Name));
+
+
+        inventoryId = Multiplayer.GetUniqueId();
+            
+
         if (IsMultiplayerAuthority())
         {
             SetupCameraSystem();
@@ -220,6 +230,7 @@ public partial class Character : CharacterBody3D
         
 
     }
+
     
     private void SetupCameraSystem()
     {
@@ -372,7 +383,7 @@ public partial class Character : CharacterBody3D
 
     public void OpenInventory(int id)
     {
-        GD.Print("Opening inventory with Id " + id);
+        GD.Print($"{Name} - Opening inventory with Id " + id);
         EmitSignal(SignalName.InventoryRequested, id);
     }
 

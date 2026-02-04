@@ -40,4 +40,69 @@ public partial class WorldItem : RigidBody3D, IInteractable
     {
         return this != null && !IsQueuedForDeletion();
     }
+
+    public void pickup(Character character)
+    {
+        InventoryManager inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+        if (Multiplayer.IsServer())
+        {
+            GD.Print("[WorldItem] Server processing pickup");
+            bool res = inventoryManager.SpawnInstance(InvItemData, character.inventoryId);
+            if (res)
+            {
+                GD.Print("[WorldItem] Server pickup successful, deleting world item");
+                Rpc(nameof(DeleteWorldItem));
+                QueueFree();
+            }
+            else
+            {
+                GD.Print("[WorldItem] Server pickup failed, inventory full?");
+            }
+        }
+        else
+        {
+            GD.Print("[WorldItem] Client processing pickup");
+            RpcId(1, nameof(ClientRequestPickup));
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+    private void ClientRequestPickup()
+    {
+        int inventoryId = (int)Multiplayer.GetRemoteSenderId();
+        if (Multiplayer.IsServer())
+        {
+            InventoryManager inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+            bool res = inventoryManager.SpawnInstance(InvItemData, inventoryId);
+            if (res)
+            {
+                GD.Print("[WorldItem] ClientRequestPickup successful, deleting world item");
+                Rpc(nameof(DeleteWorldItem));
+            }
+            else
+            {
+                GD.Print("[WorldItem] ClientRequestPickup failed, inventory full?");
+            }
+            GD.Print("[WorldItem] RequestPickup called on client, ignoring");
+            return;
+        }
+        throw new System.Exception("ClientRequestPickup should not be called on client!");
+    }
+
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true)]
+    private void DeleteWorldItem()
+    {
+        int inventoryId = (int)Multiplayer.GetUniqueId();
+        // Runs on all clients (not server, since server already called QueueFree)
+        InventoryManager inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+
+        bool res = inventoryManager.SpawnInstance(InvItemData, inventoryId);
+
+        if (!res)
+        {
+            throw new System.Exception("Server had inventory space, but client didnt! HOW?!");
+        }
+        QueueFree();
+    }
 }

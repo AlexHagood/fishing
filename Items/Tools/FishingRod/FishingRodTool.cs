@@ -103,8 +103,7 @@ public partial class FishingRodTool : ToolScript
 
         if (hookedItem != null)
         {
-            _inventoryManager.TryPushItem(character.inventoryId, hookedItem);
-            Rpc("TryPushItemRpc", character.inventoryId, hookedItem.ResourcePath);
+            _inventoryManager.RequestSpawnInstance(hookedItem, character.inventoryId);
             hookedItem = null;
         }
         

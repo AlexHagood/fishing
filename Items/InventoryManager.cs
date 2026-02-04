@@ -32,33 +32,76 @@ public class ItemInstance
 public class Inventory
 {
     public Vector2I Size { get; set; }
-    public Dictionary<Vector2I, ItemInstance> Grid { get; set; }
+    public List<ItemInstance> Items { get; set; }
 
     public Inventory(Vector2I size, int id)
     {
         Size = size;
-        Grid = new Dictionary<Vector2I, ItemInstance>();
+        Items = new List<ItemInstance>();
         HotbarItems = new List<ItemInstance?>() {null, null, null, null, null, null};
         Id = id;
     }
 
-    public List<ItemInstance> GetAllItems()
+    public int GetSpaceAt(ItemInstance item, Vector2I position, bool rotated)
     {
-        return Grid.Values
-            .GroupBy(item => item.InstanceId)
-            .Select(group => group.First())
-            .ToList();
+        Vector2I itemSize = rotated ? new Vector2I(item.Size.Y, item.Size.X) : item.Size;
+
+
+        if (position.X < 0 || position.Y < 0 ||
+            position.X + itemSize.X > Size.X ||
+            position.Y + itemSize.Y > Size.Y)
+        {
+            return 0; // Out of bounds
+        }
+        foreach (var otherItem in Items)
+        {
+            if (otherItem.InstanceId == item.InstanceId)
+                continue; // Skip self
+
+            Vector2I otherPos = otherItem.GridPosition;
+            Vector2I otherSize = otherItem.Size;
+            if (otherItem.IsRotated)
+                otherSize = new Vector2I(otherItem.Size.Y, otherItem.Size.X);
+
+            // Check for overlap
+            bool overlapX = position.X < otherPos.X + otherSize.X && position.X + itemSize.X > otherPos.X;
+            bool overlapY = position.Y < otherPos.Y + otherSize.Y && position.Y + itemSize.Y > otherPos.Y;
+
+            if (overlapX && overlapY)
+            {
+                if (otherItem.ItemData == item.ItemData && item.ItemData.Stackable)
+                {
+                    // slot is occupied by another item of the same type
+                    return item.ItemData.StackSize - otherItem.CurrentStackSize;
+                }
+            }
+        }
+        // Empty slot - could fit a whole stack!
+        return item.ItemData.StackSize;
     }
+
+    public ItemInstance? GetItemAtPosition(Vector2I position)
+    {
+        foreach (var item in Items)
+        {
+            Vector2I itemPos = item.GridPosition;
+            Vector2I itemSize = item.Size;
+            if (item.IsRotated)
+                itemSize = new Vector2I(item.Size.Y, item.Size.X);
+
+            if (position.X >= itemPos.X && position.X < itemPos.X + itemSize.X &&
+                position.Y >= itemPos.Y && position.Y < itemPos.Y + itemSize.Y)
+            {
+                return item;
+            }
+        }
+        return null;
+    }
+
 
     public List<ItemInstance?> HotbarItems;
 
     public int Id;
-
-    public string Serialize()
-    {
-        var dto = InventoryDTO.FromInventory(this);
-        return dto.ToJson();
-    }
 }
 
 [GlobalClass]
@@ -74,521 +117,358 @@ public partial class InventoryManager : Node
     private int _itemCount = 0;
     private int ItemCount => _itemCount++;
 
-    public override void _Ready()
+    [Signal]
+    public delegate void InventoryUpdateEventHandler();
+
+    public ItemInstance GetItem(int id)
+    {
+        if (_itemInstances.ContainsKey(id))
+            return _itemInstances[id];
+        throw new Exception($"Item instance not found {id}");
+    }
+
+    public Inventory GetInventory(int id)
+    {
+        if (_Inventories.ContainsKey(id))
+            return _Inventories[id];
+        throw new Exception($"Inventory not found {id}");
+    }
+
+
+    public void GetInventoryState()
     {
         if (Multiplayer.IsServer())
         {
-            Multiplayer.PeerConnected += SendInventoryState;
-            // Create default inventory for server/authority
-            GD.Print("Creating inventory state for server/authority");
-            CreateInventory(new Vector2I(5,5));
+            GD.Print("Server does not need to request state, skipping");
+        }
+        else 
+        {
+            GD.Print("Client requesting inventory state from server");
+            RpcId(1, nameof(RequestServerState), Multiplayer.GetUniqueId());
         }
     }
 
+    
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void RequestServerState()
+    {
+        string state = GetStateAsJson();
+        RpcId(Multiplayer.GetRemoteSenderId(), nameof(InventoryStateCallback), state);
+    }
+    
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void LoadInventoryState(string serializedInventories)
+    public void InventoryStateCallback(string state)
     {
-        GD.Print($"{Multiplayer.GetUniqueId()} loading inventory state from authority");
-        var state = InventoryManagerStateDTO.FromJson(serializedInventories);
-        if (state == null)
-            throw new InvalidOperationException("Failed to deserialize inventory state");
-
-        // Clear existing state
-        _Inventories.Clear();
-        _itemInstances.Clear();
+        GD.Print("Client received inventory state from server - Setting!");
+        SetStateFromJson(state);
+        GD.Print("Client received inventory state from server - Complete!");
         
-        // Restore item counter
-        _itemCount = state.NextItemId;
+    }
+
+    /// <summary>
+    /// Converts the entire inventory manager state to JSON
+    /// </summary>
+    public string GetStateAsJson()
+    {
+        return this.GetStateAsJson(_Inventories, inventoryCount, _itemCount);
+    }
+
+    /// <summary>
+    /// Loads inventory manager state from JSON
+    /// </summary>
+    public void SetStateFromJson(string json)
+    {
+        var (inventories, itemInstances, invCount, itmCount) = InventoryManagerExtensions.LoadStateFromJson(json);
         
-        // Restore all inventories
-        foreach (var invDTO in state.Inventories)
-        {
-            var inventory = invDTO.ToInventory();
-            _Inventories[inventory.Id] = inventory;
-            
-            // Register all items in cache
-            foreach (var item in inventory.GetAllItems())
-            {
-                _itemInstances[item.InstanceId] = item;
-            }
-        }
+        _Inventories = inventories;
+        _itemInstances = itemInstances;
+        inventoryCount = invCount;
+        _itemCount = itmCount;
         
-        GD.Print($"Loaded {state.Inventories.Count} inventories with {_itemInstances.Count} total items");
-    }
-
-    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void MoveItemRpc(int toInventoryId, int instanceId, Vector2I position, bool rotation)
-    {
-        ItemInstance item = IdToInstance(instanceId);
-        TryTransferItemPosition(toInventoryId, item, position, rotation);
-    }
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void DropItemRpc(int instanceId)
-    {
-        ItemInstance item = IdToInstance(instanceId);
-        DropItem(item.InventoryId, item);
-    }
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RotateItemRpc(int instanceId)
-    {
-        ItemInstance item = IdToInstance(instanceId);
-        RotateItem(item);
-    }
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void CreateInventoryRpc(Vector2I size)
-    {
-        CreateInventory(size);
-    }
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void TryPushItemRpc(int inventoryId,string itemDefPath)
-    {
-        ItemDefinition itemDef = PathToDef(itemDefPath);
-        TryPushItem(inventoryId, itemDef);
-    }
-
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void MoveCountRpc(int toInventoryId, int instanceId, Vector2I position, bool rotateAgain, int count)
-    {
-        ItemInstance item = IdToInstance(instanceId);
-        TrySplitStack(toInventoryId, item, count, position, rotateAgain);
-    }
-
-
-    
-
-    private void SendInventoryState(long peerId)
-    {
-
-        CreateInventory(new Vector2I(5, 5), (int)peerId); // Inventory for new player
-
-        var state = new InventoryManagerStateDTO
-        {
-            Inventories = _Inventories.Values
-                .Select(inv => InventoryDTO.FromInventory(inv))
-                .ToList(),
-            NextItemId = _itemCount
-        };
-        string serializedState = state.ToJson();
-        RpcId(peerId, nameof(LoadInventoryState), serializedState);
-    }
-
-
-    private ItemDefinition PathToDef(string path)
-    {
-        ItemDefinition? item = GD.Load<ItemDefinition>(path);
-        if (item == null)
-            throw new InvalidOperationException($"Failed to load ItemInstance from path: {path}");
-        return item;
-    }
-    
-    private string DefToPath(ItemDefinition item)
-    {
-        return item.ResourcePath;
-    }
-
-    // Fast O(1) lookup using cache
-    private ItemInstance IdToInstance(int id)
-    {
-        if (!_itemInstances.TryGetValue(id, out ItemInstance? item))
-            throw new InvalidOperationException($"No ItemInstance with ID {id} found");
-        return item;
-    }
-    
-    // Register item in cache when created
-    private void RegisterItem(ItemInstance item)
-    {
-        _itemInstances[item.InstanceId] = item;
-    }
-    
-    // Remove item from cache when destroyed
-    private void UnregisterItem(int instanceId)
-    {
-        _itemInstances.Remove(instanceId);
-    }
-
-
-    public int CreateInventory(Vector2I size)
-    {
-        _Inventories[inventoryCount] = new Inventory(size, inventoryCount);
-        inventoryCount++;
-        return inventoryCount - 1;
-    }
-
-    public int CreateInventory(Vector2I size, int inventoryId)
-    {
-        _Inventories[inventoryId] = new Inventory(size, inventoryId);
-        return inventoryId;
-    }
-
-    public Inventory GetInventory(int inventoryId)
-    {
-        if (!_Inventories.ContainsKey(inventoryId))
-            throw new ArgumentException($"Invalid inventory ID: {inventoryId}");
-
-        return _Inventories[inventoryId];
+        EmitSignal(nameof(InventoryUpdate));
     }
 
     public Vector2I GetInventorySize(int inventoryId)
     {
-        if (!_Inventories.ContainsKey(inventoryId))
-            throw new ArgumentException($"Invalid inventory ID: {inventoryId}");
-
-        return _Inventories[inventoryId].Size;
+        var inventory = GetInventory(inventoryId);
+        return inventory.Size;
     }
 
 
-    public string DropItem(int inventoryId, ItemInstance item)
+
+
+    private void MoveItem(int instanceId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
     {
-        if (!_Inventories.ContainsKey(inventoryId))
-            throw new ArgumentException($"Invalid inventory ID: {inventoryId}");
 
-        Inventory inv = _Inventories[inventoryId];
+        var item = GetItem(instanceId);
+        var currentInventory = _Inventories[item.InventoryId];
+        var targetInventory = _Inventories[targetInventoryId];
 
-        // Remove item from grid
-        for (int x = 0; x < item.Size.X; x++)
-        {
-            for (int y = 0; y < item.Size.Y; y++)
-            {
-                GD.Print($"Dropping item {item.InstanceId} from inventory {inventoryId} at position {item.GridPosition.X + x}, {item.GridPosition.Y + y}");
-                Vector2I pos = new Vector2I(item.GridPosition.X + x, item.GridPosition.Y + y);
-                if (!inv.Grid.Remove(pos))
-                {
-                    throw new InvalidOperationException($"Massive Error: Position {pos} was not occupied in inventory {inventoryId} when trying to drop item {item.InstanceId}");
-                }
-            }
-        }
+        int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated);
+        ItemInstance? existingItem = targetInventory.GetItemAtPosition(targetPosition);
 
-        // Unregister from cache
-        UnregisterItem(item.InstanceId);
-
-        return item.ItemData.ScenePath;
-    }
-
-    /// Check if an item fits in the inventory at any position and place it there
-    public bool TryPushItem(int inventoryId, ItemDefinition item, bool rotated = false)
-    {
-        Inventory inv = _Inventories[inventoryId];
-        for (int x = 0; x <= _Inventories[inventoryId].Size.X - item.Size.X; x++)
-        {
-            for (int y = 0; y <= _Inventories[inventoryId].Size.Y - item.Size.Y; y++)
-            {
-                Vector2I position = new Vector2I(x, y);
-                if (CheckItemFits(inventoryId, item, position, rotated) > 0)
-                {
-                    if (inv.Grid.ContainsKey(position) &&
-                    inv.Grid[position] is ItemInstance existingItem &&
-                    existingItem.ItemData == item && item.Stackable)
-                    {
-                        // Stack onto existing item
-                        AddItemToStack(inventoryId, existingItem, 1);
-                        return true; // Successfully stacked
-                        
-                    }
-                    else
-                    {
-                        ItemInstance newItemInstance = new ItemInstance
-                        {
-                            InventoryId = inventoryId,
-                            InstanceId = ItemCount,
-                            ItemData = item,
-                            CurrentStackSize = 1,
-                            GridPosition = position,
-                        };
-                        RegisterItem(newItemInstance);
-                        AddInstanceToInventory(newItemInstance);
-                        return true; // Successfully placed
-                    }
-                }
-            }
-        }
-        return false; // No suitable position found
-    }
-
-    public void AddItemToStack(int inventoryId, ItemInstance item, int count)
-    {
-        Inventory inv = _Inventories[inventoryId];
-        if (item.CurrentStackSize + count <= item.ItemData.StackSize)
-        {
-            item.CurrentStackSize += count;
-        } else
-        {
-            throw new InvalidOperationException($"Cannot add {count} to stack of item {item.InstanceId}, exceeds max stack size.");
-        }
         
-    }
-
-    // Move item from one inventory to another, any position in target inventory
-    public bool TryTransferItem(int toInventoryId, ItemInstance item)
-    {
-        if (TryPushItem(toInventoryId, item.ItemData, item.IsRotated))
+        // Item exists, try to stack it there.
+        if (existingItem != null && existingItem.ItemData == item.ItemData && item.ItemData.Stackable)
         {
-            // Remove from source inventory
-            DropItem(item.InventoryId, item);
-            return true; // Successfully transferred
-        }
-        return false;
-    }
-
-    public int TryTransferItemPosition(int toInventoryId, ItemInstance item, Vector2I position, bool rotateAgain)
-    {
-        Inventory targetInv = _Inventories[toInventoryId];
-        int spaceAvailable = CheckItemFits(toInventoryId, item.ItemData, position, item.IsRotated ^ rotateAgain, item.InstanceId);
-        
-        if (spaceAvailable > 0)
-        {
-            // Check if there's an existing stack at this position
-            if (targetInv.Grid.ContainsKey(position) &&
-                targetInv.Grid[position] is ItemInstance existingItem &&
-                existingItem.ItemData == item.ItemData &&
-                item.ItemData.Stackable)
+            if (existingItem.CurrentStackSize + count > item.ItemData.StackSize)
             {
-                // Merge stacks
-                int amountToTransfer = Math.Min(item.CurrentStackSize, spaceAvailable);
-                existingItem.CurrentStackSize += amountToTransfer;
-                item.CurrentStackSize -= amountToTransfer;
-                
-                if (item.CurrentStackSize <= 0)
-                {
-                    // Remove original stack if empty
-                    DropItem(item.InventoryId, item);
-                }
-                
-                return amountToTransfer; // Successfully merged
+                throw new Exception("Target stack is already full");
+            }
+
+            if (count > item.CurrentStackSize)
+            {
+                throw new Exception("Not enough items to transfer");
+            }
+
+            if (count == item.CurrentStackSize)
+            {
+                // Remove from current inventory
+                currentInventory.Items.Remove(item);
+                _itemInstances.Remove(item.InstanceId);
+                existingItem.CurrentStackSize += count;
             }
             else
             {
-                // No existing stack, place item at position
-                DropItem(item.InventoryId, item);
-                item.InventoryId = toInventoryId;
-                item.GridPosition = position;
-                item.IsRotated = item.IsRotated ^ rotateAgain;
-                AddInstanceToInventory(item);
-                
-                return item.CurrentStackSize; // Successfully transferred
+                item.CurrentStackSize -= count;
+                existingItem.CurrentStackSize += count;
             }
         }
-        return 0;
+        // No existing item, check for space
+        else
+        {
+            if (spaceAvailable >= item.CurrentStackSize)
+            {
+                if (count == item.CurrentStackSize)
+                {
+                    currentInventory.Items.Remove(item);
+                    item.InventoryId = targetInventoryId;
+                    item.GridPosition = targetPosition;
+                    item.IsRotated = rotated ? !item.IsRotated : item.IsRotated;
+                    targetInventory.Items.Add(item);
+                    return;
+
+                }
+                else if (count < item.CurrentStackSize)
+                {
+                    ItemInstance newItem = new ItemInstance
+                    {
+                        InstanceId = count,
+                        ItemData = item.ItemData,
+                        InventoryId = targetInventoryId,
+                        CurrentStackSize = count,
+                        GridPosition = targetPosition,
+                        IsRotated = rotated ? !item.IsRotated : item.IsRotated
+                    };
+                    item.CurrentStackSize -= count;
+                    targetInventory.Items.Add(newItem);
+                    _itemInstances[newItem.InstanceId] = newItem;
+                    return;
+                }
+                else
+                {
+                    throw new Exception("Not enough items to transfer");
+                }
+            }
+            else
+            {
+                throw new Exception("Not enough space in target inventory");
+            }
+        }
+    }
+
+
+    public void RequestItemMove(ItemInstance item, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
+    {
+        if (Multiplayer.IsServer())
+        {
+            MoveItem(item.InstanceId, targetInventoryId, targetPosition, rotated, count);
+            EmitSignal(nameof(InventoryUpdate));
+        }
+        else
+        {
+            RpcId(1, nameof(RequestServerItemMove), item.InstanceId, targetInventoryId, targetPosition, rotated, count, Multiplayer.GetUniqueId());
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void RequestServerItemMove(int instanceId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count, long peerId)
+    {
+        Inventory inv = GetInventory(targetInventoryId);
+        ItemInstance item = GetItem(instanceId);
+
+        if (inv.GetSpaceAt(item, targetPosition, rotated) <= 0)
+        {
+            GD.Print("Character requested illegal item move!");
+            RpcId(peerId, nameof(ItemMoveCallback), false, instanceId, targetInventoryId, targetPosition, rotated, count);
+            return;
+        } else
+        {
+            try
+            {
+                MoveItem(instanceId, targetInventoryId, targetPosition, rotated, count);
+                RpcId(peerId, nameof(ItemMoveCallback), true, instanceId, targetInventoryId, targetPosition, rotated, count);
+            }
+            catch (Exception e)
+            {
+                GD.Print("Character requested super illegal item move!: " + e.Message);
+                RpcId(peerId, nameof(ItemMoveCallback), false, instanceId, targetInventoryId, targetPosition, rotated, count);
+            }
+        }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void ItemMoveCallback(bool status, int instanceId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
+    {
+        if (!status)
+        {
+            GD.Print("Server rejected item move request.");
+        } else
+        {
+            MoveItem(instanceId, targetInventoryId, targetPosition, rotated, count);
+            EmitSignal(nameof(InventoryUpdate));
+        }
+    }
+
+
+    public void RequestItemRotate(ItemInstance item)
+    {
+        RequestItemMove(item, item.InventoryId, item.GridPosition, !item.IsRotated, item.CurrentStackSize);
     }
 
     public bool CanRotateItem(ItemInstance item)
     {
-        Vector2I newSize = new Vector2I(item.Size.Y, item.Size.X);
-        // Check if item fits in current position with new size
-        if (item.GridPosition.X + newSize.X > _Inventories[item.InventoryId].Size.X ||
-            item.GridPosition.Y + newSize.Y > _Inventories[item.InventoryId].Size.Y)
-        {
-            return false; // Out of bounds
-        }
+        Inventory inv = GetInventory(item.InventoryId);
+        int space = inv.GetSpaceAt(item, item.GridPosition, true);
+        return space >= item.CurrentStackSize;
+    }
 
-        for (int x = 0; x < newSize.X; x++)
+    public Vector2I? FindSpotToFitItem(ItemInstance item, int inventoryId)
+    {
+        Inventory inv = GetInventory(inventoryId);
+        for (int x = 0; x <= inv.Size.X - item.Size.X; x++)
         {
-            for (int y = 0; y < newSize.Y; y++)
+            for (int y = 0; y <= inv.Size.Y - item.Size.Y; y++)
             {
-                Vector2I checkPos = new Vector2I(item.GridPosition.X + x, item.GridPosition.Y + y);
-                if (_Inventories[item.InventoryId].Grid.ContainsKey(checkPos))
+                Vector2I pos = new Vector2I(x, y);
+                int space = inv.GetSpaceAt(item, pos, item.IsRotated);
+                if (space >= item.CurrentStackSize)
                 {
-                    if (_Inventories[item.InventoryId].Grid[checkPos].InstanceId == item.InstanceId)
-                    {
-                        // Allow checking against itself
-                        continue;
-                    }
-                    return false; // Space occupied 
+                    return pos;
                 }
             }
         }
-        return true; // Can rotate
+        return null;
     }
 
-    public bool RotateItem(ItemInstance item)
+    public bool SpawnInstance(ItemDefinition itemDef, int inventoryId)
     {
-        if (!CanRotateItem(item))
+        var inventory = GetInventory(inventoryId);
+        var newItem = new ItemInstance
+        {
+            InstanceId = ItemCount,
+            ItemData = itemDef,
+            InventoryId = inventoryId,
+            CurrentStackSize = 1,
+        };
+        Vector2I? position = FindSpotToFitItem(newItem, inventoryId);
+        if (position == null)
+        {
+            GD.Print("No space to spawn item in inventory");;
             return false;
-
-        // Remove item from current grid positions
-        DropItem(item.InventoryId, item);
-
-        // Toggle rotation
-        item.IsRotated = !item.IsRotated;
-
-        // Add item back to inventory at new size
-        AddInstanceToInventory(item);
-
-        return true;
-    }
-
-    private void AddInstanceToInventory(ItemInstance item)
-    {
-        Inventory inv = _Inventories[item.InventoryId];
-        for (int ix = 0; ix < item.Size.X; ix++)
-            {
-                for (int iy = 0; iy < item.Size.Y; iy++)
-                    {
-                        Vector2I pos = new Vector2I(item.GridPosition.X + ix, item.GridPosition.Y + iy);
-                        if (inv.Grid.ContainsKey(pos))
-                            throw new InvalidOperationException($"Massive Error: Position {pos} is already occupied in inventory {item.InventoryId}");
-                        inv.Grid[pos] = item;
-                    }
-            }
-    }
-
-    public int TrySplitStack(int targetInventoryId, ItemInstance item, int splitCount, Vector2I targetPosition, bool rotateAgain)
-    {
-        if (item.CurrentStackSize < splitCount)
-            throw new InvalidOperationException($"Cannot split {splitCount} from stack of size {item.CurrentStackSize}");
-
-        Inventory targetInv = _Inventories[targetInventoryId];
-        int spaceAvailable = CheckItemFits(targetInventoryId, item.ItemData, targetPosition, item.IsRotated ^ rotateAgain);
-        
-        if (spaceAvailable >= splitCount)
+        } else 
         {
-            // Check if there's an existing stack at this position
-            if (targetInv.Grid.ContainsKey(targetPosition) &&
-                targetInv.Grid[targetPosition] is ItemInstance existingItem &&
-                existingItem.ItemData == item.ItemData &&
-                item.ItemData.Stackable)
-            {
-                // Merge into existing stack
-                int amountToTransfer = Math.Min(splitCount, spaceAvailable);
-                existingItem.CurrentStackSize += amountToTransfer;
-                item.CurrentStackSize -= amountToTransfer;
-                
-                if (item.CurrentStackSize <= 0)
-                {
-                    // Remove original stack if empty
-                    DropItem(item.InventoryId, item);
-                }
-                
-                return amountToTransfer; // Successfully merged
-            }
-            else
-            {
-                // No existing stack, create new item instance for split stack
-                ItemInstance newItemInstance = new ItemInstance
-                {
-                    InventoryId = targetInventoryId,
-                    InstanceId = ItemCount,
-                    ItemData = item.ItemData,
-                    CurrentStackSize = splitCount,
-                    IsRotated = item.IsRotated ^ rotateAgain,
-                    GridPosition = targetPosition,
-                };
-                RegisterItem(newItemInstance);
-                AddInstanceToInventory(newItemInstance);
-                item.CurrentStackSize -= splitCount;
-                
-                if (item.CurrentStackSize == 0)
-                {
-                    // Remove original item if stack is now empty
-                    DropItem(item.InventoryId, item);
-                }
-                
-                return splitCount; // Successfully split
-            }
+            newItem.GridPosition = position.Value;
+            inventory.Items.Add(newItem);
+            _itemInstances[newItem.InstanceId] = newItem;
+            return true;
         }
-        return 0;
     }
 
-
-
-    public bool CheckItemFits(int inventoryId, ItemInstance item, Vector2I position)
+    public void RequestSpawnInstance(ItemDefinition itemDef, int inventoryId)
     {
-        return CheckCountFit(inventoryId, item.ItemData, position, item.CurrentStackSize, item.IsRotated, item.InstanceId);
+        if (Multiplayer.IsServer())
+        {
+            SpawnInstance(itemDef, inventoryId);
+            EmitSignal(nameof(InventoryUpdate));
+        }
+        else
+        {
+            RpcId(1, nameof(RequestServerSpawnInstance), itemDef.ResourcePath, inventoryId, Multiplayer.GetUniqueId());
+        }
     }
 
-    public bool CheckCountFit(int inventoryId, ItemDefinition item, Vector2I position, int count, bool rotated, int instanceId = -1)
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void RequestServerSpawnInstance(string itemResourcePath, int inventoryId, long peerId)
     {
-        int fits = CheckItemFits(inventoryId, item, position, rotated, instanceId);
-        return fits >= count;
+        bool res = SpawnInstance(GD.Load<ItemDefinition>(itemResourcePath), inventoryId);
+        if (!res)
+        {
+            RpcId(peerId, nameof(SpawnInstanceCallback), false, itemResourcePath, inventoryId);
+            throw new Exception("Player requested illegal item spawn! No space!");
+        }
+        else {
+            RpcId(peerId, nameof(SpawnInstanceCallback), true, itemResourcePath, inventoryId);
+        }
     }
+
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void SpawnInstanceCallback(bool status, string itemResourcePath, int inventoryId)
+    {
+        if (!status)
+        {
+            GD.Print("Server rejected item spawn request.");
+        } else
+        {
+            SpawnInstance(GD.Load<ItemDefinition>(itemResourcePath), inventoryId);
+            EmitSignal(nameof(InventoryUpdate));
+        }
+    }
+
     
-    /// <summary>
-    ///  Returns how many of an item can fit at that slot
-    /// </summary>
-    /// <param name="inventoryId"></param>
-    /// <param name="item"></param>
-    /// <param name="position"></param>
-    /// <returns></returns>
-    /// <exception cref="ArgumentException"></exception>
-    public int CheckItemFits(int inventoryId, ItemDefinition item, Vector2I position, bool rotated, int instanceId = -1)
+    public int CreateInventory(Vector2I size, int? id)
     {
-        Vector2I size = rotated ? new Vector2I(item.Size.Y, item.Size.X) : item.Size;
-
-        if (!_Inventories.ContainsKey(inventoryId))
-            throw new ArgumentException($"Invalid inventory ID: {inventoryId}");
-
-        Inventory inv = _Inventories[inventoryId];
-
-        if (item.Stackable)
+        int newId;
+        if (id != null)
         {
-            if (inv.Grid.ContainsKey(position) &&
-               inv.Grid[position] is ItemInstance existingItem &&
-               existingItem.ItemData == item
-               && existingItem.InstanceId != instanceId)
-            {
-                GD.Print("ItemDef Fits " + (item.StackSize - existingItem.CurrentStackSize).ToString() + " more in stack");
-                return item.StackSize - existingItem.CurrentStackSize; // How many more can be stacked
-            }
+            newId = id.Value;
+        }
+        else
+        {
+            newId = inventoryCount++;
         }
 
-        if (position.X < 0 || position.Y < 0 ||
-            position.X + size.X > _Inventories[inventoryId].Size.X ||
-            position.Y + size.Y > _Inventories[inventoryId].Size.Y)
-        {
-            GD.Print("ItemDef Doesn't fit, OOB");
-            return 0; // Out of bounds
-        }
-        
-        for (int x = 0; x < size.X; x++)
-        {
-            for (int y = 0; y < size.Y; y++)
-            {
-                Vector2I checkPos = new Vector2I(position.X + x, position.Y + y);
-                if (inv.Grid.ContainsKey(checkPos))
-                {
-                    if (inv.Grid[checkPos].InstanceId == instanceId)
-                    {
-                        // Allow checking against itself
-                        continue;
-                    }
-                    GD.Print("ItemDef Doesn't fit, Occupied");
-                    return 0; // Space occupied
-                }
-            }
-        }
-        GD.Print("ItemDef Fits");
-        return item.StackSize; // Item fits
+        GD.Print($"{Multiplayer.GetUniqueId()} Creating inventory" + size + " with specified ID " + newId);
+        _Inventories[newId] = new Inventory(size, newId);
+        return newId;
     }
 
-    /// <summary>
-    /// Find an item instance by its unique instance ID (uses cache for O(1) lookup)
-    /// </summary>
-    public ItemInstance? FindItemByInstanceId(int instanceId)
+    public void RequestDeleteItem(ItemInstance item)
     {
-        _itemInstances.TryGetValue(instanceId, out ItemInstance? item);
-        return item;
+        if (Multiplayer.IsServer())
+        {
+            var inventory = GetInventory(item.InventoryId);
+            inventory.Items.Remove(item);
+            _itemInstances.Remove(item.InstanceId);
+            EmitSignal(nameof(InventoryUpdate));
+        }
+        else
+        {
+            RpcId(1, nameof(DeleteItemCallback), item.InstanceId, Multiplayer.GetUniqueId());
+        }
     }
 
-    /// <summary>
-    /// Find an item instance by its instance ID in a specific inventory
-    /// </summary>
-    public ItemInstance? FindItemByInstanceId(int inventoryId, int instanceId)
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    private void DeleteItemCallback(int instanceId)
     {
-        if (!_itemInstances.TryGetValue(instanceId, out ItemInstance? item))
-            return null;
-        
-        // Verify it's in the specified inventory
-        return item.InventoryId == inventoryId ? item : null;
+        var item = GetItem(instanceId);
+        var inventory = GetInventory(item.InventoryId);
+        inventory.Items.Remove(item);
+        _itemInstances.Remove(item.InstanceId);
+        EmitSignal(nameof(InventoryUpdate));
+
     }
-    
-    /// <summary>
-    /// Get all items currently tracked in the system
-    /// </summary>
-    public IEnumerable<ItemInstance> GetAllItems()
-    {
-        return _itemInstances.Values;
-    }
+
+
 }

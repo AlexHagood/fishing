@@ -45,10 +45,6 @@ public partial class HotbarUI : Control
             {
                 GD.PrintErr($"[HotbarUI] Failed to find Slot{i}!");
             }
-            else
-            {
-                GD.Print($"[HotbarUI] Found Slot{i}");
-            }
             slot.AddThemeStyleboxOverride("panel", normalStyle);
             slots.Add(slot);
         }

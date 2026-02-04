@@ -44,14 +44,6 @@ public partial class FishManager : Node
         {
             GD.PushWarning($"[FishManager] Loot table percentages don't add up to 100%! Current total: {totalChance}%");
         }
-        else
-        {
-            GD.Print($"[FishManager] Loot table initialized with {_fishLootTable.Count} fish types");
-            foreach (var entry in _fishLootTable)
-            {
-                GD.Print($"  - {entry.Fish.Name}: {entry.DropChance}%");
-            }
-        }
     }
     
     /// <summary>
