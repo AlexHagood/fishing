@@ -116,8 +116,6 @@ public class Inventory
         {
             Vector2I itemPos = item.GridPosition;
             Vector2I itemSize = item.Size;
-            if (item.IsRotated)
-                itemSize = new Vector2I(item.Size.Y, item.Size.X);
 
             if (position.X >= itemPos.X && position.X < itemPos.X + itemSize.X &&
                 position.Y >= itemPos.Y && position.Y < itemPos.Y + itemSize.Y)
@@ -494,22 +492,24 @@ public partial class InventoryManager : Node
 
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestDeleteItem(ItemInstance item)
+    public void RequestDeleteItem(int itemId)
     {
         if (Multiplayer.IsServer())
         {
-            GD.Print("[IM] Server deleting item instance " + item.InstanceId);
-            Rpc(nameof(DeleteItem), item.InstanceId);
+            GD.Print("[IM] Server deleting item instance " + itemId);
+            Rpc(nameof(DeleteItem), itemId);
         }
         else
         {
-            RpcId(1, nameof(RequestDeleteItem), item.InstanceId, Multiplayer.GetUniqueId());
+            GD.Print("[IM] Client requesting item deletion " + itemId);
+            RpcId(1, nameof(RequestDeleteItem), itemId);
         }
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void DeleteItem(int instanceId)
     {
+        GD.Print("[IM] Deleting item instance " + instanceId);
         var item = GetItem(instanceId);
         var inventory = GetInventory(item.InventoryId);
         inventory.Items.Remove(item);

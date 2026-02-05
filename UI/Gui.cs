@@ -12,8 +12,6 @@ public partial class Gui : CanvasLayer
     public List<UIWindow> windows = new List<UIWindow>();
 
     private int openWindows => windows.Count(w => w.Visible);
-    protected ItemTile? _draggedItem = null;
-
     private ItemGhost _dragGhost = null!;
     private InventoryManager _inventoryManager = null!;
     private InventorySlot? _lastHoveredSlot = null;
@@ -37,13 +35,10 @@ public partial class Gui : CanvasLayer
     private Label _HintFLabel;
     private Label _HintELabel;
 
-    private PopupMenu _contextMenu;
+    private ContextMenu _contextMenu;
 
-    private LineEdit chatEntry;
 
-    private TextEdit chatLog;
 
-    private ChatManager _chatManager;
     private InputHandler _inputHandler = null!;
 
 
@@ -56,11 +51,7 @@ public partial class Gui : CanvasLayer
     public void init(Character character)
     {
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
-        _chatManager = GetNode<ChatManager>("/root/ChatManager");
         _inputHandler = GetNode<InputHandler>("/root/InputHandler");
-
-        // Connect to ChatManager's MessageAdded signal
-        _chatManager.MessageAdded += OnChatMessageReceived;
 
         _dropAudio = GetNode<AudioStreamPlayer>("DropSound");
         _pickupAudio = GetNode<AudioStreamPlayer>("PickupSound");
@@ -78,50 +69,19 @@ public partial class Gui : CanvasLayer
         _HintFLabel = _HintF.GetNode<Label>("Label");
         _HintELabel = _HintE.GetNode<Label>("Label");
 
-        _contextMenu = GetNode<PopupMenu>("PopupMenu");
+        _contextMenu = GetNode<ContextMenu>("PopupMenu");
         _contextMenu.AddItem("Drop", 0);
         _contextMenu.AddItem("Rotate", 1);
-        _contextMenu.IdPressed += OnContextMenuItemSelected;
 
-        chatEntry = GetNode<LineEdit>("ChatContainer/ChatEntry");
-        chatLog = GetNode<TextEdit>("ChatContainer/ChatLog");
-
-        // Connect text submitted event for chat entry
-        chatEntry.TextSubmitted += OnChatMessageSubmitted;
 
         // Connect to InputHandler signals for UI-specific input
         _inputHandler.NumkeyPressed += OnInputHandlerHotbarSlotSelected;
         _inputHandler.ItemRotateRequested += HandleRotateAction;
+        _inputHandler.EscPressed += CloseAllWindows;
 
     }
 
-    // Called when ChatManager emits MessageAdded signal
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void OnChatMessageReceived(string sender, string message)
-    {
-        string formattedMessage = $"[{System.DateTime.Now:HH:mm}] {sender}: {message}\n";
-        chatLog.Text += formattedMessage;
 
-        // Scroll to bottom to show latest message
-        chatLog.ScrollVertical = (int)chatLog.GetVScrollBar().MaxValue;
-    }
-
-    // Called when user submits text in chat entry
-    private void OnChatMessageSubmitted(string text)
-    {
-        // Don't send empty messages
-        if (string.IsNullOrWhiteSpace(text))
-        {
-            chatEntry.Text = "";
-            return;
-        }
-
-        // Add the message to ChatManager (which will emit signal to all GUIs)
-        Rpc("OnChatMessageReceived", Multiplayer.GetUniqueId().ToString(), text);
-
-        // Clear the input field
-        chatEntry.Text = "";
-    }
 
     public void SetHintF(string hint)
     {
@@ -198,7 +158,7 @@ public partial class Gui : CanvasLayer
             mouseButton.Pressed)
         {
             // Opens the context menu
-            if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed && _draggedItem == null)
+            if (mouseButton.ButtonIndex == MouseButton.Right && mouseButton.Pressed && _dragGhost == null)
             {
                 // Show context menu at mouse position
                 Vector2 mousePos = GetViewport().GetMousePosition();
@@ -207,18 +167,20 @@ public partial class Gui : CanvasLayer
                 {
                     // Check if this slot actually has an item in it
                     var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
-                    if (inv.GetItemAtPosition(slotUnder.slotPosition) != null)
+                    ItemInstance? item = inv.GetItemAtPosition(slotUnder.slotPosition);
+                    if (item != null)
                     {
-                        GD.Print($"[GUI] Right-clicked on item - {inv.GetItemAtPosition(slotUnder.slotPosition)!.ItemData.Name}");
+                        GD.Print($"[GUI] Right-clicked on item - {item.ItemData.Name}");
                         // There's an item here - show context menu
                         _contextMenu.Position = (Vector2I)mousePos;
+                        _contextMenu.item = item;
                         _contextMenu.Popup();
                         GetViewport().SetInputAsHandled();
                     }
                 }
             }
 
-            if (_draggedItem != null)
+            if (_dragGhost != null)
             {
                 if (mouseButton.ButtonIndex == MouseButton.Left)
                 {
@@ -273,8 +235,9 @@ public partial class Gui : CanvasLayer
                 if (slotUnder != null)
                 {
                     // Calculate target rotation
-                    bool targetRotation = _draggedItem.ItemInstance.IsRotated ^ _rotateHeld;
-                    Vector2I targetSize = _draggedItem.ItemInstance.ItemData.Size;
+
+                    bool targetRotation = _dragGhost.ItemInstance.IsRotated ^ _rotateHeld;
+                    Vector2I targetSize = _dragGhost.ItemInstance.ItemData.Size;
                     // Get target size based on rotation
                     targetSize = targetRotation ? targetSize.Flip() : targetSize;
 
@@ -282,7 +245,7 @@ public partial class Gui : CanvasLayer
 
                     // Check if it fits with target rotation and ignore self
                     int spaceAvailable = _inventoryManager.GetInventory(slotUnder.inventoryId).GetSpaceAt(
-                        _draggedItem.ItemInstance,
+                        _dragGhost.ItemInstance,
                         slotUnder.slotPosition,
                         _rotateHeld);
 
@@ -340,37 +303,14 @@ public partial class Gui : CanvasLayer
         return null;
     }
 
-    /// <summary>
-    /// Get the detection point for the dragged item (32px offset from top-left corner)
-    /// </summary>
-
-    private void OnContextMenuItemSelected(long id)
+    public void CloseAllWindows()
     {
-        Vector2 mousePos = GetViewport().GetMousePosition();
-        var slotUnder = GetSlotAtPosition(mousePos);
-
-        if (slotUnder == null)
-            return;
-
-        var inv = _inventoryManager.GetInventory(slotUnder.inventoryId);
-        if (inv.GetItemAtPosition(slotUnder.slotPosition) == null)
-            return;
-
-        var itemAtSlot = inv.GetItemAtPosition(slotUnder.slotPosition);
-
-        switch (id)
+        foreach (var window in windows)
         {
-            case 0: // Drop
-                GD.Print($"[GUI] Context menu: Drop item {itemAtSlot.ItemData.Name}");
-                _inventoryManager.RequestDeleteItem(itemAtSlot);
-                break;
-
-            case 1: // Rotate
-                GD.Print($"[GUI] Context menu: Rotate item {itemAtSlot.ItemData.Name}");
-                _inventoryManager.RequestItemRotate(itemAtSlot);
-                break;
+            CloseWindow(window);
         }
     }
+
 
     public void OnInventoryKeyPress(int id)
     {
@@ -380,10 +320,7 @@ public partial class Gui : CanvasLayer
         {
             if (existing.Visible)
             {
-                foreach (var window in windows)
-                {
-                    CloseWindow(window);
-                }
+                CloseAllWindows();
             }
             else
             {
@@ -406,7 +343,7 @@ public partial class Gui : CanvasLayer
 
         }
 
-        GD.Print($"[GUI] Window closed. Total windows: {windows.Count}");
+        GD.Print($"[GUI] Window closed. Windows open: {openWindows}");
     }
 
     // Call this when any UIWindow is opened
@@ -419,7 +356,7 @@ public partial class Gui : CanvasLayer
             _inputHandler.CurrentContext = InputHandler.InputContext.UI;
         }
 
-        GD.Print($"[GUI] On Window opened. Total windows: {windows.Count}");
+        GD.Print($"[GUI] On Window opened. Windows open: {openWindows}");
     }
 
 
@@ -457,10 +394,10 @@ public partial class Gui : CanvasLayer
     private void HandleRotateAction()
     {
         // Case 1: If we're dragging an item, rotate the drag ghost
-        if (_draggedItem != null && _dragGhost != null)
+        if (_dragGhost != null)
         {
             // XOR: if IsRotated and _rotateHeld match, rotate left; if they differ, rotate right
-            if (_draggedItem.ItemInstance.IsRotated == _rotateHeld)
+            if (_dragGhost.ItemInstance.IsRotated == _rotateHeld)
             {
                 _dragGhost.RotateLeft();
             }
@@ -511,13 +448,13 @@ public partial class Gui : CanvasLayer
     private void OnStartDraggingItem(ItemTile itemTile)
     {
         GD.Print($"[GUI] Item grabbed: {itemTile.ItemInstance.InstanceId}");
-        _draggedItem = itemTile;
         _dragGhost = new ItemGhost();
         _dragGhost.MouseDefaultCursorShape = Control.CursorShape.Move;
         _dragGhost.Count = itemTile.ItemInstance.CurrentStackSize;
         _pickupAudio.Play();
         AddChild(_dragGhost);
         _dragGhost.setup(itemTile);
+        _dragGhost.ItemInstance = itemTile.ItemInstance;
         _rotateHeld = false;
     }
 
@@ -525,7 +462,7 @@ public partial class Gui : CanvasLayer
     {
         bool leftClick = !rightClick;
 
-        if (_draggedItem == null || _dragGhost == null)
+        if (_dragGhost == null)
             return;
 
         GD.Print("[GUI] Attempting to place dragged item");
@@ -539,10 +476,10 @@ public partial class Gui : CanvasLayer
             Inventory targetInv = _inventoryManager.GetInventory(targetSlot.inventoryId);
             Vector2I targetPos = targetSlot.slotPosition;
 
-            ItemInstance itemInstance = _draggedItem.ItemInstance;
+            ItemInstance itemInstance = _dragGhost.ItemInstance;
             if (targetSlot != null)
             {
-                if (targetInv.GetItemAtPosition(targetSlot.slotPosition)?.InstanceId == itemInstance.InstanceId && leftClick && !_rotateHeld)
+                if (targetInv.GetItemAtPosition(targetSlot.slotPosition)?.InstanceId == itemInstance.InstanceId && leftClick && !_rotateHeld && targetSlot.slotPosition == itemInstance.GridPosition)
                 {
                     GD.Print("[GUI] Placed item onto self, exitting dragging");
                     StopDragging();
@@ -621,7 +558,6 @@ public partial class Gui : CanvasLayer
             _dragGhost.QueueFree();
             _dragGhost = null!;
         }
-        _draggedItem = null;
 
         // Clear highlights
         foreach (var slot in _highlightedSlots)
@@ -640,7 +576,7 @@ public partial class Gui : CanvasLayer
 
         if (_dragGhost != null)
         {
-            int itemid = _draggedItem.ItemInstance.InstanceId;
+            int itemid = _dragGhost.ItemInstance.InstanceId;
             if (_inventoryManager.ItemExists(itemid))
             {
                 ItemInstance item = _inventoryManager.GetItem(itemid);
@@ -660,16 +596,6 @@ public partial class Gui : CanvasLayer
         }
 
 
-    }
-
-    private void CloseAll()
-    {
-        foreach (var window in windows)
-        {
-            window.QueueFree();
-        }
-        _inputHandler.CurrentContext = InputHandler.InputContext.Gameplay;
-        GD.Print($"[GUI] Windows closed. Total windows: {windows.Count}");
     }
 
 

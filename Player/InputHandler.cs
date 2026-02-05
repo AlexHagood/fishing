@@ -12,7 +12,9 @@ public partial class InputHandler : Node
     {
         Gameplay,    // Normal gameplay - character can move, use tools
         UI,          // Inventory/menu open - only UI inputs allowed
-        Paused       // Game paused - minimal inputs
+        Paused,
+        
+        Chatting       // Game paused - minimal inputs
     }
 
     private InputContext _currentContext = InputContext.Gameplay;
@@ -23,6 +25,8 @@ public partial class InputHandler : Node
     [Signal] public delegate void SprintPressedEventHandler(bool isPressed);
     [Signal] public delegate void MouseMotionEventHandler(Vector2 relative);
     [Signal] public delegate void MouseClickEventHandler(MouseButton button, bool isPressed);
+
+    [Signal] public delegate void ChatPressedEventHandler();
     
     // Signals for hotbar
     [Signal] public delegate void NumkeyPressedEventHandler(int keyValue);
@@ -36,6 +40,9 @@ public partial class InputHandler : Node
     [Signal] public delegate void InteractEPressedEventHandler();
     [Signal] public delegate void InteractFPressedEventHandler();
     [Signal] public delegate void CameraToggledEventHandler();
+
+
+    [Signal] public delegate void EscPressedEventHandler();
     
     public InputContext CurrentContext 
     { 
@@ -74,6 +81,17 @@ public partial class InputHandler : Node
             return;
         }
 
+        if (Input.IsActionJustPressed("ui_cancel"))
+        {
+            if (_currentContext == InputContext.Chatting)
+            {
+                CurrentContext = InputContext.Gameplay;
+            }
+            EmitSignal(SignalName.EscPressed);
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
         // Route input based on current context
         switch (_currentContext)
         {
@@ -86,6 +104,20 @@ public partial class InputHandler : Node
             case InputContext.Paused:
                 HandlePausedInput(@event);
                 break;
+            case InputContext.Chatting:
+                HandleChattingInput(@event);
+                break;
+        }
+    }
+
+    public void HandleChattingInput(InputEvent @event)
+    {
+        if (Input.IsActionJustPressed("ui_close_dialog"))
+        {
+            EmitSignal(SignalName.ChatPressed);
+            CurrentContext = InputContext.Gameplay;
+            GetViewport().SetInputAsHandled();
+            return;
         }
     }
 
@@ -155,6 +187,14 @@ public partial class InputHandler : Node
         if (Input.IsActionJustPressed("camera"))
         {
             EmitSignal(SignalName.CameraToggled);
+            GetViewport().SetInputAsHandled();
+            return;
+        }
+
+        if(Input.IsActionJustPressed("chat"))
+        {
+            EmitSignal(SignalName.ChatPressed);
+            _currentContext = InputContext.Chatting;
             GetViewport().SetInputAsHandled();
             return;
         }

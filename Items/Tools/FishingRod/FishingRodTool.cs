@@ -503,20 +503,6 @@ public partial class FishingRodTool : ToolScript
             p += up * slack * sagFactor;
             
 
-            // --- Ground collision ---
-            var query = PhysicsRayQueryParameters3D.Create(
-                p,
-                p - up * 1
-            );
-            query.CollideWithAreas = false;
-
-            var hit = space.IntersectRay(query);
-
-            if (hit.Count > 0)
-            {
-                p = (Vector3)hit["position"];
-            }
-
             _lineMesh.SurfaceAddVertex(p);
         }
                     

@@ -19,13 +19,11 @@ public class FishLootEntry
 
 public partial class FishManager : Node
 {
-    private ChatManager _chatManager;
     private List<FishLootEntry> _fishLootTable = new List<FishLootEntry>();
 
     public override void _Ready()
     {
         InitializeLootTable();
-        _chatManager = GetTree().Root.GetNode<ChatManager>("ChatManager");
     }
     
     private void InitializeLootTable()
@@ -70,7 +68,7 @@ public partial class FishManager : Node
             if (roll <= cumulative)
             {
                 GD.Print($"[FishManager] Caught: {entry.Fish.Name}!");
-                _chatManager.AddMessage("System", $"You caught a {entry.Fish.Name}!");
+                Rpc("UI.Chat.SendChatMessage", "System", $"You caught a {entry.Fish.Name}!");
                 return entry.Fish;
             }
         }

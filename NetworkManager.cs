@@ -21,6 +21,12 @@ public partial class NetworkManager : Node
         Multiplayer.PeerConnected += OnPeerConnected;
         
     }
+
+    private void OnPeerDisconnected(long peerId)
+    {
+        GD.Print($"[NetworkManager {Multiplayer.GetUniqueId()}] Peer {peerId} disconnected");
+        GetTree().Quit();
+    }
     
     private void OnPeerConnected(long peerId)
     {

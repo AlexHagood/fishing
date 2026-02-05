@@ -8,6 +8,8 @@
 [ext_resource type="AudioStream" uid="uid://bhnd84rgcbrci" path="res://Sounds/pickup.ogg" id="6_0wv8u"]
 [ext_resource type="Texture2D" uid="uid://cuolmbuxnef6b" path="res://UI/keyboard_e_outline.png" id="6_7u6ry"]
 [ext_resource type="AudioStream" uid="uid://cny6s3cb8lk68" path="res://Sounds/drop.ogg" id="7_67jta"]
+[ext_resource type="Script" uid="uid://cji0cvrryc564" path="res://UI/ContextMenu.cs" id="9_p8208"]
+[ext_resource type="Script" uid="uid://cafdx3hab30sx" path="res://UI/Chat.cs" id="10_axmix"]
 
 [sub_resource type="Animation" id="Animation_wfnr8"]
 resource_name = "BadWiggle"
@@ -246,11 +248,14 @@ stream = ExtResource("6_0wv8u")
 stream = ExtResource("7_67jta")
 
 [node name="PopupMenu" type="PopupMenu" parent="." unique_id=675510949]
+oversampling_override = 1.0
+script = ExtResource("9_p8208")
 
 [node name="ChatContainer" type="VBoxContainer" parent="." unique_id=783032385]
 offset_top = 550.0
 offset_right = 400.0
 offset_bottom = 950.0
+script = ExtResource("10_axmix")
 
 [node name="ChatLog" type="TextEdit" parent="ChatContainer" unique_id=1036441217]
 layout_mode = 2

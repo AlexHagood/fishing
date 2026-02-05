@@ -15,6 +15,8 @@ public partial class ItemGhost : TextureRect
 
     int ItemInstanceId;
 
+    public ItemInstance ItemInstance { get; set; } = null!;
+
     Label _CountLabel = new Label(); 
 
 
