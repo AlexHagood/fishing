@@ -11,15 +11,13 @@ public partial class ContainerItem : PhysItem
 	public override string HintF { get; protected set; } = "Open";
 
 	private InventoryManager _inventoryManager;
-
+    [Export]
 	private int _containerInventoryId;
 	public override void _Ready()
 	{
 		_inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
-		if (Multiplayer.IsServer())
-		{
-			_containerInventoryId = _inventoryManager.CreateInventory(new Vector2I(4, 3), 69);
-		}
+
+		_inventoryManager.CreateInventory(new Vector2I(4, 3), _containerInventoryId);
 		GD.Print("Created tacklebox with Id " + _containerInventoryId);
 		base._Ready();
 	}

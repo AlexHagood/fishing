@@ -11,6 +11,9 @@ public partial class UIWindow : Control
     
     private bool _isDragging = false;
     private Vector2 _dragOffset;
+
+    [Signal]
+    public delegate void WindowClosedEventHandler(UIWindow window);
     
     public override void _Ready()
     {
@@ -29,9 +32,6 @@ public partial class UIWindow : Control
         
         _statusBar.GuiInput += OnStatusBarGuiInput;
         _statusBar.MouseFilter = MouseFilterEnum.Stop;
-
-        // Connect to TreeExiting signal to notify parent when freed
-        TreeExiting += OnTreeExiting;
 
         // Defer resize to next frame so content has time to calculate its size
         CallDeferred(MethodName.ResizeAndCenter);
@@ -53,17 +53,7 @@ public partial class UIWindow : Control
     
     private void OnClosePressed()
     {
-        QueueFree();
-    }
-    
-    private void OnTreeExiting()
-    {
-        // Notify parent Gui that this window is being closed
-        var parentGui = GetParent<Gui>();
-        if (parentGui != null)
-        {
-            parentGui.OnWindowClosed(this);
-        }
+        EmitSignal(SignalName.WindowClosed, this);
     }
     
     private void ResizeAndCenter()

@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using Godot;
 
 public partial class FishingRodTool : ToolScript
@@ -14,7 +15,7 @@ public partial class FishingRodTool : ToolScript
     private FishingState _state = FishingState.Idle;
     
     private RigidBody3D _bobber;
-    private RigidBody3D _bobberTemplate; // Template stored in scene
+    private PackedScene _bobberScene; // Template stored in scene
     private Node3D _rodTip; // Position where the line attaches to the rod
     private float _currentLength = 3.0f;
     private const float MinLength = 0.5f;
@@ -42,7 +43,6 @@ public partial class FishingRodTool : ToolScript
     private bool _isLeftButtonHeld = false;
     private bool _isRightButtonHeld = false;
     
-    private Character _character; // Reference to the character using this tool
 
     MeshInstance3D _fishMesh;
 
@@ -63,17 +63,8 @@ public partial class FishingRodTool : ToolScript
         // No need to set them here anymore
         
         // Get reference to bobber template (it should be a child in the scene)
-        _bobberTemplate = GetNodeOrNull<RigidBody3D>("Bobber");
-        if (_bobberTemplate != null)
-        {
-            // Keep it frozen and hidden initially
-            _bobberTemplate.Freeze = true;
-            _bobberTemplate.Visible = false;
-        }
-        else
-        {
-            GD.PushWarning("[FishingRodTool] No Bobber child found in scene!");
-        }
+        _bobberScene = ResourceLoader.Load<PackedScene>("res://Items/Tools/FishingRod/bobber.tscn");
+        
         
         // Find rod tip marker
         _rodTip = GetNodeOrNull<Node3D>("RodTip");
@@ -81,14 +72,12 @@ public partial class FishingRodTool : ToolScript
         
         // Setup line mesh for drawing
         _lineMesh = new ImmediateMesh();
-        _lineMeshInstance = new MeshInstance3D();
+        _lineMeshInstance = GetNode<MeshInstance3D>("LineMesh");
         _lineMeshInstance.Mesh = _lineMesh;
-        _lineMeshInstance.CastShadow = GeometryInstance3D.ShadowCastingSetting.Off;
         // Make the mesh instance top-level so it doesn't inherit our transform
-        _lineMeshInstance.TopLevel = true;
-        AddChild(_lineMeshInstance);
         _fishMesh = GetNode<MeshInstance3D>("FishMesh");
         _fishMesh.Visible = false;
+        
         
         // Add this tool to the FishingRodTool group so water can find it
         AddToGroup("FishingRodTool");
@@ -99,11 +88,11 @@ public partial class FishingRodTool : ToolScript
     
     public override void PrimaryFire(Character character)
     {
-        _character = character;
+        holdingCharacter = character;
 
         if (hookedItem != null)
         {
-            _inventoryManager.RequestSpawnInstance(hookedItem, character.inventoryId);
+            _inventoryManager.RequestSpawnInstance(hookedItem.ResourcePath, character.inventoryId);
             hookedItem = null;
         }
         
@@ -125,7 +114,7 @@ public partial class FishingRodTool : ToolScript
     
     public override void SecondaryFire(Character character)
     {
-        _character = character;
+        holdingCharacter = character;
         if (hookedItem != null)
         {
             hookedItem = null;
@@ -140,6 +129,16 @@ public partial class FishingRodTool : ToolScript
     public override void _Process(double delta)
     {
         base._Process(delta);
+
+        if (_bobber != null && IsInstanceValid(_bobber) && _rodTip != null)
+        {
+            DrawFishingLine();
+        }
+        else
+        {
+            // Clear line if no bobber
+            _lineMesh.ClearSurfaces();
+        }
         
 
         // Handle continuous reeling in/out while buttons are held
@@ -157,9 +156,9 @@ public partial class FishingRodTool : ToolScript
                 if (isLeftHeld && !isRightHeld)
                 {
                     // Reeling in - set animation target to 1
-                    if (_character != null)
+                    if (holdingCharacter != null)
                     {
-                        _character.animTree.ReelTarget = 1.0f;
+                        holdingCharacter.animTree.ReelTarget = 1.0f;
                     }
                     
                     // Reel in
@@ -174,9 +173,9 @@ public partial class FishingRodTool : ToolScript
                 else if (isRightHeld && !isLeftHeld)
                 {
                     // Reeling out - set animation target to -1
-                    if (_character != null)
+                    if (holdingCharacter != null)
                     {
-                        _character.animTree.ReelTarget = -1.0f;
+                        holdingCharacter.animTree.ReelTarget = -1.0f;
                     }
                     
                     // Let out
@@ -185,40 +184,30 @@ public partial class FishingRodTool : ToolScript
                 else
                 {
                     // Not reeling - set animation target to 0 (idle)
-                    if (_character != null)
+                    if (holdingCharacter != null)
                     {
-                        _character.animTree.ReelTarget = 0.0f;
+                        holdingCharacter.animTree.ReelTarget = 0.0f;
                     }
                 }
             }
             else
             {
                 // During cooldown, ensure reel animation is idle
-                if (_character != null)
+                if (holdingCharacter != null)
                 {
-                    _character.animTree.ReelTarget = 0.0f;
+                    holdingCharacter.animTree.ReelTarget = 0.0f;
                 }
             }
         }
         else
         {
             // Not in Cast state - ensure reel animation is idle
-            if (_character != null)
+            if (holdingCharacter != null)
             {
-                _character.animTree.ReelTarget = 0.0f;
+                holdingCharacter.animTree.ReelTarget = 0.0f;
             }
         }
-        
-        // Draw the fishing line from rod tip to bobber
-        if (_state == FishingState.Cast && _rodTip != null && _bobber != null && IsInstanceValid(_bobber))
-        {
-            DrawFishingLine();
-        }
-        else
-        {
-            // Clear the line when not cast
-            _lineMesh?.ClearSurfaces();
-        }
+    
     }
     
     public override void _PhysicsProcess(double delta)
@@ -276,26 +265,33 @@ public partial class FishingRodTool : ToolScript
     
     private void CastBobber()
     {
-        if (_bobberTemplate == null || _rodTip == null || _character == null)
-        {
-            GD.PushWarning("[FishingRodTool] Cannot cast - missing bobber template, rod tip, or character!");
-            return;
-        }
         
         GD.Print("[FishingRodTool] Starting cast animation - bobber will spawn in 0.9 seconds");
         
         // Delay the actual bobber spawn/launch by 0.9 seconds to sync with animation
         GetTree().CreateTimer(0.9).Timeout += () => {
             // Make sure we're still in a valid state
-            if (_character == null || _rodTip == null || _bobberTemplate == null)
+            if (holdingCharacter == null || _rodTip == null || _bobberScene == null)
             {
                 GD.PushWarning("[FishingRodTool] Cast cancelled - character or rod no longer valid");
                 return;
             }
-            
             SpawnAndLaunchBobber();
+            
         };
     }
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SpawnNetworkBobbers()
+    {
+        _bobber = _bobberScene.Instantiate() as RigidBody3D;
+        _bobber.SetMultiplayerAuthority(GetMultiplayerAuthority());
+        GetNode("/root/Main").AddChild(_bobber);
+        GD.Print($"[FishingRodTool] SpawnNetworkBobbers called - bobber added to scene on player {Multiplayer.GetUniqueId()} with authority {_bobber.GetMultiplayerAuthority()}");
+        
+    }
+
+
     
     private void SpawnAndLaunchBobber()
     {
@@ -304,14 +300,12 @@ public partial class FishingRodTool : ToolScript
         GD.Print("[FishingRodTool] Spawning and launching bobber!");
         
         // Duplicate the bobber template and add it to the world
-        _bobber = _bobberTemplate.Duplicate() as RigidBody3D;
-        if (_bobber == null) return;
-        
-        // Add bobber to the world (root node) so it's independent
-        GetTree().Root.AddChild(_bobber);
+        Rpc(nameof(SpawnNetworkBobbers));
+
+        GD.Print($"[FishingRodTool] Bobber instantiated and added to world with authority {_bobber.GetMultiplayerAuthority()}");
         
         // Get the camera's forward direction (where the character is looking)
-        Camera3D camera = _character.GetNode<Camera3D>("Camera3D");
+        Camera3D camera = holdingCharacter.GetNode<Camera3D>("Camera3D");
         Vector3 castDirection = -camera.GlobalTransform.Basis.Z;
         
         // Position bobber at the rod tip position
@@ -321,10 +315,6 @@ public partial class FishingRodTool : ToolScript
         GD.Print($"[FishingRodTool] Cast direction: {castDirection}");
         GD.Print($"[FishingRodTool] Bobber spawned at: {_bobber.GlobalPosition}");
         
-        _bobber.Visible = true;
-        _bobber.Freeze = false;
-        _bobber.CollisionLayer = 1;
-        _bobber.CollisionMask = 1;
         
         // Set physics properties
         _bobber.Mass = 1.0f;
@@ -368,6 +358,13 @@ public partial class FishingRodTool : ToolScript
             }
         };
     }
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void ClearNetworkBobbers()
+    {
+        _bobber.QueueFree();
+        _bobber = null;
+    }
+
     
     private void ResetRod()
     {
@@ -402,22 +399,13 @@ public partial class FishingRodTool : ToolScript
         
         
         // Reset reel animation to idle
-        if (_character != null)
+        if (holdingCharacter != null)
         {
-            _character.animTree.ReelTarget = 0.0f;
+            holdingCharacter.animTree.ReelTarget = 0.0f;
         }
         
         // Clean up bobber
-        if (_bobber != null && IsInstanceValid(_bobber))
-        {
-            // Disconnect signal if connected
-            if (_bobber.IsConnected("body_entered", new Callable(this, nameof(OnBobberLanded))))
-            {
-                _bobber.BodyEntered -= OnBobberLanded;
-            }
-            _bobber.QueueFree();
-            _bobber = null;
-        }
+        Rpc(nameof(ClearNetworkBobbers));
         
         // Reset to idle state so we can cast again
         _state = FishingState.Idle;
@@ -465,8 +453,27 @@ public partial class FishingRodTool : ToolScript
     
     private void DrawFishingLine()
     {
-        if (_lineMesh == null || _rodTip == null || _bobber == null || !IsInstanceValid(_bobber)) return;
-        
+        if (_lineMesh == null)
+        {
+            GD.Print("Cannot draw line: _lineMesh is null");
+            return;
+        }
+        if (_rodTip == null)
+        {
+            GD.Print("Cannot draw line: _rodTip is null");
+            return;
+        }
+        if (_bobber == null)
+        {
+            GD.Print("Cannot draw line: _bobber is null");
+            return;
+        }
+        if (!IsInstanceValid(_bobber))
+        {
+            GD.Print("Cannot draw line: _bobber is not a valid instance");
+            return;
+        }
+
         _lineMesh.ClearSurfaces();
         _lineMesh.SurfaceBegin(Mesh.PrimitiveType.LineStrip);
 

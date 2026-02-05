@@ -66,9 +66,11 @@ public partial class Character : CharacterBody3D
 
     public AudioStreamPlayer3D footstepsAudioPlayer;
 
+    Vector3 _externalVelocity = Vector3.Zero;
+
     public string Username = "Player";
 
-    private int _inventoryId = 0;
+    public int _inventoryId = 0;
 
     [Export]
     public int inventoryId;
@@ -127,7 +129,9 @@ public partial class Character : CharacterBody3D
                 
 
             _currentTool = item.ItemData.ToolScriptScene.Instantiate<ToolScript>();
+            _currentTool.SetMultiplayerAuthority(GetMultiplayerAuthority());
             _currentTool.itemInstance = item;
+            _currentTool.holdingCharacter = this;
             _toolPosition.AddChild(_currentTool);
             GD.Print("[Character] Authority player equipped tool with full functionality");
 
@@ -193,14 +197,10 @@ public partial class Character : CharacterBody3D
 
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
+        inventoryId = GetMultiplayerAuthority();
 
+        _inventoryManager.CreateInventory(new Vector2I(5, 5), inventoryId);
 
-        
-        inventoryId = _inventoryManager.CreateInventory(new Vector2I(5, 5), int.Parse(Name));
-
-
-        inventoryId = Multiplayer.GetUniqueId();
-            
 
         if (IsMultiplayerAuthority())
         {
@@ -222,12 +222,24 @@ public partial class Character : CharacterBody3D
 
         
         // Create hold position for physics items (attached to active camera)
+    }
 
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
+    public void ApplyCharacterImpulse(Vector3 forceVelocity)
+    {
         
-        
-        
+        if (!IsMultiplayerAuthority())
+        {
+            long peerid = GetMultiplayerAuthority();
+            RpcId(peerid, nameof(ApplyCharacterImpulse), forceVelocity);
+            return;
+        }
 
-        
+        // Apply vertical force immediately to main Velocity so gravity takes over
+        Velocity = new Vector3(Velocity.X, Velocity.Y + forceVelocity.Y, Velocity.Z);
+
+        // Store only horizontal force in external velocity for friction decay
+        _externalVelocity += new Vector3(forceVelocity.X, 0, forceVelocity.Z);
 
     }
 
@@ -298,7 +310,6 @@ public partial class Character : CharacterBody3D
         
         // UI
         _inputHandler.InventoryToggled += OnInventoryToggled;
-        _inputHandler.ItemRotateRequested += OnItemRotateRequested;
     }
 
     // Input signal handlers
@@ -338,8 +349,6 @@ public partial class Character : CharacterBody3D
     private void OnHotbarSlotSelected(int slotIndex)
     {
         HotbarSlot = slotIndex;
-        
-        EmitSignal(SignalName.HotbarSlotSelected, slotIndex);
     }
 
     private void OnHotbarScroll(int direction)
@@ -376,10 +385,6 @@ public partial class Character : CharacterBody3D
         OpenInventory(inventoryId);
     }
 
-    private void OnItemRotateRequested()
-    {
-        EmitSignal(SignalName.RotateRequested);
-    }
 
     public void OpenInventory(int id)
     {
@@ -429,10 +434,22 @@ public partial class Character : CharacterBody3D
             }
         }
 
-        Velocity = new Vector3(
+        Vector3 targetVelocity = new Vector3(
             direction.X * currentSpeed,
             Velocity.Y, // preserve vertical component for gravity/jump
             direction.Z * currentSpeed
+        );
+
+        // Apply External Velocity decay
+        float friction = isOnFloor ? 10.0f : 2.0f;
+        _externalVelocity = _externalVelocity.Lerp(Vector3.Zero, friction * (float)delta);
+        if (_externalVelocity.LengthSquared() < 0.1f) _externalVelocity = Vector3.Zero;
+
+
+        Velocity = new Vector3(
+            targetVelocity.X + _externalVelocity.X,
+            Velocity.Y, // Use existing Y velocity (which includes gravity and jump)
+            targetVelocity.Z + _externalVelocity.Z
         );
 
         if (Engine.GetPhysicsFrames() % 60 == 0 && direction.Length() > 0)

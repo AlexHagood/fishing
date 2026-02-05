@@ -61,7 +61,7 @@ namespace InventoryState
         public int SizeX { get; set; }
         public int SizeY { get; set; }
         public List<ItemInstanceDTO> Items { get; set; } = new();
-        public List<int?> HotbarItemIds { get; set; } = new();
+        public Dictionary<int, int> HotbarItemIds { get; set; } = new();
         public int Id { get; set; }
 
         public static InventoryDTO FromInventory(Inventory inventory)
@@ -71,7 +71,7 @@ namespace InventoryState
                 SizeX = inventory.Size.X,
                 SizeY = inventory.Size.Y,
                 Items = inventory.Items.Select(ItemInstanceDTO.FromItemInstance).ToList(),
-                HotbarItemIds = inventory.HotbarItems.Select(item => item?.InstanceId).ToList(),
+                HotbarItemIds = inventory.HotbarItems.ToDictionary(k => k.Key, v => v.Value.InstanceId),
                 Id = inventory.Id
             };
         }
@@ -82,11 +82,7 @@ namespace InventoryState
             inventory.Items = Items.Select(dto => dto.ToItemInstance()).ToList();
             
             // Reconstruct hotbar references (will be populated after all items are loaded)
-            inventory.HotbarItems = new List<ItemInstance?>();
-            for (int i = 0; i < HotbarItemIds.Count; i++)
-            {
-                inventory.HotbarItems.Add(null);
-            }
+            inventory.HotbarItems = new Dictionary<int, ItemInstance>();
             
             return inventory;
         }
@@ -178,16 +174,14 @@ public static class InventoryManagerExtensions
             var inventory = inventories[kvp.Key];
             var hotbarIds = kvp.Value.HotbarItemIds;
 
-            for (int i = 0; i < hotbarIds.Count; i++)
+            foreach (var hotbarKvp in hotbarIds)
             {
-                var hotbarId = hotbarIds[i];
-                if (hotbarId.HasValue && itemInstances.ContainsKey(hotbarId.Value))
+                int slot = hotbarKvp.Key;
+                int instanceId = hotbarKvp.Value;
+                
+                if (itemInstances.ContainsKey(instanceId))
                 {
-                    inventory.HotbarItems[i] = itemInstances[hotbarId.Value];
-                }
-                else
-                {
-                    inventory.HotbarItems[i] = null;
+                    inventory.HotbarItems[slot] = itemInstances[instanceId];
                 }
             }
         }

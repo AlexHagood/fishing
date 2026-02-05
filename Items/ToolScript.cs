@@ -6,6 +6,8 @@ public partial class ToolScript: Node3D
     
     [Export]
     public NodePath MeshPath;
+
+    public Character holdingCharacter;
     
     public virtual void PrimaryFire(Character character)
     {

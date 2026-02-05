@@ -50,16 +50,18 @@ public partial class HotbarUI : Control
         }
         GD.Print($"[HotbarUI] Ready - initialized {slots.Count} slots");
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+
+        _inventoryManager.HotbarUpdate += Refresh;
     }
 
     public void Refresh()
     {
         GD.Print($"[HotbarUI] Refreshing hotbar UI from inventory {inventoryId}");
-        List<ItemInstance?> hotbarItems = _inventoryManager.GetInventory(inventoryId).HotbarItems;
+        Dictionary<int, ItemInstance> hotbarItems = _inventoryManager.GetInventory(inventoryId).HotbarItems;
         for (int i = 0; i < hotbarSize; i++)
         {
             Panel slotPanel = slots[i];
-            ItemInstance? itemInstance = (i < hotbarItems.Count) ? hotbarItems[i] : null;
+            ItemInstance? itemInstance = hotbarItems.ContainsKey(i) ? hotbarItems[i] : null;
             TextureRect slotTexture = slotPanel.GetNode<TextureRect>("TextureRect");
             if (itemInstance != null)
             {

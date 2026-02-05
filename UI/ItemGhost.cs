@@ -13,7 +13,11 @@ public partial class ItemGhost : TextureRect
         }
     }
 
+    int ItemInstanceId;
+
     Label _CountLabel = new Label(); 
+
+
     
     public void setup(ItemTile original)
     {
@@ -27,7 +31,7 @@ public partial class ItemGhost : TextureRect
         Image image = Texture.GetImage();
         image.Rotate90(ClockDirection.Counterclockwise);
         Texture = ImageTexture.CreateFromImage(image);
-        Size = new Vector2(Size.Y, Size.X); // Swap dimensions
+        Size = Size.Flip(); // Swap dimensions
     }
 
     public void RotateRight()
@@ -35,7 +39,7 @@ public partial class ItemGhost : TextureRect
         Image image = Texture.GetImage();
         image.Rotate90(ClockDirection.Clockwise);
         Texture = ImageTexture.CreateFromImage(image);
-        Size = new Vector2(Size.Y, Size.X); // Swap dimensions
+        Size = Size.Flip(); // Swap dimensions
     }
 
     public override void _Ready()

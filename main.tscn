@@ -64,6 +64,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6ff2c"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ly5pk"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8lrju"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_5kegx"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yaehf"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -109,6 +125,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_oosfy"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_s0u5n"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8lrju"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_afgqn"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_jvn2n"]
 radius = 0.1
 height = 0.2
 
@@ -160,6 +192,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_5kegx"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_afgqn"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jegnu"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rx6mv"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_getpj"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -205,6 +253,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_pw0td"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jvn2n"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_jegnu"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_31js7"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0a4i0"]
 radius = 0.1
 height = 0.2
 
@@ -256,6 +320,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rx6mv"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_31js7"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_i0xsp"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_kll2q"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0odxb"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -301,6 +381,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_5s44m"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0a4i0"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_i0xsp"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ft875"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_6hmxt"]
 radius = 0.1
 height = 0.2
 
@@ -352,6 +448,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kll2q"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ft875"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rhlye"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_pqvsh"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_qsp4k"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -397,6 +509,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_uo83y"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_6hmxt"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rhlye"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3qj4k"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_mo8hc"]
 radius = 0.1
 height = 0.2
 
@@ -448,6 +576,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_pqvsh"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_3qj4k"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gbg58"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_le5wj"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_jq2sk"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -493,6 +637,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_fdpg8"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mo8hc"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_gbg58"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2um21"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ak6tq"]
 radius = 0.1
 height = 0.2
 
@@ -544,6 +704,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_le5wj"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2um21"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_w7qqv"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_3gvdc"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_facbu"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -589,6 +765,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_3ox4t"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ak6tq"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_w7qqv"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_h0sjo"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_uqsbb"]
 radius = 0.1
 height = 0.2
 
@@ -640,6 +832,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_3gvdc"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_h0sjo"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gfi32"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_12204"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4lmeg"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -685,6 +893,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_hnquj"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_uqsbb"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_gfi32"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_trkoe"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_bvlej"]
 radius = 0.1
 height = 0.2
 
@@ -736,6 +960,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_12204"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_trkoe"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ycw8e"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2gd4m"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0n3wm"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -781,6 +1021,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_arf1h"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_bvlej"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ycw8e"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_61bol"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_lix4w"]
 radius = 0.1
 height = 0.2
 
@@ -832,6 +1088,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2gd4m"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_61bol"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kmrid"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_c6fgv"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0cbny"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -877,6 +1149,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_ryg4g"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_lix4w"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_kmrid"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_fd6dt"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_gttkg"]
 radius = 0.1
 height = 0.2
 
@@ -928,6 +1216,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_c6fgv"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_fd6dt"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_hiwvf"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_ed5de"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_abqjc"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -973,6 +1277,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_oiuw5"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_gttkg"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_hiwvf"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e31mi"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_mq14a"]
 radius = 0.1
 height = 0.2
 
@@ -1024,6 +1344,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ed5de"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_e31mi"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_yf6j3"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_e4ynb"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rnkwl"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -1069,6 +1405,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_wghq8"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_mq14a"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_yf6j3"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_a1n43"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_dfxmq"]
 radius = 0.1
 height = 0.2
 
@@ -1120,6 +1472,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_e4ynb"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_a1n43"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kcoi7"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_rkju4"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rm4vd"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -1165,6 +1533,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_lxb2r"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_dfxmq"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_kcoi7"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_um25j"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_7dysq"]
 radius = 0.1
 height = 0.2
 
@@ -1216,6 +1600,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_rkju4"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_um25j"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0abf2"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_7b48j"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_ntx8l"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -1261,6 +1661,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_6kttw"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7dysq"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0abf2"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_8tqy7"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_faa31"]
 radius = 0.1
 height = 0.2
 
@@ -1312,6 +1728,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_7b48j"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_8tqy7"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_acld0"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_kc3cm"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wu3dr"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -1357,6 +1789,22 @@ transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
 
 [sub_resource type="SphereMesh" id="SphereMesh_j6smb"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_faa31"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_acld0"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_utcts"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_2pm5r"]
 radius = 0.1
 height = 0.2
 
@@ -1408,6 +1856,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kc3cm"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_utcts"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_38n85"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_nkmqd"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_kkkcx"]
 transparency = 1
 albedo_color = Color(0.8, 0.8, 0.8, 1)
@@ -1456,6 +1920,22 @@ albedo_color = Color(0.8, 0.8, 0.8, 1)
 radius = 0.1
 height = 0.2
 
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_2pm5r"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_38n85"]
+radius = 0.1
+height = 0.2
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_4b624"]
+transparency = 1
+albedo_color = Color(0.8, 0.8, 0.8, 1)
+
+[sub_resource type="SphereMesh" id="SphereMesh_0li47"]
+radius = 0.1
+height = 0.2
+
 [sub_resource type="Resource" id="Resource_w48qg"]
 script = ExtResource("8_ycdy4")
 metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"
@@ -1465,6 +1945,11 @@ size = Vector3(0.75, 0.5, 1)
 
 [sub_resource type="BoxShape3D" id="BoxShape3D_w48qg"]
 size = Vector3(0.75, 0.5, 1)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_nkmqd"]
+properties/0/path = NodePath(".:_containerInventoryId")
+properties/0/spawn = true
+properties/0/replication_mode = 1
 
 [sub_resource type="BoxMesh" id="BoxMesh_efxa6"]
 size = Vector3(0.2, 0.1, 0.2)
@@ -1521,6 +2006,14 @@ mesh = SubResource("SphereMesh_gx4rg")
 material_override = SubResource("StandardMaterial3D_ldnlw")
 mesh = SubResource("SphereMesh_qe8ju")
 
+[node name="@MeshInstance3D@18642" type="MeshInstance3D" parent="Terrain/GraphNode" unique_id=1773604594]
+material_override = SubResource("StandardMaterial3D_6ff2c")
+mesh = SubResource("SphereMesh_ly5pk")
+
+[node name="@MeshInstance3D@71056" type="MeshInstance3D" parent="Terrain/GraphNode" unique_id=1049437463]
+material_override = SubResource("StandardMaterial3D_8lrju")
+mesh = SubResource("SphereMesh_5kegx")
+
 [node name="GraphNode2" type="Node3D" parent="Terrain" unique_id=994533302]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -16.562288, -6.1264076, -3.504266)
 script = ExtResource("3_4c57u")
@@ -1549,6 +2042,14 @@ mesh = SubResource("SphereMesh_phcyf")
 [node name="@MeshInstance3D@18702" type="MeshInstance3D" parent="Terrain/GraphNode2" unique_id=1866365913]
 material_override = SubResource("StandardMaterial3D_bnk2o")
 mesh = SubResource("SphereMesh_oosfy")
+
+[node name="@MeshInstance3D@18643" type="MeshInstance3D" parent="Terrain/GraphNode2" unique_id=1734968468]
+material_override = SubResource("StandardMaterial3D_s0u5n")
+mesh = SubResource("SphereMesh_8lrju")
+
+[node name="@MeshInstance3D@71057" type="MeshInstance3D" parent="Terrain/GraphNode2" unique_id=856527763]
+material_override = SubResource("StandardMaterial3D_afgqn")
+mesh = SubResource("SphereMesh_jvn2n")
 
 [node name="GraphNode3" type="Node3D" parent="Terrain" unique_id=1616781455]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -0.5626759, -6.4175005, 15.853487)
@@ -1579,6 +2080,14 @@ mesh = SubResource("SphereMesh_f1p13")
 material_override = SubResource("StandardMaterial3D_nf4f2")
 mesh = SubResource("SphereMesh_xkvoa")
 
+[node name="@MeshInstance3D@18644" type="MeshInstance3D" parent="Terrain/GraphNode3" unique_id=885438416]
+material_override = SubResource("StandardMaterial3D_5kegx")
+mesh = SubResource("SphereMesh_afgqn")
+
+[node name="@MeshInstance3D@71058" type="MeshInstance3D" parent="Terrain/GraphNode3" unique_id=19258492]
+material_override = SubResource("StandardMaterial3D_jegnu")
+mesh = SubResource("SphereMesh_rx6mv")
+
 [node name="GraphNode4" type="Node3D" parent="Terrain" unique_id=1207642333]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -25.43099, -17.281124, -36.314774)
 script = ExtResource("3_4c57u")
@@ -1607,6 +2116,14 @@ mesh = SubResource("SphereMesh_ovcoh")
 [node name="@MeshInstance3D@18704" type="MeshInstance3D" parent="Terrain/GraphNode4" unique_id=707551459]
 material_override = SubResource("StandardMaterial3D_t5kpo")
 mesh = SubResource("SphereMesh_pw0td")
+
+[node name="@MeshInstance3D@18645" type="MeshInstance3D" parent="Terrain/GraphNode4" unique_id=598525547]
+material_override = SubResource("StandardMaterial3D_jvn2n")
+mesh = SubResource("SphereMesh_jegnu")
+
+[node name="@MeshInstance3D@71059" type="MeshInstance3D" parent="Terrain/GraphNode4" unique_id=1640758588]
+material_override = SubResource("StandardMaterial3D_31js7")
+mesh = SubResource("SphereMesh_0a4i0")
 
 [node name="GraphNode5" type="Node3D" parent="Terrain" unique_id=1543282779]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -36.91404, -17.029266, -32.260406)
@@ -1637,6 +2154,14 @@ mesh = SubResource("SphereMesh_1yv1y")
 material_override = SubResource("StandardMaterial3D_37eu1")
 mesh = SubResource("SphereMesh_0wkqm")
 
+[node name="@MeshInstance3D@18646" type="MeshInstance3D" parent="Terrain/GraphNode5" unique_id=178562882]
+material_override = SubResource("StandardMaterial3D_rx6mv")
+mesh = SubResource("SphereMesh_31js7")
+
+[node name="@MeshInstance3D@71060" type="MeshInstance3D" parent="Terrain/GraphNode5" unique_id=1540784026]
+material_override = SubResource("StandardMaterial3D_i0xsp")
+mesh = SubResource("SphereMesh_kll2q")
+
 [node name="GraphNode6" type="Node3D" parent="Terrain" unique_id=1573337346]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 13.526921, -12.440416, 19.713045)
 script = ExtResource("3_4c57u")
@@ -1665,6 +2190,14 @@ mesh = SubResource("SphereMesh_pjuso")
 [node name="@MeshInstance3D@18706" type="MeshInstance3D" parent="Terrain/GraphNode6" unique_id=20578022]
 material_override = SubResource("StandardMaterial3D_ve5sr")
 mesh = SubResource("SphereMesh_5s44m")
+
+[node name="@MeshInstance3D@18647" type="MeshInstance3D" parent="Terrain/GraphNode6" unique_id=572863551]
+material_override = SubResource("StandardMaterial3D_0a4i0")
+mesh = SubResource("SphereMesh_i0xsp")
+
+[node name="@MeshInstance3D@71061" type="MeshInstance3D" parent="Terrain/GraphNode6" unique_id=521638649]
+material_override = SubResource("StandardMaterial3D_ft875")
+mesh = SubResource("SphereMesh_6hmxt")
 
 [node name="GraphNode7" type="Node3D" parent="Terrain" unique_id=1281026477]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.544815, -11.106613, 19.519875)
@@ -1695,6 +2228,14 @@ mesh = SubResource("SphereMesh_swlj1")
 material_override = SubResource("StandardMaterial3D_ibca3")
 mesh = SubResource("SphereMesh_g3y5b")
 
+[node name="@MeshInstance3D@18648" type="MeshInstance3D" parent="Terrain/GraphNode7" unique_id=387458362]
+material_override = SubResource("StandardMaterial3D_kll2q")
+mesh = SubResource("SphereMesh_ft875")
+
+[node name="@MeshInstance3D@71062" type="MeshInstance3D" parent="Terrain/GraphNode7" unique_id=134797995]
+material_override = SubResource("StandardMaterial3D_rhlye")
+mesh = SubResource("SphereMesh_pqvsh")
+
 [node name="GraphNode8" type="Node3D" parent="Terrain" unique_id=342118070]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.45167, -12.247776, -13.420879)
 script = ExtResource("3_4c57u")
@@ -1723,6 +2264,14 @@ mesh = SubResource("SphereMesh_n5t1e")
 [node name="@MeshInstance3D@18708" type="MeshInstance3D" parent="Terrain/GraphNode8" unique_id=221617999]
 material_override = SubResource("StandardMaterial3D_1slqb")
 mesh = SubResource("SphereMesh_uo83y")
+
+[node name="@MeshInstance3D@18649" type="MeshInstance3D" parent="Terrain/GraphNode8" unique_id=1266122926]
+material_override = SubResource("StandardMaterial3D_6hmxt")
+mesh = SubResource("SphereMesh_rhlye")
+
+[node name="@MeshInstance3D@71063" type="MeshInstance3D" parent="Terrain/GraphNode8" unique_id=1515719530]
+material_override = SubResource("StandardMaterial3D_3qj4k")
+mesh = SubResource("SphereMesh_mo8hc")
 
 [node name="GraphNode9" type="Node3D" parent="Terrain" unique_id=549064231]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -18.88057, -16.713894, -33.110935)
@@ -1753,6 +2302,14 @@ mesh = SubResource("SphereMesh_53bls")
 material_override = SubResource("StandardMaterial3D_y0aao")
 mesh = SubResource("SphereMesh_wm5rm")
 
+[node name="@MeshInstance3D@18650" type="MeshInstance3D" parent="Terrain/GraphNode9" unique_id=1244028725]
+material_override = SubResource("StandardMaterial3D_pqvsh")
+mesh = SubResource("SphereMesh_3qj4k")
+
+[node name="@MeshInstance3D@71064" type="MeshInstance3D" parent="Terrain/GraphNode9" unique_id=1669328092]
+material_override = SubResource("StandardMaterial3D_gbg58")
+mesh = SubResource("SphereMesh_le5wj")
+
 [node name="GraphNode10" type="Node3D" parent="Terrain" unique_id=1378272053]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 21.835411, -10.07972, 3.5380545)
 script = ExtResource("3_4c57u")
@@ -1781,6 +2338,14 @@ mesh = SubResource("SphereMesh_41lik")
 [node name="@MeshInstance3D@18710" type="MeshInstance3D" parent="Terrain/GraphNode10" unique_id=510962134]
 material_override = SubResource("StandardMaterial3D_ekl5k")
 mesh = SubResource("SphereMesh_fdpg8")
+
+[node name="@MeshInstance3D@18651" type="MeshInstance3D" parent="Terrain/GraphNode10" unique_id=2119857047]
+material_override = SubResource("StandardMaterial3D_mo8hc")
+mesh = SubResource("SphereMesh_gbg58")
+
+[node name="@MeshInstance3D@71065" type="MeshInstance3D" parent="Terrain/GraphNode10" unique_id=2107577805]
+material_override = SubResource("StandardMaterial3D_2um21")
+mesh = SubResource("SphereMesh_ak6tq")
 
 [node name="GraphNode11" type="Node3D" parent="Terrain" unique_id=842523282]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.794601, -8.748546, -18.061407)
@@ -1811,6 +2376,14 @@ mesh = SubResource("SphereMesh_sn1fb")
 material_override = SubResource("StandardMaterial3D_rpys8")
 mesh = SubResource("SphereMesh_6gr3f")
 
+[node name="@MeshInstance3D@18652" type="MeshInstance3D" parent="Terrain/GraphNode11" unique_id=1636138405]
+material_override = SubResource("StandardMaterial3D_le5wj")
+mesh = SubResource("SphereMesh_2um21")
+
+[node name="@MeshInstance3D@71066" type="MeshInstance3D" parent="Terrain/GraphNode11" unique_id=536205401]
+material_override = SubResource("StandardMaterial3D_w7qqv")
+mesh = SubResource("SphereMesh_3gvdc")
+
 [node name="GraphNode12" type="Node3D" parent="Terrain" unique_id=1800190459]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 16.418108, -8.286614, 8.375201)
 script = ExtResource("3_4c57u")
@@ -1839,6 +2412,14 @@ mesh = SubResource("SphereMesh_vieuh")
 [node name="@MeshInstance3D@18712" type="MeshInstance3D" parent="Terrain/GraphNode12" unique_id=664561532]
 material_override = SubResource("StandardMaterial3D_6seew")
 mesh = SubResource("SphereMesh_3ox4t")
+
+[node name="@MeshInstance3D@18653" type="MeshInstance3D" parent="Terrain/GraphNode12" unique_id=1747925435]
+material_override = SubResource("StandardMaterial3D_ak6tq")
+mesh = SubResource("SphereMesh_w7qqv")
+
+[node name="@MeshInstance3D@71067" type="MeshInstance3D" parent="Terrain/GraphNode12" unique_id=83676230]
+material_override = SubResource("StandardMaterial3D_h0sjo")
+mesh = SubResource("SphereMesh_uqsbb")
 
 [node name="GraphNode13" type="Node3D" parent="Terrain" unique_id=1282385307]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -10.842963, -12.89366, -31.397509)
@@ -1869,6 +2450,14 @@ mesh = SubResource("SphereMesh_l0gw7")
 material_override = SubResource("StandardMaterial3D_4fmho")
 mesh = SubResource("SphereMesh_aivy6")
 
+[node name="@MeshInstance3D@18654" type="MeshInstance3D" parent="Terrain/GraphNode13" unique_id=49184221]
+material_override = SubResource("StandardMaterial3D_3gvdc")
+mesh = SubResource("SphereMesh_h0sjo")
+
+[node name="@MeshInstance3D@71068" type="MeshInstance3D" parent="Terrain/GraphNode13" unique_id=247943211]
+material_override = SubResource("StandardMaterial3D_gfi32")
+mesh = SubResource("SphereMesh_12204")
+
 [node name="GraphNode14" type="Node3D" parent="Terrain" unique_id=1710790042]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 11.108563, -11.063274, -23.868275)
 script = ExtResource("3_4c57u")
@@ -1897,6 +2486,14 @@ mesh = SubResource("SphereMesh_jcxqu")
 [node name="@MeshInstance3D@18714" type="MeshInstance3D" parent="Terrain/GraphNode14" unique_id=331208174]
 material_override = SubResource("StandardMaterial3D_bil4k")
 mesh = SubResource("SphereMesh_hnquj")
+
+[node name="@MeshInstance3D@18655" type="MeshInstance3D" parent="Terrain/GraphNode14" unique_id=687521956]
+material_override = SubResource("StandardMaterial3D_uqsbb")
+mesh = SubResource("SphereMesh_gfi32")
+
+[node name="@MeshInstance3D@71069" type="MeshInstance3D" parent="Terrain/GraphNode14" unique_id=1864653693]
+material_override = SubResource("StandardMaterial3D_trkoe")
+mesh = SubResource("SphereMesh_bvlej")
 
 [node name="GraphNode15" type="Node3D" parent="Terrain" unique_id=150172685]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -35.046585, -14.904095, -11.9567795)
@@ -1927,6 +2524,14 @@ mesh = SubResource("SphereMesh_dij0e")
 material_override = SubResource("StandardMaterial3D_0h8y2")
 mesh = SubResource("SphereMesh_nycv6")
 
+[node name="@MeshInstance3D@18656" type="MeshInstance3D" parent="Terrain/GraphNode15" unique_id=796975178]
+material_override = SubResource("StandardMaterial3D_12204")
+mesh = SubResource("SphereMesh_trkoe")
+
+[node name="@MeshInstance3D@71070" type="MeshInstance3D" parent="Terrain/GraphNode15" unique_id=132878035]
+material_override = SubResource("StandardMaterial3D_ycw8e")
+mesh = SubResource("SphereMesh_2gd4m")
+
 [node name="GraphNode16" type="Node3D" parent="Terrain" unique_id=961263507]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -27.324598, -11.06793, 2.7139328)
 script = ExtResource("3_4c57u")
@@ -1955,6 +2560,14 @@ mesh = SubResource("SphereMesh_wat4s")
 [node name="@MeshInstance3D@18716" type="MeshInstance3D" parent="Terrain/GraphNode16" unique_id=28076957]
 material_override = SubResource("StandardMaterial3D_x4ftd")
 mesh = SubResource("SphereMesh_arf1h")
+
+[node name="@MeshInstance3D@18657" type="MeshInstance3D" parent="Terrain/GraphNode16" unique_id=714950699]
+material_override = SubResource("StandardMaterial3D_bvlej")
+mesh = SubResource("SphereMesh_ycw8e")
+
+[node name="@MeshInstance3D@71071" type="MeshInstance3D" parent="Terrain/GraphNode16" unique_id=778963628]
+material_override = SubResource("StandardMaterial3D_61bol")
+mesh = SubResource("SphereMesh_lix4w")
 
 [node name="GraphNode17" type="Node3D" parent="Terrain" unique_id=673201179]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.465923, -13.565348, -19.870232)
@@ -1985,6 +2598,14 @@ mesh = SubResource("SphereMesh_m74q3")
 material_override = SubResource("StandardMaterial3D_s0om5")
 mesh = SubResource("SphereMesh_gkfde")
 
+[node name="@MeshInstance3D@18658" type="MeshInstance3D" parent="Terrain/GraphNode17" unique_id=1748876853]
+material_override = SubResource("StandardMaterial3D_2gd4m")
+mesh = SubResource("SphereMesh_61bol")
+
+[node name="@MeshInstance3D@71072" type="MeshInstance3D" parent="Terrain/GraphNode17" unique_id=1852911675]
+material_override = SubResource("StandardMaterial3D_kmrid")
+mesh = SubResource("SphereMesh_c6fgv")
+
 [node name="GraphNode18" type="Node3D" parent="Terrain" unique_id=1760142956]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -34.529552, -15.371885, -3.0832562)
 script = ExtResource("3_4c57u")
@@ -2013,6 +2634,14 @@ mesh = SubResource("SphereMesh_am8a1")
 [node name="@MeshInstance3D@18718" type="MeshInstance3D" parent="Terrain/GraphNode18" unique_id=1146115947]
 material_override = SubResource("StandardMaterial3D_4qxq8")
 mesh = SubResource("SphereMesh_ryg4g")
+
+[node name="@MeshInstance3D@18659" type="MeshInstance3D" parent="Terrain/GraphNode18" unique_id=1141709757]
+material_override = SubResource("StandardMaterial3D_lix4w")
+mesh = SubResource("SphereMesh_kmrid")
+
+[node name="@MeshInstance3D@71073" type="MeshInstance3D" parent="Terrain/GraphNode18" unique_id=1896442619]
+material_override = SubResource("StandardMaterial3D_fd6dt")
+mesh = SubResource("SphereMesh_gttkg")
 
 [node name="GraphNode19" type="Node3D" parent="Terrain" unique_id=1936478883]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 7.81569, -13.0767765, 23.875422)
@@ -2043,6 +2672,14 @@ mesh = SubResource("SphereMesh_htgcl")
 material_override = SubResource("StandardMaterial3D_oy6td")
 mesh = SubResource("SphereMesh_fe76k")
 
+[node name="@MeshInstance3D@18660" type="MeshInstance3D" parent="Terrain/GraphNode19" unique_id=17421640]
+material_override = SubResource("StandardMaterial3D_c6fgv")
+mesh = SubResource("SphereMesh_fd6dt")
+
+[node name="@MeshInstance3D@71074" type="MeshInstance3D" parent="Terrain/GraphNode19" unique_id=1141271143]
+material_override = SubResource("StandardMaterial3D_hiwvf")
+mesh = SubResource("SphereMesh_ed5de")
+
 [node name="GraphNode20" type="Node3D" parent="Terrain" unique_id=1791257092]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 19.83513, -6.602031, -6.3053536)
 script = ExtResource("3_4c57u")
@@ -2071,6 +2708,14 @@ mesh = SubResource("SphereMesh_f3y11")
 [node name="@MeshInstance3D@18720" type="MeshInstance3D" parent="Terrain/GraphNode20" unique_id=96150666]
 material_override = SubResource("StandardMaterial3D_p5pln")
 mesh = SubResource("SphereMesh_oiuw5")
+
+[node name="@MeshInstance3D@18661" type="MeshInstance3D" parent="Terrain/GraphNode20" unique_id=1289513385]
+material_override = SubResource("StandardMaterial3D_gttkg")
+mesh = SubResource("SphereMesh_hiwvf")
+
+[node name="@MeshInstance3D@71075" type="MeshInstance3D" parent="Terrain/GraphNode20" unique_id=1761089614]
+material_override = SubResource("StandardMaterial3D_e31mi")
+mesh = SubResource("SphereMesh_mq14a")
 
 [node name="GraphNode21" type="Node3D" parent="Terrain" unique_id=938585404]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -21.996078, -7.5436974, 4.4754357)
@@ -2101,6 +2746,14 @@ mesh = SubResource("SphereMesh_u81y6")
 material_override = SubResource("StandardMaterial3D_mldrc")
 mesh = SubResource("SphereMesh_1tiwm")
 
+[node name="@MeshInstance3D@18662" type="MeshInstance3D" parent="Terrain/GraphNode21" unique_id=813206224]
+material_override = SubResource("StandardMaterial3D_ed5de")
+mesh = SubResource("SphereMesh_e31mi")
+
+[node name="@MeshInstance3D@71076" type="MeshInstance3D" parent="Terrain/GraphNode21" unique_id=238409596]
+material_override = SubResource("StandardMaterial3D_yf6j3")
+mesh = SubResource("SphereMesh_e4ynb")
+
 [node name="GraphNode22" type="Node3D" parent="Terrain" unique_id=401974949]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.120047, -16.530304, -37.19537)
 script = ExtResource("3_4c57u")
@@ -2129,6 +2782,14 @@ mesh = SubResource("SphereMesh_mnw77")
 [node name="@MeshInstance3D@18722" type="MeshInstance3D" parent="Terrain/GraphNode22" unique_id=734169796]
 material_override = SubResource("StandardMaterial3D_xxpw2")
 mesh = SubResource("SphereMesh_wghq8")
+
+[node name="@MeshInstance3D@18663" type="MeshInstance3D" parent="Terrain/GraphNode22" unique_id=964593981]
+material_override = SubResource("StandardMaterial3D_mq14a")
+mesh = SubResource("SphereMesh_yf6j3")
+
+[node name="@MeshInstance3D@71077" type="MeshInstance3D" parent="Terrain/GraphNode22" unique_id=891693719]
+material_override = SubResource("StandardMaterial3D_a1n43")
+mesh = SubResource("SphereMesh_dfxmq")
 
 [node name="GraphNode23" type="Node3D" parent="Terrain" unique_id=1383809037]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -23.486874, -14.121321, -27.227367)
@@ -2159,6 +2820,14 @@ mesh = SubResource("SphereMesh_d5iia")
 material_override = SubResource("StandardMaterial3D_k08w7")
 mesh = SubResource("SphereMesh_hp4ct")
 
+[node name="@MeshInstance3D@18664" type="MeshInstance3D" parent="Terrain/GraphNode23" unique_id=626091633]
+material_override = SubResource("StandardMaterial3D_e4ynb")
+mesh = SubResource("SphereMesh_a1n43")
+
+[node name="@MeshInstance3D@71078" type="MeshInstance3D" parent="Terrain/GraphNode23" unique_id=124798279]
+material_override = SubResource("StandardMaterial3D_kcoi7")
+mesh = SubResource("SphereMesh_rkju4")
+
 [node name="GraphNode24" type="Node3D" parent="Terrain" unique_id=274276140]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -6.128134, -6.505704, -22.117401)
 script = ExtResource("3_4c57u")
@@ -2187,6 +2856,14 @@ mesh = SubResource("SphereMesh_qwt6e")
 [node name="@MeshInstance3D@18724" type="MeshInstance3D" parent="Terrain/GraphNode24" unique_id=1871737894]
 material_override = SubResource("StandardMaterial3D_suf1q")
 mesh = SubResource("SphereMesh_lxb2r")
+
+[node name="@MeshInstance3D@18665" type="MeshInstance3D" parent="Terrain/GraphNode24" unique_id=2077118228]
+material_override = SubResource("StandardMaterial3D_dfxmq")
+mesh = SubResource("SphereMesh_kcoi7")
+
+[node name="@MeshInstance3D@71079" type="MeshInstance3D" parent="Terrain/GraphNode24" unique_id=1439666700]
+material_override = SubResource("StandardMaterial3D_um25j")
+mesh = SubResource("SphereMesh_7dysq")
 
 [node name="GraphNode25" type="Node3D" parent="Terrain" unique_id=145107107]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -22.72253, -9.550814, -18.819937)
@@ -2217,6 +2894,14 @@ mesh = SubResource("SphereMesh_tttfs")
 material_override = SubResource("StandardMaterial3D_ceu5l")
 mesh = SubResource("SphereMesh_lv1ug")
 
+[node name="@MeshInstance3D@18666" type="MeshInstance3D" parent="Terrain/GraphNode25" unique_id=321591740]
+material_override = SubResource("StandardMaterial3D_rkju4")
+mesh = SubResource("SphereMesh_um25j")
+
+[node name="@MeshInstance3D@71080" type="MeshInstance3D" parent="Terrain/GraphNode25" unique_id=876379853]
+material_override = SubResource("StandardMaterial3D_0abf2")
+mesh = SubResource("SphereMesh_7b48j")
+
 [node name="GraphNode26" type="Node3D" parent="Terrain" unique_id=1407189509]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -31.933283, -15.796313, -30.515198)
 script = ExtResource("3_4c57u")
@@ -2245,6 +2930,14 @@ mesh = SubResource("SphereMesh_g5xqc")
 [node name="@MeshInstance3D@18726" type="MeshInstance3D" parent="Terrain/GraphNode26" unique_id=1720812404]
 material_override = SubResource("StandardMaterial3D_mofpq")
 mesh = SubResource("SphereMesh_6kttw")
+
+[node name="@MeshInstance3D@18667" type="MeshInstance3D" parent="Terrain/GraphNode26" unique_id=1893025470]
+material_override = SubResource("StandardMaterial3D_7dysq")
+mesh = SubResource("SphereMesh_0abf2")
+
+[node name="@MeshInstance3D@71081" type="MeshInstance3D" parent="Terrain/GraphNode26" unique_id=253985378]
+material_override = SubResource("StandardMaterial3D_8tqy7")
+mesh = SubResource("SphereMesh_faa31")
 
 [node name="GraphNode27" type="Node3D" parent="Terrain" unique_id=893355531]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 5.2450476, -4.2836094, -4.972997)
@@ -2277,6 +2970,14 @@ mesh = SubResource("SphereMesh_7mmqq")
 material_override = SubResource("StandardMaterial3D_oqmj5")
 mesh = SubResource("SphereMesh_uor2d")
 
+[node name="@MeshInstance3D@18668" type="MeshInstance3D" parent="Terrain/GraphNode27" unique_id=1874203841]
+material_override = SubResource("StandardMaterial3D_7b48j")
+mesh = SubResource("SphereMesh_8tqy7")
+
+[node name="@MeshInstance3D@71082" type="MeshInstance3D" parent="Terrain/GraphNode27" unique_id=1246710096]
+material_override = SubResource("StandardMaterial3D_acld0")
+mesh = SubResource("SphereMesh_kc3cm")
+
 [node name="GraphNode28" type="Node3D" parent="Terrain" unique_id=1221461397]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 18.089088, -11.70611, -21.3154)
 script = ExtResource("3_4c57u")
@@ -2305,6 +3006,14 @@ mesh = SubResource("SphereMesh_5aa3q")
 [node name="@MeshInstance3D@18728" type="MeshInstance3D" parent="Terrain/GraphNode28" unique_id=1193285096]
 material_override = SubResource("StandardMaterial3D_bdw5g")
 mesh = SubResource("SphereMesh_j6smb")
+
+[node name="@MeshInstance3D@18669" type="MeshInstance3D" parent="Terrain/GraphNode28" unique_id=499327419]
+material_override = SubResource("StandardMaterial3D_faa31")
+mesh = SubResource("SphereMesh_acld0")
+
+[node name="@MeshInstance3D@71083" type="MeshInstance3D" parent="Terrain/GraphNode28" unique_id=1274223877]
+material_override = SubResource("StandardMaterial3D_utcts")
+mesh = SubResource("SphereMesh_2pm5r")
 
 [node name="GraphNode29" type="Node3D" parent="Terrain" unique_id=2034993991]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0.82299566, -10.609598, 22.136288)
@@ -2335,6 +3044,14 @@ mesh = SubResource("SphereMesh_shlp4")
 material_override = SubResource("StandardMaterial3D_xp7cv")
 mesh = SubResource("SphereMesh_6ff2c")
 
+[node name="@MeshInstance3D@18670" type="MeshInstance3D" parent="Terrain/GraphNode29" unique_id=1193574164]
+material_override = SubResource("StandardMaterial3D_kc3cm")
+mesh = SubResource("SphereMesh_utcts")
+
+[node name="@MeshInstance3D@71084" type="MeshInstance3D" parent="Terrain/GraphNode29" unique_id=11307420]
+material_override = SubResource("StandardMaterial3D_38n85")
+mesh = SubResource("SphereMesh_nkmqd")
+
 [node name="GraphNode30" type="Node3D" parent="Terrain" unique_id=1760449715]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 12.838227, -6.482132, -17.387613)
 script = ExtResource("3_4c57u")
@@ -2363,6 +3080,14 @@ mesh = SubResource("SphereMesh_86lig")
 [node name="@MeshInstance3D@18730" type="MeshInstance3D" parent="Terrain/GraphNode30" unique_id=288814912]
 material_override = SubResource("StandardMaterial3D_ly5pk")
 mesh = SubResource("SphereMesh_s0u5n")
+
+[node name="@MeshInstance3D@18671" type="MeshInstance3D" parent="Terrain/GraphNode30" unique_id=1419721646]
+material_override = SubResource("StandardMaterial3D_2pm5r")
+mesh = SubResource("SphereMesh_38n85")
+
+[node name="@MeshInstance3D@71085" type="MeshInstance3D" parent="Terrain/GraphNode30" unique_id=1140095978]
+material_override = SubResource("StandardMaterial3D_4b624")
+mesh = SubResource("SphereMesh_0li47")
 
 [node name="@StaticBody3D@421324" type="StaticBody3D" parent="Terrain" unique_id=1463640806]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -32.160538, -12.819214, -11.499921)
@@ -2722,6 +3447,7 @@ shadow_enabled = true
 [node name="Tacklebox" type="RigidBody3D" parent="." unique_id=441802834]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, -1.8236876, 0, 0)
 script = ExtResource("11_dg77c")
+_containerInventoryId = 69
 
 [node name="MeshInstance3D" type="MeshInstance3D" parent="Tacklebox" unique_id=1423042815]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.1202292)
@@ -2730,6 +3456,9 @@ mesh = SubResource("BoxMesh_ycdy4")
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Tacklebox" unique_id=227084111]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.1202292)
 shape = SubResource("BoxShape3D_w48qg")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Tacklebox" unique_id=1926359225]
+replication_config = SubResource("SceneReplicationConfig_nkmqd")
 
 [node name="Pickaxe" parent="." unique_id=363654327 instance=ExtResource("12_ycdy4")]
 transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 1.358479, 0, 5.1202292)
@@ -2742,56 +3471,24 @@ transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 7.0727277)
 freeze_mode = 1
 
 [node name="Hook" type="RigidBody3D" parent="." unique_id=872470782]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.39380538, -15.742263)
+transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, -3.1410105)
 gravity_scale = 0.0
 script = ExtResource("11_ycdy4")
 InvItemData = ExtResource("12_dg77c")
 
 [node name="MeshInstance3D2" type="MeshInstance3D" parent="Hook" unique_id=354959579]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.1202292)
 mesh = SubResource("BoxMesh_efxa6")
 skeleton = NodePath("../..")
 
 [node name="CollisionShape3D" type="CollisionShape3D" parent="Hook" unique_id=547031642]
-transform = Transform3D(0.9998643, 0, 0.016475163, 0, 1, 0, -0.016475163, 0, 0.9998643, 0, 0, 5.1202292)
+transform = Transform3D(0.9998643, 0, 0.016475163, 0, 1, 0, -0.016475163, 0, 0.9998643, 0, 0, 0)
 shape = SubResource("BoxShape3D_efxa6")
 
 [node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Hook" unique_id=978195613]
 replication_config = SubResource("SceneReplicationConfig_ycdy4")
 
-[node name="Hook2" type="RigidBody3D" parent="." unique_id=436741267]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -1.2797656, -15.672713)
-gravity_scale = 0.0
-script = ExtResource("11_ycdy4")
-InvItemData = ExtResource("12_dg77c")
+[node name="ItemSpawner" type="MultiplayerSpawner" parent="." unique_id=1248389055]
+_spawnable_scenes = PackedStringArray("uid://12qjdkx2l2h2")
+spawn_path = NodePath("../SyncedItems")
 
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Hook2" unique_id=938505105]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.1202292)
-mesh = SubResource("BoxMesh_efxa6")
-skeleton = NodePath("../..")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Hook2" unique_id=1967253180]
-transform = Transform3D(0.9998643, 0, 0.016475163, 0, 1, 0, -0.016475163, 0, 0.9998643, 0, 0, 5.1202292)
-shape = SubResource("BoxShape3D_efxa6")
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Hook2" unique_id=1314897671]
-replication_config = SubResource("SceneReplicationConfig_ycdy4")
-
-[node name="Hook3" type="RigidBody3D" parent="." unique_id=117812173]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, -0.18047714, -31.484526)
-gravity_scale = 0.0
-script = ExtResource("11_ycdy4")
-InvItemData = ExtResource("12_dg77c")
-
-[node name="MeshInstance3D2" type="MeshInstance3D" parent="Hook3" unique_id=583987657]
-transform = Transform3D(1, 0, 0, 0, 1, 0, 0, 0, 1, 0, 0, 5.1202292)
-mesh = SubResource("BoxMesh_efxa6")
-skeleton = NodePath("../../Hook2")
-
-[node name="CollisionShape3D" type="CollisionShape3D" parent="Hook3" unique_id=292920911]
-transform = Transform3D(0.9998643, 0, 0.016475163, 0, 1, 0, -0.016475163, 0, 0.9998643, 0, 0, 5.1202292)
-shape = SubResource("BoxShape3D_efxa6")
-
-[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="Hook3" unique_id=2099625875]
-root_path = NodePath("../../Hook3")
-replication_config = SubResource("SceneReplicationConfig_ycdy4")
+[node name="SyncedItems" type="Node3D" parent="." unique_id=118053957]

@@ -23,6 +23,10 @@ public partial class PickaxeTool : ToolScript
             
             GD.Print($"[PickaxeTool] Applied impulse: {direction * impulseStrength}");
         }
+        else if (Target is Character TargetCharacter)
+        {
+            TargetCharacter.ApplyCharacterImpulse((TargetCharacter.GlobalTransform.Origin - character.GlobalTransform.Origin).Normalized() * 20.0f + (Vector3.Up * 5.0f));
+        }
         else
         {
             GD.Print("[PickaxeTool] No valid target hit.");

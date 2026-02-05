@@ -14,12 +14,6 @@ public partial class GameItem : WorldItem
 
 	public override void InteractF(Character character)
 	{
-		if (!CanInteract())
-		{
-			GD.Print("[GameItem] No ItemData set, cannot pick up");
-			return;
-		}
-		
 		pickup(character);
 	}
 }
