@@ -25,8 +25,8 @@ public partial class InputHandler : Node
     [Signal] public delegate void MouseClickEventHandler(MouseButton button, bool isPressed);
     
     // Signals for hotbar
-    [Signal] public delegate void HotbarSlotSelectedEventHandler(int slotIndex);
-    [Signal] public delegate void HotbarScrollEventHandler(int direction); // 1 = up, -1 = down
+    [Signal] public delegate void NumkeyPressedEventHandler(int keyValue);
+    [Signal] public delegate void ScrollEventHandler(int direction); // 1 = up, -1 = down
     
     // Signals for UI
     [Signal] public delegate void InventoryToggledEventHandler();
@@ -105,13 +105,13 @@ public partial class InputHandler : Node
             // Mouse wheel for hotbar scrolling
             if (mouseButton.ButtonIndex == MouseButton.WheelUp && mouseButton.Pressed)
             {
-                EmitSignal(SignalName.HotbarScroll, 1);
+                EmitSignal(SignalName.Scroll, 1);
                 GetViewport().SetInputAsHandled();
                 return;
             }
             else if (mouseButton.ButtonIndex == MouseButton.WheelDown && mouseButton.Pressed)
             {
-                EmitSignal(SignalName.HotbarScroll, -1);
+                EmitSignal(SignalName.Scroll, -1);
                 GetViewport().SetInputAsHandled();
                 return;
             }
@@ -131,7 +131,7 @@ public partial class InputHandler : Node
             if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
             {
                 int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
-                EmitSignal(SignalName.HotbarSlotSelected, slotIndex);
+                EmitSignal(SignalName.NumkeyPressed, slotIndex);
                 GetViewport().SetInputAsHandled();
                 return;
             }
@@ -158,14 +158,6 @@ public partial class InputHandler : Node
             GetViewport().SetInputAsHandled();
             return;
         }
-
-        if (Input.IsActionJustPressed("rotate"))
-        {
-            EmitSignal(SignalName.ItemRotateRequested);
-            GetViewport().SetInputAsHandled();
-            return;
-        }
-
         // Sprint handling (continuous, not just pressed)
         bool isSprinting = Input.IsActionPressed("sprint");
         EmitSignal(SignalName.SprintPressed, isSprinting);
@@ -183,7 +175,7 @@ public partial class InputHandler : Node
             if (keyEvent.Keycode >= Key.Key1 && keyEvent.Keycode <= Key.Key6)
             {
                 int slotIndex = (int)keyEvent.Keycode - (int)Key.Key1;
-                EmitSignal(SignalName.HotbarSlotSelected, slotIndex);
+                EmitSignal(SignalName.NumkeyPressed, slotIndex);
                 // Don't consume - let GUI handle it too
                 return;
             }

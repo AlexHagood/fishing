@@ -10,7 +10,8 @@ using System.Numerics;
 using System.Runtime.CompilerServices;
 
 #nullable enable
-public class ItemInstance
+public class 
+ItemInstance
 {
     public int InventoryId { get; set; }
     public int InstanceId { get; set; }
@@ -45,26 +46,45 @@ public class Inventory
         Id = id;
     }
 
+    /// <param name="rotated">If true, checks validity for the item rotated 90 degrees relative to its current state</param>
     public int GetSpaceAt(ItemInstance item, Vector2I position, bool rotated)
     {
-        Vector2I itemSize = rotated ? item.Size.Flip() : item.Size;
-
-
-        if (position.X < 0 || position.Y < 0 ||
-            position.X + itemSize.X > Size.X ||
-            position.Y + itemSize.Y > Size.Y)
+        Vector2I itemSize = item.Size;
+        if (rotated) 
         {
+            itemSize = new Vector2I(item.Size.Y, item.Size.X);
+        }
+
+
+        if (position.X < 0)
+        {
+            GD.Print("[Inventory] GetSpaceAt: Position out of bounds -X");
+            return 0; // Out of bounds
+        } 
+        else if (position.Y < 0)
+        {
+            GD.Print("[Inventory] GetSpaceAt: Position out of bounds -Y");
             return 0; // Out of bounds
         }
+        else if (position.X + itemSize.X > Size.X)
+        {
+            GD.Print("[Inventory] GetSpaceAt: Position out of bounds +X");
+            return 0; // Out of bounds
+        }
+        else if (position.Y + itemSize.Y > Size.Y)
+        {
+            GD.Print("[Inventory] GetSpaceAt: Position out of bounds +Y");
+            return 0; // Out of bounds
+        }
+
         foreach (var otherItem in Items)
         {
-            if (otherItem.InstanceId == item.InstanceId)
+            if (otherItem.InstanceId == item.InstanceId){
                 continue; // Skip self
+            }
 
             Vector2I otherPos = otherItem.GridPosition;
             Vector2I otherSize = otherItem.Size;
-            if (otherItem.IsRotated)
-                otherSize = otherSize.Flip();
 
             // Check for overlap
             bool overlapX = position.X < otherPos.X + otherSize.X && position.X + itemSize.X > otherPos.X;
@@ -74,8 +94,15 @@ public class Inventory
             {
                 if (otherItem.ItemData == item.ItemData && item.ItemData.Stackable)
                 {
+                    GD.Print($"[Inventory] Item overlaps, but is stackable. How many will fit here?" + (item.ItemData.StackSize - otherItem.CurrentStackSize));
                     // slot is occupied by another item of the same type
                     return item.ItemData.StackSize - otherItem.CurrentStackSize;
+                }
+                else
+                {
+                    GD.Print("[Inventory] Item overlaps with non-stackable item or different type");
+                    // slot is occupied by another item
+                    return 0;
                 }
             }
         }
@@ -209,7 +236,7 @@ public partial class InventoryManager : Node
         var currentInventory = _Inventories[item.InventoryId];
         var targetInventory = _Inventories[targetInventoryId];
 
-        int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated ^ item.IsRotated);
+        int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated);
         ItemInstance? existingItem = targetInventory.GetItemAtPosition(targetPosition);
 
         
@@ -341,6 +368,7 @@ public partial class InventoryManager : Node
             {
                 Vector2I pos = new Vector2I(x, y);
                 int space = inv.GetSpaceAt(item, pos, item.IsRotated);
+                GD.Print("-> Space to fit item at " + pos + ": " + space);
                 if (space >= item.CurrentStackSize)
                 {
                     return pos;
@@ -368,8 +396,9 @@ public partial class InventoryManager : Node
         };
 
         _itemInstances[newItem.InstanceId] = newItem;
+        inventory.Items.Add(newItem);
         Vector2I? position = FindSpotToFitItem(newItem, inventoryId);
-        GD.Print($"Space to fit item at {position}");
+        GD.Print($"Space to fit new item {newItem.InstanceId} at {position}");
 
 
         // We find no valid position to spawn an item
@@ -377,6 +406,8 @@ public partial class InventoryManager : Node
         {
             _itemCount -= 1;
             _itemInstances.Remove(newItem.InstanceId);
+            inventory.Items.Remove(newItem);
+
 
             if (!check)
             {
@@ -397,6 +428,7 @@ public partial class InventoryManager : Node
             {
                 _itemCount -= 1;
                 _itemInstances.Remove(newItem.InstanceId);
+                inventory.Items.Remove(newItem);
                 return true;
             }
             GD.Print("[IM] Spawning item at " + position.Value);

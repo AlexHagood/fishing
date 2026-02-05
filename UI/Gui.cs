@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection.Metadata;
 using Godot;
 
 #nullable enable
@@ -89,8 +90,8 @@ public partial class Gui : CanvasLayer
         chatEntry.TextSubmitted += OnChatMessageSubmitted;
 
         // Connect to InputHandler signals for UI-specific input
-        _inputHandler.HotbarSlotSelected += OnInputHandlerHotbarSlotSelected;
-        _inputHandler.ItemRotateRequested += OnInputHandlerRotateRequested;
+        _inputHandler.NumkeyPressed += OnInputHandlerHotbarSlotSelected;
+        _inputHandler.ItemRotateRequested += HandleRotateAction;
 
     }
 
@@ -160,9 +161,15 @@ public partial class Gui : CanvasLayer
     private void OnInputHandlerHotbarSlotSelected(int slotIndex)
     {
         // Only handle this in UI context (when inventory is open)
-        if (_inputHandler.CurrentContext != InputHandler.InputContext.UI)
-            return;
-
+        if (_inputHandler.CurrentContext == InputHandler.InputContext.Gameplay)
+        {
+            GD.Print($"[GUI] Hotbar slot selected: {slotIndex}");
+            _hotbarUI.HighlightSlot(slotIndex);
+            _hotbarUI.Refresh(); // Update thumbnails when slot changes
+            
+        } 
+        else if (_inputHandler.CurrentContext == InputHandler.InputContext.UI)
+        {
         GD.Print($"[GUI] InputHandler hotbar key pressed: {slotIndex}");
         Vector2 mousePos = GetViewport().GetMousePosition();
         var slotUnder = GetSlotAtPosition(mousePos);
@@ -179,14 +186,9 @@ public partial class Gui : CanvasLayer
                 _inventoryManager.BindItemToSlot(inv.Id, slotIndex, item.InstanceId);
             }
         }
+        }
     }
 
-    private void OnInputHandlerRotateRequested()
-    {
-
-        // Then handle the actual rotation (call the existing handler)
-        HandleRotateAction();
-    }
 
 
     public override void _Input(InputEvent @event)
@@ -296,12 +298,6 @@ public partial class Gui : CanvasLayer
         }
     }
 
-    public void OnHotbarSlotSelected(int slotIndex)
-    {
-        GD.Print($"[GUI] Hotbar slot selected: {slotIndex}");
-        _hotbarUI.HighlightSlot(slotIndex);
-        _hotbarUI.Refresh(); // Update thumbnails when slot changes
-    }
 
     private InventorySlot? GetSlotAtPosition(Vector2 globalPosition)
     {
@@ -458,12 +454,6 @@ public partial class Gui : CanvasLayer
 
     }
 
-    private void OnRotateRequested()
-    {
-        // Called from Character signal - just handle the rotation action
-        HandleRotateAction();
-    }
-
     private void HandleRotateAction()
     {
         // Case 1: If we're dragging an item, rotate the drag ghost
@@ -528,6 +518,7 @@ public partial class Gui : CanvasLayer
         _pickupAudio.Play();
         AddChild(_dragGhost);
         _dragGhost.setup(itemTile);
+        _rotateHeld = false;
     }
 
     private void OnDraggingItemClick(bool rightClick)
@@ -551,7 +542,7 @@ public partial class Gui : CanvasLayer
             ItemInstance itemInstance = _draggedItem.ItemInstance;
             if (targetSlot != null)
             {
-                if (targetInv.GetItemAtPosition(targetSlot.slotPosition)?.InstanceId == itemInstance.InstanceId && leftClick)
+                if (targetInv.GetItemAtPosition(targetSlot.slotPosition)?.InstanceId == itemInstance.InstanceId && leftClick && !_rotateHeld)
                 {
                     GD.Print("[GUI] Placed item onto self, exitting dragging");
                     StopDragging();
@@ -566,12 +557,12 @@ public partial class Gui : CanvasLayer
                 {
                     if (leftClick)
                     {
-                        GD.Print("[GUI] Left click, drop all");
+                        GD.Print($"[GUI] Left click, drop all, rotating? {_rotateHeld}");
 
                         _inventoryManager.RequestItemMove(
                             itemInstance.InstanceId,
                             targetSlot.inventoryId,
-                            targetSlot.slotPosition,
+                            targetPos,
                             _rotateHeld,
                             Math.Min(canPlace, _dragGhost.Count));
                         _dragGhost.Count -= Math.Min(canPlace, _dragGhost.Count);
@@ -585,7 +576,7 @@ public partial class Gui : CanvasLayer
                         _inventoryManager.RequestItemMove(
                             itemInstance.InstanceId,
                             targetSlot.inventoryId,
-                            targetSlot.slotPosition,
+                            targetPos,
                             _rotateHeld,
                             1);
                         _dragGhost.Count -= 1;
@@ -686,8 +677,6 @@ public partial class Gui : CanvasLayer
     {
         var character = GetNode<Character>("/root/Main/Character/CharacterBody3D");
         character.InventoryRequested += OnInventoryKeyPress;
-        character.RotateRequested += OnRotateRequested;
-        character.HotbarSlotSelected += OnHotbarSlotSelected;
 
         base._ExitTree();
     }
