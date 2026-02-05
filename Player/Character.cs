@@ -91,6 +91,25 @@ public partial class Character : CharacterBody3D
             Rpc("UpdateEquippedTool", _hotbarSlot);
         }
     }
+
+    public void SetHeadVisibility(bool isVisible)
+    {
+        if (!isVisible)
+        {
+            // Create a new transparent material
+            var invisibleMaterial = new StandardMaterial3D();
+            invisibleMaterial.Transparency = BaseMaterial3D.TransparencyEnum.Alpha;
+            invisibleMaterial.AlbedoColor = new Color(1, 1, 1, 0);
+
+            _playerBodyMesh.SetSurfaceOverrideMaterial(1, invisibleMaterial);
+            _playerBodyMesh.SetSurfaceOverrideMaterial(2, invisibleMaterial);
+        } 
+        else
+        {   
+            _playerBodyMesh.SetSurfaceOverrideMaterial(1, null);
+            _playerBodyMesh.SetSurfaceOverrideMaterial(2, null);
+        }
+    }
     
 
     
@@ -148,8 +167,10 @@ public partial class Character : CharacterBody3D
             _activeCamera.Current = true;
             _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
             animTree.ReelTarget = 0;
+            SetHeadVisibility(false);
             
             GetNode<Gui>("/root/Main/GUI").init(this);
+
             
             // Connect to InputHandler signals for local authority player
             _inputHandler = GetNode<InputHandler>("/root/InputHandler");
@@ -566,9 +587,8 @@ public partial class Character : CharacterBody3D
             // Reset camera pitch
             _cameraPitch = 0.0f;
             _firstPersonCamera.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
-            
-            // Hide player mesh
-            setMeshVisibility(false);
+            SetHeadVisibility(false);
+
         }
         else
         {
@@ -585,23 +605,8 @@ public partial class Character : CharacterBody3D
             {
                 _cameraTarget.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
             }
-            
-            // Show player mesh
-            setMeshVisibility(true);
+            SetHeadVisibility(true);
         }
-    }
-
-    private void setMeshVisibility(bool isVisible)
-    {
-        // Only hide/show the body mesh, not the entire armature
-        // This keeps the skeleton and bone attachments (like tools) working
-        if (_playerBodyMesh != null)
-        {
-            _playerBodyMesh.Visible = isVisible;
-        }
-        
-        // Tool stays visible regardless (it's attached to the skeleton, not the mesh)
-        // No need to explicitly set tool visibility - it's always visible
     }
 
     /// <summary>
