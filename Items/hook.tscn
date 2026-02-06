@@ -1,0 +1,31 @@
+[gd_scene format=3 uid="uid://cnh6prtd1qoub"]
+
+[ext_resource type="Script" uid="uid://kill1sr1ygyw" path="res://Items/GameItem.cs" id="1_l5pru"]
+[ext_resource type="Resource" uid="uid://bw44vg40p452c" path="res://Items/Hook.tres" id="2_ip6q7"]
+
+[sub_resource type="BoxMesh" id="BoxMesh_efxa6"]
+size = Vector3(0.2, 0.1, 0.2)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_efxa6"]
+size = Vector3(0.3, 0.3, 0.3)
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_ycdy4"]
+properties/0/path = NodePath(".:position")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="Hook" type="RigidBody3D" unique_id=668904624]
+gravity_scale = 0.0
+script = ExtResource("1_l5pru")
+InvItemData = ExtResource("2_ip6q7")
+
+[node name="MeshInstance3D2" type="MeshInstance3D" parent="." unique_id=2087597875]
+mesh = SubResource("BoxMesh_efxa6")
+skeleton = NodePath("../..")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=119805009]
+transform = Transform3D(0.9998643, 0, 0.016475163, 0, 1, 0, -0.016475163, 0, 0.9998643, 0, 0, 0)
+shape = SubResource("BoxShape3D_efxa6")
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." unique_id=1373556414]
+replication_config = SubResource("SceneReplicationConfig_ycdy4")

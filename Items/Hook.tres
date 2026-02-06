@@ -8,4 +8,5 @@ Name = "Hook"
 Icon = "uid://c8jfpp2v13noh"
 Size = Vector2i(2, 2)
 StackSize = 5
+ScenePath = "uid://cnh6prtd1qoub"
 metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

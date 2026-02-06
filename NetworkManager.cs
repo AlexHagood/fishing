@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 using System.Linq;
 
 public partial class NetworkManager : Node
@@ -10,6 +11,8 @@ public partial class NetworkManager : Node
     public const int SERVER_PORT = 6969;
 
     public ENetMultiplayerPeer? PeerInstance = null;
+
+    public Dictionary<long, Character> IdToPlayer = new Dictionary<long, Character>();
 
     public override void _Ready()
     {
@@ -115,9 +118,11 @@ public partial class NetworkManager : Node
             { "peer_id", peerId }
         };
 
-        var player = spawner.Spawn(spawnData);
+        Character player = spawner.Spawn(spawnData) as Character;
 
         GD.Print($"Spawned player {player.Name}");
+
+        IdToPlayer[peerId] = player;
         
         // Fallback to manual spawning if no spawner exists
         

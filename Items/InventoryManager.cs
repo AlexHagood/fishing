@@ -144,6 +144,13 @@ public partial class InventoryManager : Node
     [Signal]
     public delegate void InventoryUpdateEventHandler();
 
+    private NetworkManager _networkManager;
+
+    public override void _Ready()
+    {
+        _networkManager = GetNode<NetworkManager>("/root/NetworkManager");
+    }
+
     public ItemInstance GetItem(int id)
     {
         if (_itemInstances.ContainsKey(id))
@@ -497,6 +504,7 @@ public partial class InventoryManager : Node
         if (Multiplayer.IsServer())
         {
             GD.Print("[IM] Server deleting item instance " + itemId);
+            Rpc(nameof(SpawnWorldItem), itemId, Multiplayer.GetRemoteSenderId());
             Rpc(nameof(DeleteItem), itemId);
         }
         else
@@ -504,6 +512,28 @@ public partial class InventoryManager : Node
             GD.Print("[IM] Client requesting item deletion " + itemId);
             RpcId(1, nameof(RequestDeleteItem), itemId);
         }
+    }
+
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SpawnWorldItem(int itemid, long peerId)
+    {
+        Character requestingPlayer = _networkManager.IdToPlayer[peerId];
+        PackedScene item = GD.Load<PackedScene>(GetItem(itemid).ItemData.ScenePath);
+        Node instance = item.Instantiate();
+        if (instance == null)
+        {
+            throw new Exception($"Failed to instantiate item scene at path {GetItem(itemid).ItemData.ScenePath}");
+        }
+
+        if (requestingPlayer.holdPosition != null && instance is Node3D node3D)
+        {
+            node3D.Position = requestingPlayer.holdPosition.GlobalPosition;
+        }
+        else
+        {
+            throw new Exception("Requesting player does not have a hold position to spawn item at or instance is invalid type");
+        }
+        GetNode("/root/Main").AddChild(instance);
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]

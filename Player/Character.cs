@@ -1,3 +1,4 @@
+using System.Collections.Specialized;
 using System.Dynamic;
 using Godot;
 using TriangleNet.Tools;
@@ -41,8 +42,8 @@ public partial class Character : CharacterBody3D
     private float _sprintSpeed = 10.0f;
     private bool _isSprinting = false;
 
-    private Node3D _holdPosition;
-    private PhysItem _heldPhysItem;
+    public Node3D holdPosition;
+    public WorldItem heldPhysItem;
     private Node3D _cameraTarget; // Third-person camera pivot
     private SpringArm3D _springArm;  // For third-person collision
     private MeshInstance3D _playerBodyMesh;  // Reference to player's body mesh (not the whole armature!)
@@ -117,6 +118,8 @@ public partial class Character : CharacterBody3D
     public override void _Ready()
     {
 
+        GetNode<NetworkManager>("/root/NetworkManager").IdToPlayer[GetMultiplayerAuthority()] = this;
+
         var nametag = GetNode<Label3D>("Nametag");
         nametag.Text = Name;
 
@@ -157,15 +160,14 @@ public partial class Character : CharacterBody3D
 
         _inventoryManager.CreateInventory(new Vector2I(5, 5), inventoryId);
 
+        holdPosition = GetNode<Node3D>("Camera3D/HoldPosition");
+
 
         if (IsMultiplayerAuthority())
         {
             SetupCameraSystem();
-            _holdPosition = new Node3D();
-            _holdPosition.Name = "HoldPosition";
-            _activeCamera.AddChild(_holdPosition);
+            
             _activeCamera.Current = true;
-            _holdPosition.Position = new Vector3(0, -0.5f, -2.0f);
             animTree.ReelTarget = 0;
             SetHeadVisibility(false);
             
@@ -282,22 +284,24 @@ public partial class Character : CharacterBody3D
         
         if (button == MouseButton.Left)
         {
-            if (_heldPhysItem != null)
+            if (heldPhysItem != null)
             {
-                ThrowPhysItem();
+                // Throw the held item
+                Vector3 throwDirection = -_activeCamera.GlobalTransform.Basis.Z.Normalized();
+                heldPhysItem.Throw(throwDirection);
             }
-            if (_currentTool != null)
+            else if (_currentTool != null)
             {
                 _currentTool.PrimaryFire(this);
             }
         }
         else if (button == MouseButton.Right)
         {
-            if (_heldPhysItem != null)
+            if (heldPhysItem != null)
             {
-                DropPhysItem();
+                heldPhysItem.Throw(Vector3.Zero);
             }
-            if (_currentTool != null)
+            else if (_currentTool != null)
             {
                 _currentTool.SecondaryFire(this);
             }
@@ -417,11 +421,6 @@ public partial class Character : CharacterBody3D
 
     public override void _Process(double delta)
     {
-        // Apply floaty physics to held physics item
-        if (_heldPhysItem != null && _holdPosition != null)
-        {
-            _heldPhysItem.ApplyFloatyPhysics(_holdPosition.GlobalPosition, (float)delta);
-        }
     }
 
     public override void _PhysicsProcess(double delta)
@@ -754,44 +753,7 @@ public partial class Character : CharacterBody3D
         }
     }
 
-    public void PickupPhysItem(PhysItem physItem)
-    {
-        if (_heldPhysItem != null)
-        {
-            GD.Print("[Character] Already holding an item!");
-            return;
-        }
 
-        _heldPhysItem = physItem;
-        _heldPhysItem.OnPickedUp();
-        GD.Print($"[Character] Picked up: {physItem.Name}");
-    }
-
-    private void DropPhysItem()
-    {
-        if (_heldPhysItem == null) return;
-
-        var itemToDrop = _heldPhysItem;
-        _heldPhysItem = null;    
-        itemToDrop.OnDropped();
-        GD.Print($"[Character] Dropped: {itemToDrop.Name}");
-    }
-
-    private void ThrowPhysItem()
-    {
-        if (_heldPhysItem == null) return;
-
-        var throwDirection = -_activeCamera.GlobalTransform.Basis.Z;
-        var itemToThrow = _heldPhysItem;
-        var throwForce = _heldPhysItem.ThrowForce;
-        
-        // Clear the reference FIRST so floaty physics stops applying
-        _heldPhysItem = null;
-        
-        // Then throw the item
-        itemToThrow.OnThrown(throwDirection, throwForce);
-        GD.Print($"[Character] Threw: {itemToThrow.Name}");
-    }
 
     
     /// <summary>

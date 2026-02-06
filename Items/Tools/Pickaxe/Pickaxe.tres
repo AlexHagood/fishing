@@ -8,5 +8,6 @@ script = ExtResource("2_w4vxe")
 Name = "Pickaxe"
 Icon = "uid://bqkp6n0rvol73"
 Size = Vector2i(2, 3)
+ScenePath = "uid://dovtc3lfpwj5c"
 ToolScriptScene = ExtResource("1_t1im3")
 metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

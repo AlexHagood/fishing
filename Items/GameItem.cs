@@ -14,6 +14,6 @@ public partial class GameItem : WorldItem
 
 	public override void InteractF(Character character)
 	{
-		pickup(character);
+		Pickup(character);
 	}
 }
