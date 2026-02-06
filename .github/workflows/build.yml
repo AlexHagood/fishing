@@ -5,12 +5,12 @@ on:
     branches:
       - main
 
+permissions:
+  contents: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        platform: [linux, windows]
     steps:
       - uses: actions/checkout@v2
         with:
@@ -23,15 +23,13 @@ jobs:
           godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_linux.x86_64.zip
           godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_export_templates.tpz
           relative_project_path: ./
-          archive_output: true
+          archive_output: false
           export_debug: true
-        env:
-          GODOT_PRESET: ${{ matrix.platform }}
       
-      - name: Upload Artifact
+      - name: Upload Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: Client-${{ matrix.platform }}
+          name: game-builds
           path: ${{ steps.export.outputs.archive_directory }}/*
 
   release:
