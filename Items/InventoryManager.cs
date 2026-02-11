@@ -1,6 +1,7 @@
 
 
 using Godot;
+using InventoryState;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
@@ -8,6 +9,7 @@ using System.IO;
 using System.Linq;
 using System.Numerics;
 using System.Runtime.CompilerServices;
+using System.Text.Json;
 
 #nullable enable
 public class 
@@ -19,6 +21,7 @@ ItemInstance
     public int CurrentStackSize { get; set; }
     public Vector2I GridPosition { get; set; }
     public bool IsRotated { get; set; } = false;
+    public bool Infinite = false;
 
     public Vector2I Size
     {
@@ -38,12 +41,25 @@ public class Inventory
     public List<ItemInstance> Items { get; set; }
     // Hotbar mapping: slot index -> item instance ID
     public Dictionary<int, ItemInstance> HotbarItems;
+    public List<long> subscribedPlayers = new List<long>();
     public Inventory(Vector2I size, int id)
     {
         Size = size;
         Items = new List<ItemInstance>();
         HotbarItems = new Dictionary<int, ItemInstance>();
         Id = id;
+    }
+
+    /// <summary>
+    /// Notify all subscribed players by calling the provided action for each player
+    /// </summary>
+    /// <param name="notifyAction">Action to perform for each subscribed player (receives peerId)</param>
+    public void Notify(Action<long> notifyAction)
+    {
+        foreach (long peerId in subscribedPlayers)
+        {
+            notifyAction(peerId);
+        }
     }
 
     /// <param name="rotated">If true, checks validity for the item rotated 90 degrees relative to its current state</param>
@@ -169,57 +185,61 @@ public partial class InventoryManager : Node
             return _Inventories[id];
         throw new Exception($"Inventory not found {id}");
     }
-
-
-    public void GetInventoryState()
+    
+    public bool InventoryExists(int id)
     {
-        if (Multiplayer.IsServer())
-        {
-            GD.Print("[IM] Server does not need to request state, skipping");
-        }
-        else 
-        {
-            GD.Print("[IM] Client requesting inventory state from server");
-            RpcId(1, nameof(RequestServerState), Multiplayer.GetUniqueId());
-        }
+        return _Inventories.ContainsKey(id);
     }
 
-    
-    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestServerState()
+
+    /// <summary>
+    /// Serialize a single inventory to JSON
+    /// </summary>
+    public string GetInventoryAsJson(int inventoryId)
     {
-        string state = GetStateAsJson();
-        RpcId(Multiplayer.GetRemoteSenderId(), nameof(InventoryStateCallback), state);
-    }
-    
-    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void InventoryStateCallback(string state)
-    {
-        GD.Print("[IM] Client received inventory state from server - Setting!");
-        SetStateFromJson(state);
-        GD.Print("[IM] Client received inventory state from server - Complete!");
+        if (!InventoryExists(inventoryId))
+        {
+            throw new Exception($"Cannot serialize non-existent inventory {inventoryId}");
+        }
         
+        var inventory = GetInventory(inventoryId);
+        var dto = InventoryState.InventoryDTO.FromInventory(inventory);
+        return JsonSerializer.Serialize(dto, new JsonSerializerOptions { WriteIndented = true });
     }
 
     /// <summary>
-    /// Converts the entire inventory manager state to JSON
+    /// Create/update an inventory from JSON and register all items in the item cache
     /// </summary>
-    public string GetStateAsJson()
+    public void SetInventoryFromJson(string json)
     {
-        return this.GetStateAsJson(_Inventories, inventoryCount, _itemCount);
-    }
-
-    /// <summary>
-    /// Loads inventory manager state from JSON
-    /// </summary>
-    public void SetStateFromJson(string json)
-    {
-        var (inventories, itemInstances, invCount, itmCount) = InventoryManagerExtensions.LoadStateFromJson(json);
+        var dto = JsonSerializer.Deserialize<InventoryState.InventoryDTO>(json);
+        if (dto == null)
+        {
+            throw new Exception("Failed to deserialize inventory");
+        }
         
-        _Inventories = inventories;
-        _itemInstances = itemInstances;
-        inventoryCount = invCount;
-        _itemCount = itmCount;
+        var inventory = dto.ToInventory();
+        
+        // Register all items in the global item cache
+        foreach (var item in inventory.Items)
+        {
+            _itemInstances[item.InstanceId] = item;
+        }
+        
+        // Reconstruct hotbar references using the now-populated item cache
+        foreach (var kvp in dto.HotbarItemIds)
+        {
+            int slotIndex = kvp.Key;
+            int instanceId = kvp.Value;
+            
+            if (_itemInstances.ContainsKey(instanceId))
+            {
+                inventory.HotbarItems[slotIndex] = _itemInstances[instanceId];
+            }
+        }
+        
+        // Store or update the inventory
+        _Inventories[inventory.Id] = inventory;
         
         EmitSignal(nameof(InventoryUpdate));
     }
@@ -243,6 +263,9 @@ public partial class InventoryManager : Node
 
         int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated);
         ItemInstance? existingItem = targetInventory.GetItemAtPosition(targetPosition);
+
+        var dto = InventoryDTO.FromInventory(targetInventory);
+        GD.Print($"Target Inventory: {JsonSerializer.Serialize(dto)}");
 
         
         // Item exists, try to stack it there.
@@ -269,14 +292,20 @@ public partial class InventoryManager : Node
             {
                 GD.Print("[IM] Moving entire stack to existing stack");
                 // Remove from current inventory
-                currentInventory.Items.Remove(item);
-                _itemInstances.Remove(item.InstanceId);
+                if (!item.Infinite)
+                {
+                    currentInventory.Items.Remove(item);
+                    _itemInstances.Remove(item.InstanceId);
+                }
                 existingItem.CurrentStackSize += count;
             }
             else
             {
                 GD.Print("[IM] Moving partial stack to existing stack");
-                item.CurrentStackSize -= count;
+                if (!item.Infinite)
+                {
+                    item.CurrentStackSize -= count;
+                }
                 existingItem.CurrentStackSize += count;
             }
             EmitSignal(nameof(InventoryUpdate));
@@ -287,7 +316,7 @@ public partial class InventoryManager : Node
         {
             if (spaceAvailable >= item.CurrentStackSize)
             {
-                if (count == item.CurrentStackSize)
+                if (count == item.CurrentStackSize && !item.Infinite)
                 {
                     GD.Print("[IM] Moving existing itemdef to position");
                     currentInventory.Items.Remove(item);
@@ -297,9 +326,8 @@ public partial class InventoryManager : Node
                     targetInventory.Items.Add(item);
                     EmitSignal(nameof(InventoryUpdate));
                     return;
-
                 }
-                else if (count < item.CurrentStackSize)
+                else if (count < item.CurrentStackSize || item.Infinite)
                 {
                     GD.Print("[IM] Moving new itemdef to position");
                     ItemInstance newItem = new ItemInstance
@@ -311,7 +339,10 @@ public partial class InventoryManager : Node
                         GridPosition = targetPosition,
                         IsRotated = rotated ^ item.IsRotated
                     };
-                    item.CurrentStackSize -= count;
+                    if (!item.Infinite)
+                    {
+                        item.CurrentStackSize -= count;
+                    }
                     targetInventory.Items.Add(newItem);
                     _itemInstances[newItem.InstanceId] = newItem;
                     EmitSignal(nameof(InventoryUpdate));
@@ -319,7 +350,7 @@ public partial class InventoryManager : Node
                 }
                 else
                 {
-                    throw new Exception("Not enough items to transfer");
+                    throw new Exception("Not enough items to transfer or invalid count? Infinite broken?");
                 }
             }
             else
@@ -333,7 +364,9 @@ public partial class InventoryManager : Node
     public void RequestItemMove(int itemId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
     {
         ItemInstance item = GetItem(itemId);
-        if (GetInventory(targetInventoryId).GetSpaceAt(item, targetPosition, rotated) < count)
+        Inventory sourceInventory = GetInventory(item.InventoryId);
+        Inventory targetInventory = GetInventory(targetInventoryId);
+        if (targetInventory.GetSpaceAt(item, targetPosition, rotated) < count)
         {
             GD.Print("[IM] RequestItemMove: Not enough space in target inventory, aborting request.");
             return;
@@ -343,7 +376,24 @@ public partial class InventoryManager : Node
         }
         if (Multiplayer.IsServer())
         {
-            Rpc(nameof(MoveItem), item.InstanceId, targetInventoryId, targetPosition, rotated, count);
+            // Collect all peers that need to be notified (from both source and target inventories)
+            HashSet<long> peersToNotify = new HashSet<long>();
+            
+            foreach (long peerId in sourceInventory.subscribedPlayers)
+            {
+                peersToNotify.Add(peerId);
+            }
+            
+            foreach (long peerId in targetInventory.subscribedPlayers)
+            {
+                peersToNotify.Add(peerId);
+            }
+            
+            // Notify all subscribed peers
+            foreach (long peerId in peersToNotify)
+            {
+                RpcId(peerId, nameof(MoveItem), item.InstanceId, targetInventoryId, targetPosition, rotated, count);
+            }
         }
         else
         {
@@ -384,8 +434,9 @@ public partial class InventoryManager : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public bool SpawnInstance(string itemResourcePath, int inventoryId, NodePath DeleteItemPath, bool check=false)
+    public bool SpawnInstance(string itemResourcePath, int inventoryId, NodePath DeleteItemPath, bool check=false, bool infinite = false)
     {
+        GD.Print($"[IM] SpawnInstance called: check={check}, infinite={infinite}, InstanceId will be {ItemCount}");
         if (check)
         {
             GD.Print("[IM] Server checking spawn validity");
@@ -398,12 +449,14 @@ public partial class InventoryManager : Node
             ItemData = itemDef,
             InventoryId = inventoryId,
             CurrentStackSize = 1,
+            Infinite = infinite
         };
 
         _itemInstances[newItem.InstanceId] = newItem;
         inventory.Items.Add(newItem);
+        GD.Print($"[IM] Created item {newItem.InstanceId}, inventory now has {inventory.Items.Count} items");
         Vector2I? position = FindSpotToFitItem(newItem, inventoryId);
-        GD.Print($"Space to fit new item {newItem.InstanceId} at {position}");
+        GD.Print($"[IM] Space to fit new item {newItem.InstanceId} at {position}, infinite = {infinite}");
 
 
         // We find no valid position to spawn an item
@@ -412,6 +465,7 @@ public partial class InventoryManager : Node
             _itemCount -= 1;
             _itemInstances.Remove(newItem.InstanceId);
             inventory.Items.Remove(newItem);
+            GD.Print($"[IM] No position found, cleaned up. ItemCount now {ItemCount}, inventory has {inventory.Items.Count} items");
 
 
             if (!check)
@@ -434,10 +488,14 @@ public partial class InventoryManager : Node
                 _itemCount -= 1;
                 _itemInstances.Remove(newItem.InstanceId);
                 inventory.Items.Remove(newItem);
+                GD.Print($"[IM] Check successful, cleaned up. ItemCount now {ItemCount}, inventory has {inventory.Items.Count} items");
                 return true;
             }
+            // Set position directly instead of using MoveItem to avoid creating duplicates
             GD.Print("[IM] Spawning item at " + position.Value);
-            MoveItem(newItem.InstanceId, inventoryId, position.Value, false, 1);
+            newItem.GridPosition = position.Value;
+            // Item already added to inventory.Items at line ~425, just set position here
+            EmitSignal(nameof(InventoryUpdate));
             if (!DeleteItemPath.IsEmpty)
             {
                 GD.Print("[IM] Deleting spawned item from world");
@@ -456,7 +514,7 @@ public partial class InventoryManager : Node
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestSpawnInstance(string itemResourcePath, int inventoryId, NodePath? deleteNodePath = null)
+    public void RequestSpawnInstance(string itemResourcePath, int inventoryId, NodePath? deleteNodePath = null, bool infinite = false)
     {
         if (deleteNodePath == null)
         {
@@ -464,11 +522,15 @@ public partial class InventoryManager : Node
         }
         if (Multiplayer.IsServer())
         {
-            if (SpawnInstance(itemResourcePath, inventoryId, deleteNodePath, check: true))
+            if (SpawnInstance(itemResourcePath, inventoryId, deleteNodePath, check: true, infinite: infinite))
             {
-                GD.Print("[IM] Server accepts spawn instance, sending to clients");
-                Rpc(nameof(SpawnInstance), itemResourcePath, inventoryId, deleteNodePath, false);
-                SpawnInstance(itemResourcePath, inventoryId, deleteNodePath, false);
+                Inventory inventory = GetInventory(inventoryId);
+                GD.Print($"[IM] Server accepts spawn instance of {itemResourcePath}, sending to clients");
+                inventory.Notify(peerId =>
+                {
+                     RpcId(peerId, nameof(SpawnInstance), itemResourcePath, inventoryId, deleteNodePath, false, infinite);
+                                    })
+;                 SpawnInstance(itemResourcePath, inventoryId, deleteNodePath, false, infinite);
             }
             else
             {
@@ -477,6 +539,11 @@ public partial class InventoryManager : Node
         }
         else
         {
+            if (infinite == true)
+            {
+                GD.Print("[IM] Client requesting infinite item spawn");
+                throw new Exception("Clients cannot spawn infinite items!");
+            }
             GD.Print("[IM] Client requesting item spawn");
             RpcId(1, nameof(RequestSpawnInstance), itemResourcePath, inventoryId, deleteNodePath);
         }
@@ -503,9 +570,14 @@ public partial class InventoryManager : Node
     {
         if (Multiplayer.IsServer())
         {
+
+            ItemInstance item = GetItem(itemId);
+            Inventory inventory = GetInventory(item.InventoryId);
             GD.Print("[IM] Server deleting item instance " + itemId);
             Rpc(nameof(SpawnWorldItem), itemId, Multiplayer.GetRemoteSenderId());
-            Rpc(nameof(DeleteItem), itemId);
+
+            inventory.Notify(peerId => {                Rpc(Id(peerId, ameof(DeleteItem), itemId);;
+            })
         }
         else
         {
@@ -558,6 +630,10 @@ public partial class InventoryManager : Node
     {
         GD.Print("[IM] Deleting item instance " + instanceId);
         var item = GetItem(instanceId);
+        if (item.Infinite)
+        {
+            throw new Exception("[IM] Item instance " + instanceId + " is infinite, not deleting");
+        }
         var inventory = GetInventory(item.InventoryId);
         inventory.Items.Remove(item);
         inventory.HotbarItems = inventory.HotbarItems.Where(kvp => kvp.Value.InstanceId != instanceId).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
@@ -602,4 +678,31 @@ public partial class InventoryManager : Node
         inventory.HotbarItems[slotIndex] = item;
         EmitSignal(nameof(HotbarUpdate));
     }
+
+
+    [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void SubscribeToInventory(int inventoryId)
+    {
+        if (!IsMultiplayerAuthority())
+        {
+            GD.Print("[IM] Trying to subscribe to inventory from non-authority peer, ignoring");
+            throw new Exception("Only the server can manage inventory subscriptions");
+        }
+        Inventory inventory = GetInventory(inventoryId);
+        if (!inventory.subscribedPlayers.Contains(Multiplayer.GetUniqueId()))
+        {
+            inventory.subscribedPlayers.Add(Multiplayer.GetUniqueId());
+            GD.Print($"[IM] Player {Multiplayer.GetUniqueId()} subscribed to inventory {inventoryId}");
+            RpcId(Multiplayer.GetRemoteSenderId(), nameof(InventorySubscribeCallback), GetInventoryAsJson(inventoryId));
+        }
+    }
+
+    public void InventorySubscribeCallback(string jsonState)
+    {
+        GD.Print($"[IM] InventorySubscribeCallback called, receiving inventory state");
+        SetInventoryFromJson(jsonState);
+        EmitSignal(nameof(InventoryUpdate));
+    }
+
+
 }

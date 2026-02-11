@@ -1,0 +1,18 @@
+[gd_scene format=3 uid="uid://bmxmf4kkr50s2"]
+
+[ext_resource type="PackedScene" uid="uid://7w6f0jl420ge" path="res://Items/Tools/Shovel.fbx" id="1_jen1w"]
+[ext_resource type="Script" uid="uid://kill1sr1ygyw" path="res://Items/GameItem.cs" id="1_s2m2o"]
+[ext_resource type="Resource" uid="uid://bplmbchcwrp8n" path="res://Items/Tools/Shovel/Shovel.tres" id="2_s2m2o"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape3D_57d4p"]
+radius = 0.3
+
+[node name="WorldShovel" type="RigidBody3D" unique_id=477012601]
+script = ExtResource("1_s2m2o")
+InvItemData = ExtResource("2_s2m2o")
+
+[node name="Shovel" parent="." unique_id=1440315031 instance=ExtResource("1_jen1w")]
+transform = Transform3D(0.5, 0, 0, 0, 0.5, 0, 0, 0, 0.5, 0, 0, 0)
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="." unique_id=1380783074]
+shape = SubResource("CapsuleShape3D_57d4p")

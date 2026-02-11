@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ItemDefinition" format=3 uid="uid://bplmbchcwrp8n"]
+
+[ext_resource type="PackedScene" uid="uid://b4onvyxclc8iv" path="res://Items/Tools/Shovel/ToolShovel.tscn" id="1_2cdjv"]
+[ext_resource type="Script" uid="uid://dtbrmxc8w0vpf" path="res://Items/ItemDefinition.cs" id="2_pwnus"]
+
+[resource]
+script = ExtResource("2_pwnus")
+Name = "Shovel"
+Icon = "uid://3ixjphyqs4pp"
+Size = Vector2i(1, 3)
+ScenePath = "uid://bmxmf4kkr50s2"
+ToolScriptScene = ExtResource("1_2cdjv")
+metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

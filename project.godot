@@ -37,7 +37,7 @@ project/assembly_name="Glop 3"
 
 [editor_plugins]
 
-enabled=PackedStringArray("res://addons/TerrainTools/plugin.cfg")
+enabled=PackedStringArray()
 project/assembly_name="Glop 3"
 
 [gdunit4]

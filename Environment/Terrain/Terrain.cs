@@ -52,6 +52,15 @@ public partial class Terrain : Node3D
 
 	public int[] Indices;
 	
+	// === Modification System ===
+	private Dictionary<int, List<int>> _vertexToTriangles; // vertex index -> list of triangle indices
+	private Dictionary<int, Vector2I> _triangleToChunk; // triangle index -> chunk coordinate
+	
+	// Cached data for regeneration
+	private Vector3[] _cachedNormals;
+	private Vector2[] _cachedUVs;
+	private Vector3[] _cachedFaceNormals;
+	
 	// === Configuration ===
 	[Export]
 	public Vector3 TerrainSize = new Vector3(40, 3, 40);
@@ -74,6 +83,26 @@ public partial class Terrain : Node3D
 	[Export]
 	Curve HeightCurve; // Curve to control height distribution (X=normalized distance, Y=height multiplier)
 
+
+	// Connect to position change signals for all nodes
+
+	[Export(PropertyHint.Range, "0,10")]
+	public int RelaxationIterations = 2; // Number of Lloyd's relaxation iterations to improve triangle quality
+	
+	[Export(PropertyHint.Range, "0,10")]
+	public int HeightSmoothingIterations = 3; // Number of height smoothing passes
+	
+	[Export(PropertyHint.Range, "0,1")]
+	public float HeightSmoothingStrength = 0.5f; // How much to blend with neighbors (0=none, 1=full average)
+	
+	[Export]
+	public string HeightmapPath = "res://heightmap.png"; // Path to heightmap texture
+	
+	[Export]
+	public float HeightmapScale = 50.0f; // Multiplier for heightmap values (black=0, white=HeightmapScale)
+	
+	private Image _heightmapImage;
+
 	public override void _Ready()
 	{
 		base._Ready();
@@ -83,17 +112,7 @@ public partial class Terrain : Node3D
 		_grassMaterial = CreateGrassMaterial();
 		_rockMaterial = CreateRockMaterial();
 		
-		// Only regenerate in editor, never in game
-		if (Engine.IsEditorHint())
-		{
-			GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
-			Reset();
-		}
-		else
-		{
-			GD.Print("Terrain: Game mode - using pre-generated terrain from editor.");
-			// Don't regenerate - use the terrain that was saved in the editor
-		}
+		Reset();
 	}
 
 
@@ -138,10 +157,13 @@ public partial class Terrain : Node3D
 		
 		// === PARTITION INTO CHUNKS ===
 		PartitionIntoChunks();
+		
+		// === BUILD MODIFICATION MAPPINGS ===
+		BuildVertexToTriangleMap();
 
 		// Calculate normals for proper lighting (shared across all chunks)
-		Vector3[] normals = new Vector3[Vertices.Length];
-		Vector3[] faceNormals = new Vector3[Triangles.Length];
+		_cachedNormals = new Vector3[Vertices.Length];
+		_cachedFaceNormals = new Vector3[Triangles.Length];
 		
 		// Calculate face normals and accumulate at vertices
 		for (int i = 0; i < Triangles.Length; i++)
@@ -156,28 +178,28 @@ public partial class Terrain : Node3D
 			var faceNormal = -edge1.Cross(edge2).Normalized();
 			
 			// Store face normal for later use
-			faceNormals[i] = faceNormal;
+			_cachedFaceNormals[i] = faceNormal;
 			
 			// Accumulate normal at each vertex
-			normals[Triangles[i].A] += faceNormal;
-			normals[Triangles[i].B] += faceNormal;
-			normals[Triangles[i].C] += faceNormal;
+			_cachedNormals[Triangles[i].A] += faceNormal;
+			_cachedNormals[Triangles[i].B] += faceNormal;
+			_cachedNormals[Triangles[i].C] += faceNormal;
 		}
 		
 		// Normalize accumulated normals (smooth shading)
-		for (int i = 0; i < normals.Length; i++)
+		for (int i = 0; i < _cachedNormals.Length; i++)
 		{
-			normals[i] = normals[i].Normalized();
+			_cachedNormals[i] = _cachedNormals[i].Normalized();
 		}
 
 		// Generate UV coordinates based on world-space XZ position for tiling (shared across all chunks)
-		Vector2[] uvs = new Vector2[Vertices.Length];
+		_cachedUVs = new Vector2[Vertices.Length];
 		float uvScale = 0.1f; // Adjust this to control texture tiling (smaller = more tiles)
 		
 		for (int i = 0; i < Vertices.Length; i++)
 		{
 			// Use XZ position for UV coordinates
-			uvs[i] = new Vector2(Vertices[i].X * uvScale, Vertices[i].Z * uvScale);
+			_cachedUVs[i] = new Vector2(Vertices[i].X * uvScale, Vertices[i].Z * uvScale);
 		}
 
 		// Ensure we have a container to put generated terrain elements (debug lines, mesh, etc.)
@@ -206,14 +228,14 @@ public partial class Terrain : Node3D
 		foreach (var kvp in ChunkMap)
 		{
 			var chunk = kvp.Value;
-			GenerateChunkMeshAndCollision(chunk, normals, uvs, faceNormals);
+			GenerateChunkMeshAndCollision(chunk, _cachedNormals, _cachedUVs, _cachedFaceNormals);
 		}
 		
 		GD.Print($"Generated {ChunkMap.Count} chunk meshes and collisions");
 
 		
 
-
+ 
 
 		
 		
@@ -232,24 +254,7 @@ public partial class Terrain : Node3D
 
 	
 	
-	// Connect to position change signals for all nodes
 
-	[Export(PropertyHint.Range, "0,10")]
-	public int RelaxationIterations = 2; // Number of Lloyd's relaxation iterations to improve triangle quality
-	
-	[Export(PropertyHint.Range, "0,10")]
-	public int HeightSmoothingIterations = 3; // Number of height smoothing passes
-	
-	[Export(PropertyHint.Range, "0,1")]
-	public float HeightSmoothingStrength = 0.5f; // How much to blend with neighbors (0=none, 1=full average)
-	
-	[Export]
-	public string HeightmapPath = "res://heightmap.png"; // Path to heightmap texture
-	
-	[Export]
-	public float HeightmapScale = 50.0f; // Multiplier for heightmap values (black=0, white=HeightmapScale)
-	
-	private Image _heightmapImage;
 
 	public List<Vector3> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
 	{
@@ -409,6 +414,7 @@ public partial class Terrain : Node3D
 	private void PartitionIntoChunks()
 	{
 		ChunkMap.Clear();
+		_triangleToChunk = new Dictionary<int, Vector2I>();
 		
 		// First pass: assign triangles to chunks based on centroid
 		for (int i = 0; i < Triangles.Length; i++)
@@ -438,6 +444,9 @@ public partial class Terrain : Node3D
 			
 			// Add triangle index to chunk
 			chunk.TriangleIndices.Add(i);
+			
+			// Map triangle to chunk for fast lookup
+			_triangleToChunk[i] = chunkCoord;
 		}
 		
 		// Calculate bounds for each chunk
@@ -611,6 +620,246 @@ public partial class Terrain : Node3D
 		{
 			chunkCollider.Owner = GetTree().EditedSceneRoot;
 		}
+	}
+
+	public int GetTriangleAtPosition(Vector3 worldPosition)
+	{
+	// Get the chunk this position is in - O(1)
+		var chunkCoord = GetChunkCoordinate(worldPosition);
+
+		if (!ChunkMap.TryGetValue(chunkCoord, out var chunk))
+			return -1;
+
+		// Only check triangles in this chunk - O(k) where k is small
+		float closestDist = float.MaxValue;
+		int closestTriangle = -1;
+
+		foreach (int triIndex in chunk.TriangleIndices)
+		{
+			var tri = Triangles[triIndex];
+			
+			// Calculate triangle centroid
+			var centroid = (Vertices[tri.A] + Vertices[tri.B] + Vertices[tri.C]) / 3.0f;
+			float dist = worldPosition.DistanceSquaredTo(centroid);
+			
+			if (dist < closestDist)
+			{
+				closestDist = dist;
+				closestTriangle = triIndex;
+			}
+		}
+
+		return closestTriangle;
+	}
+
+	// === TERRAIN MODIFICATION SYSTEM ===
+	
+	/// <summary>
+	/// Builds a mapping from vertex indices to the triangles that use them
+	/// </summary>
+	private void BuildVertexToTriangleMap()
+	{
+		_vertexToTriangles = new Dictionary<int, List<int>>();
+		
+		for (int i = 0; i < Triangles.Length; i++)
+		{
+			var tri = Triangles[i];
+			
+			if (!_vertexToTriangles.ContainsKey(tri.A))
+				_vertexToTriangles[tri.A] = new List<int>();
+			if (!_vertexToTriangles.ContainsKey(tri.B))
+				_vertexToTriangles[tri.B] = new List<int>();
+			if (!_vertexToTriangles.ContainsKey(tri.C))
+				_vertexToTriangles[tri.C] = new List<int>();
+				
+			_vertexToTriangles[tri.A].Add(i);
+			_vertexToTriangles[tri.B].Add(i);
+			_vertexToTriangles[tri.C].Add(i);
+		}
+		
+		GD.Print($"Built vertex-to-triangle mapping: {_vertexToTriangles.Count} vertices");
+	}
+	
+	/// <summary>
+	/// Modifies a single vertex and regenerates affected chunks immediately
+	/// </summary>
+	public void ModifyVertex(int vertexIndex, Vector3 newPosition)
+	{
+		if (vertexIndex < 0 || vertexIndex >= Vertices.Length)
+		{
+			GD.PrintErr($"Invalid vertex index: {vertexIndex}");
+			return;
+		}
+		
+		// Update the vertex
+		Vertices[vertexIndex] = newPosition;
+		
+		// Find all affected triangles
+		if (!_vertexToTriangles.TryGetValue(vertexIndex, out var affectedTriangles))
+		{
+			GD.PrintErr($"No triangles found for vertex {vertexIndex}");
+			return;
+		}
+		
+		// Find all affected chunks
+		var affectedChunks = new HashSet<Vector2I>();
+		foreach (int triIndex in affectedTriangles)
+		{
+			if (_triangleToChunk.TryGetValue(triIndex, out var chunkCoord))
+			{
+				affectedChunks.Add(chunkCoord);
+			}
+		}
+		
+		// Recalculate normals for affected triangles
+		RecalculateNormals(affectedTriangles);
+		
+		// Regenerate only affected chunks
+		foreach (var chunkCoord in affectedChunks)
+		{
+			if (ChunkMap.TryGetValue(chunkCoord, out var chunk))
+			{
+				RegenerateChunk(chunk);
+			}
+		}
+		
+		GD.Print($"Modified vertex {vertexIndex}, regenerated {affectedChunks.Count} chunks");
+	}
+	
+	/// <summary>
+	/// Modifies vertices within a radius using a modification function
+	/// </summary>
+	public void ModifyArea(Vector3 worldPosition, float radius, Func<Vector3, Vector3> modifyFunc)
+	{
+		var affectedChunks = new HashSet<Vector2I>();
+		var affectedTriangles = new HashSet<int>();
+		
+		// Find vertices within radius
+		for (int i = 0; i < Vertices.Length; i++)
+		{
+			if (Vertices[i].DistanceTo(worldPosition) <= radius)
+			{
+				// Apply modification
+				Vertices[i] = modifyFunc(Vertices[i]);
+				
+				// Track affected triangles
+				if (_vertexToTriangles.TryGetValue(i, out var tris))
+				{
+					foreach (int triIndex in tris)
+					{
+						affectedTriangles.Add(triIndex);
+						
+						if (_triangleToChunk.TryGetValue(triIndex, out var chunkCoord))
+						{
+							affectedChunks.Add(chunkCoord);
+						}
+					}
+				}
+			}
+		}
+		
+		// Recalculate normals for affected triangles
+		RecalculateNormals(affectedTriangles);
+		
+		// Regenerate affected chunks
+		foreach (var chunkCoord in affectedChunks)
+		{
+			if (ChunkMap.TryGetValue(chunkCoord, out var chunk))
+			{
+				RegenerateChunk(chunk);
+			}
+		}
+		
+		GD.Print($"Modified area at {worldPosition} (radius {radius}), regenerated {affectedChunks.Count} chunks");
+	}
+	
+	/// <summary>
+	/// Recalculates normals for specific triangles
+	/// </summary>
+	private void RecalculateNormals(IEnumerable<int> triangleIndices)
+	{
+		// Reset normals for affected vertices
+		var affectedVertices = new HashSet<int>();
+		foreach (int triIndex in triangleIndices)
+		{
+			if (triIndex >= 0 && triIndex < Triangles.Length)
+			{
+				var tri = Triangles[triIndex];
+				affectedVertices.Add(tri.A);
+				affectedVertices.Add(tri.B);
+				affectedVertices.Add(tri.C);
+			}
+		}
+		
+		foreach (int vertIdx in affectedVertices)
+		{
+			_cachedNormals[vertIdx] = Vector3.Zero;
+		}
+		
+		// Recalculate face normals and accumulate at vertices
+		foreach (int triIndex in triangleIndices)
+		{
+			if (triIndex >= 0 && triIndex < Triangles.Length)
+			{
+				var tri = Triangles[triIndex];
+				var v0 = Vertices[tri.A];
+				var v1 = Vertices[tri.B];
+				var v2 = Vertices[tri.C];
+				
+				var edge1 = v1 - v0;
+				var edge2 = v2 - v0;
+				var faceNormal = -edge1.Cross(edge2).Normalized();
+				
+				_cachedFaceNormals[triIndex] = faceNormal;
+				
+				_cachedNormals[tri.A] += faceNormal;
+				_cachedNormals[tri.B] += faceNormal;
+				_cachedNormals[tri.C] += faceNormal;
+			}
+		}
+		
+		// Normalize affected vertices
+		foreach (int vertIdx in affectedVertices)
+		{
+			_cachedNormals[vertIdx] = _cachedNormals[vertIdx].Normalized();
+		}
+	}
+	
+	/// <summary>
+	/// Regenerates a single chunk's mesh and collision
+	/// </summary>
+	private void RegenerateChunk(Chunk chunk)
+	{
+		// Destroy old nodes
+		if (chunk.ChunkCollision != null && IsInstanceValid(chunk.ChunkCollision))
+		{
+			chunk.ChunkCollision.QueueFree();
+		}
+		
+		// Regenerate with updated vertex data
+		GenerateChunkMeshAndCollision(chunk, _cachedNormals, _cachedUVs, _cachedFaceNormals);
+	}
+	
+	/// <summary>
+	/// Gets the closest vertex to a world position from a specific triangle
+	/// </summary>
+	public int GetClosestVertexInTriangle(int triangleIndex, Vector3 worldPosition)
+	{
+		if (triangleIndex < 0 || triangleIndex >= Triangles.Length)
+			return -1;
+		
+		var tri = Triangles[triangleIndex];
+		
+		float distA = Vertices[tri.A].DistanceSquaredTo(worldPosition);
+		float distB = Vertices[tri.B].DistanceSquaredTo(worldPosition);
+		float distC = Vertices[tri.C].DistanceSquaredTo(worldPosition);
+		
+		if (distA <= distB && distA <= distC)
+			return tri.A;
+		else if (distB <= distC)
+			return tri.B;
+		else
+			return tri.C;
 	}
 
 

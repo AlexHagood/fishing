@@ -23,46 +23,6 @@ public partial class InventoryWindow : UIWindow
 
     public override void _Ready()
     {
-        // Get the content container from the base UIWindow
-        var contentContainer = GetNode<PanelContainer>("Panel/VBoxContainer/Content");
-        Vector2I InventorySize = inventoryManager.GetInventorySize(inventoryId);
-        inventoryManager.InventoryUpdate += RefreshItems;
-        // Create and add the GridContainer to the content area
-        _gridContainer = new GridContainer();
-        _gridContainer.AddThemeConstantOverride("v_separation", 0);
-        _gridContainer.AddThemeConstantOverride("h_separation", 0);
-
-        _gridContainer.Columns = InventorySize.X;
-        contentContainer.AddChild(_gridContainer);
-        
-        // Create panels for each grid slot
-        for (int y = 0; y < InventorySize.Y; y++)
-        {
-            for (int x = 0; x < InventorySize.X; x++)
-            {
-                var slot = new InventorySlot();
-                slot.slotPosition = new Vector2I(x, y);
-                slot.Name = $"Slot_{x}_{y}";
-                slot.inventoryId = inventoryId;
-                slot.CustomMinimumSize = new Vector2(64, 64);
-                _gridContainer.AddChild(slot);
-            }
-        }
-        
-        // Create item layer on top of grid for displaying items
-        _itemLayer = new Control();
-        _itemLayer.MouseFilter = Control.MouseFilterEnum.Ignore;
-        _itemLayer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
-        contentContainer.AddChild(_itemLayer);
-
-        // Set grid container's minimum size
-        _gridContainer.CustomMinimumSize = new Vector2(InventorySize.X * 64, InventorySize.Y * 64);
-        
-        // Calculate and set the minimum size based on grid content
-
-
-        
-    
         base._Ready();
 
         // Initial display of items
@@ -71,14 +31,53 @@ public partial class InventoryWindow : UIWindow
     
     public void RefreshItems()
     {
+
+        if (_gridContainer == null)
+        {
+                        // Get the content container from the base UIWindow
+            var contentContainer = GetNode<PanelContainer>("Panel/VBoxContainer/Content");
+            Vector2I inventorySize = inventoryManager.GetInventorySize(inventoryId);
+            inventoryManager.InventoryUpdate += RefreshItems;
+            // Create and add the GridContainer to the content area
+            _gridContainer = new GridContainer();
+            _gridContainer.AddThemeConstantOverride("v_separation", 0);
+            _gridContainer.AddThemeConstantOverride("h_separation", 0);
+
+            _gridContainer.Columns = inventorySize.X;
+            contentContainer.AddChild(_gridContainer);
+            
+            // Create panels for each grid slot
+            for (int y = 0; y < inventorySize.Y; y++)
+            {
+                for (int x = 0; x < inventorySize.X; x++)
+                {
+                    var slot = new InventorySlot();
+                    slot.slotPosition = new Vector2I(x, y);
+                    slot.Name = $"Slot_{x}_{y}";
+                    slot.inventoryId = inventoryId;
+                    slot.CustomMinimumSize = new Vector2(64, 64);
+                    _gridContainer.AddChild(slot);
+                }
+            }
+            
+            // Create item layer on top of grid for displaying items
+            _itemLayer = new Control();
+            _itemLayer.MouseFilter = Control.MouseFilterEnum.Ignore;
+            _itemLayer.SetAnchorsPreset(Control.LayoutPreset.FullRect);
+            contentContainer.AddChild(_itemLayer);
+
+            // Set grid container's minimum size
+            _gridContainer.CustomMinimumSize = new Vector2(inventorySize.X * 64, inventorySize.Y * 64);
+
+            base.ResizeAndCenter();
+
+        }
         // Clear all existing item tiles from the item layer
         foreach (Node child in _itemLayer.GetChildren())
         {
             child.QueueFree();
         }
         
-        // Get inventory size for calculations
-        Vector2I InventorySize = inventoryManager.GetInventorySize(inventoryId);
         
         // Get all items and recreate their tiles
         List<ItemInstance> items = inventoryManager.GetInventory(inventoryId).Items;

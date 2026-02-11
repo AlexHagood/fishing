@@ -503,7 +503,7 @@ public partial class Gui : CanvasLayer
                             _rotateHeld,
                             Math.Min(canPlace, _dragGhost.Count));
                         _dragGhost.Count -= Math.Min(canPlace, _dragGhost.Count);
-                        GD.Print($"[GUI] Placed {canPlace} items, {_dragGhost.Count} remaining");
+                        GD.Print($"[GUI] Placed {Math.Min(canPlace, _dragGhost.Count)} items, {_dragGhost.Count} remaining");
 
                     }
                     else if (rightClick)

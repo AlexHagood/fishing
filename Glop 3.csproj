@@ -5,6 +5,8 @@
     <RootNamespace>Glop3</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
     <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
+    <!-- Suppress nullable warnings that don't make sense in Godot context -->
+    <NoWarn>$(NoWarn);CS8618;CS8632</NoWarn>
   </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0">

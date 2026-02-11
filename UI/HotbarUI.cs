@@ -58,6 +58,14 @@ public partial class HotbarUI : Control
     public void Refresh()
     {
         GD.Print($"[HotbarUI] Refreshing hotbar UI from inventory {inventoryId}");
+        
+        // Check if inventory exists before trying to access it
+        if (!_inventoryManager.InventoryExists(inventoryId))
+        {
+            GD.Print($"[HotbarUI] Inventory {inventoryId} doesn't exist yet, skipping refresh");
+            return;
+        }
+        
         Dictionary<int, ItemInstance> hotbarItems = _inventoryManager.GetInventory(inventoryId).HotbarItems;
         for (int i = 0; i < hotbarSize; i++)
         {

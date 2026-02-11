@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://dyfthathb27j0"]
+
+[ext_resource type="PackedScene" uid="uid://d0rj7djsnos6a" path="res://npc.tscn" id="1_vi8yi"]
+[ext_resource type="Script" uid="uid://1ycl3ektelvx" path="res://Merchant.cs" id="2_pm7pw"]
+[ext_resource type="Resource" uid="uid://bw44vg40p452c" path="res://Items/Hook.tres" id="3_4467b"]
+[ext_resource type="Resource" uid="uid://d1omxjw12mqo3" path="res://Items/Tools/Pickaxe/Pickaxe.tres" id="4_k1q5i"]
+[ext_resource type="Resource" uid="uid://cdx2u0a1rvmah" path="res://Items/Tools/FishingRod/RodDef.tres" id="5_jjmm1"]
+
+[sub_resource type="SceneReplicationConfig" id="SceneReplicationConfig_pm7pw"]
+properties/0/path = NodePath(".:ShopId")
+properties/0/spawn = true
+properties/0/replication_mode = 1
+
+[node name="Merchant" unique_id=538088281 instance=ExtResource("1_vi8yi")]
+script = ExtResource("2_pm7pw")
+ShopId = 3
+ShopInventory = Array[Object]([ExtResource("3_4467b"), ExtResource("4_k1q5i"), ExtResource("5_jjmm1"), null, null])
+idleAnimation = "Npc/Idle"
+
+[node name="Skeleton3D" parent="CharacterArmature" parent_id_path=PackedInt32Array(568231143) index="0" unique_id=217301219]
+bones/9/position = Vector3(3.5882625e-08, 0.25953144, -1.2155756e-09)
+bones/9/rotation = Quaternion(0.42728776, 0.23048775, 0.72847, -0.48335496)
+bones/10/position = Vector3(-5.1958224e-08, 0.5282712, -1.9757781e-08)
+bones/10/rotation = Quaternion(-0.038043927, 0.22458364, -0.12795776, 0.96526766)
+bones/13/position = Vector3(-2.1520395e-07, 0.25953156, -1.9224906e-09)
+bones/13/rotation = Quaternion(-0.4272878, 0.23048781, 0.72847, 0.483355)
+bones/14/rotation = Quaternion(-0.038043834, -0.22458358, 0.12795778, 0.96526766)
+bones/15/rotation = Quaternion(0.011377625, -0.15603992, 0.00957493, 0.9876389)
+
+[node name="RightHandAttachment" parent="CharacterArmature/Skeleton3D" index="1" unique_id=2019164811]
+transform = Transform3D(-0.97166264, -0.03913121, -0.23310626, 0.0114922, -0.9928548, 0.11876584, -0.23608905, 0.11272162, 0.96517026, -0.5052373, 0.8887037, 0.061532065)
+
+[node name="MultiplayerSynchronizer" type="MultiplayerSynchronizer" parent="." index="4" unique_id=59316516]
+replication_config = SubResource("SceneReplicationConfig_pm7pw")

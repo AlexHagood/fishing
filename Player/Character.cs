@@ -159,8 +159,6 @@ public partial class Character : CharacterBody3D
 
         inventoryId = GetMultiplayerAuthority();
 
-        _inventoryManager.CreateInventory(new Vector2I(5, 5), inventoryId);
-
         holdPosition = GetNode<Node3D>("Camera3D/HoldPosition");
 
 
@@ -178,6 +176,9 @@ public partial class Character : CharacterBody3D
             // Connect to InputHandler signals for local authority player
             _inputHandler = GetNode<InputHandler>("/root/InputHandler");
             ConnectInputSignals();
+
+            _inventoryManager.CreateInventory(new Vector2I(5, 5), inventoryId);
+
         }
 
         _inventoryManager.InventoryUpdate += () => Rpc(nameof(UpdateEquippedTool), HotbarSlot);
@@ -693,6 +694,24 @@ public partial class Character : CharacterBody3D
         return null;
     }
 
+    public Godot.Collections.Dictionary RaycastRaw(float range = 5.0f)
+    {
+                if (_activeCamera == null)
+        {
+            GD.PrintErr("[Character] Cannot raycast - active camera not initialized!");
+            return null;
+        }
+        var spaceState = GetWorld3D().DirectSpaceState;
+        var from = _activeCamera.GlobalTransform.Origin;
+        var to = from + _activeCamera.GlobalTransform.Basis.Z * -range;
+        var query = PhysicsRayQueryParameters3D.Create(from, to);
+        query.CollideWithAreas = false;
+        query.CollideWithBodies = true;
+        query.Exclude = new Godot.Collections.Array<Rid> { GetRid() };
+        var result = spaceState.IntersectRay(query);
+        return result;
+    }
+
     private void TryInteractE()
     {
         var collider = RaycastFromCamera(5.0f);
@@ -794,24 +813,25 @@ public partial class Character : CharacterBody3D
             return;
         }
 
-        // Look for WorldItem in the parent chain
+
+        // Look for IInteractable in the parent chain (includes WorldItem and NPCs)
         Node nodeToCheck = collider as Node;
         while (nodeToCheck != null)
         {
-            if (nodeToCheck is WorldItem worldItem && worldItem.CanInteract())
+            
+            if (nodeToCheck is IInteractable interactable && interactable.CanInteract())
             {
-                float distance = GlobalPosition.DistanceTo(worldItem.GlobalPosition);
+                float distance = GlobalPosition.DistanceTo((nodeToCheck as Node3D)?.GlobalPosition ?? Vector3.Zero);
                 
                 // Check if within interaction range
-                if (distance <= worldItem.InteractRange)
+                if (distance <= interactable.InteractRange)
                 {
                     // Update hints with the item's hint text
-                    EmitSignal(SignalName.HintEUpdated, worldItem.HintE);
-                    EmitSignal(SignalName.HintFUpdated, worldItem.HintF);
+                    EmitSignal(SignalName.HintEUpdated, interactable.HintE);
+                    EmitSignal(SignalName.HintFUpdated, interactable.HintF);
                 }
                 else
-                {
-                    // Too far away - clear hints
+                {                    // Too far away - clear hints
                     EmitSignal(SignalName.HintEUpdated, "");
                     EmitSignal(SignalName.HintFUpdated, "");
                 }
@@ -820,7 +840,7 @@ public partial class Character : CharacterBody3D
             nodeToCheck = nodeToCheck.GetParent();
         }
         
-        // No WorldItem found - clear hints
+        // No interactable found - clear hints
         EmitSignal(SignalName.HintEUpdated, "");
         EmitSignal(SignalName.HintFUpdated, "");
     }

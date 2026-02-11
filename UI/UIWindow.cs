@@ -36,6 +36,7 @@ public partial class UIWindow : Control
         // Defer resize to next frame so content has time to calculate its size
         CallDeferred(MethodName.ResizeAndCenter);
     }
+
     
     public override void _Process(double delta)
     {
@@ -56,7 +57,7 @@ public partial class UIWindow : Control
         EmitSignal(SignalName.WindowClosed, this);
     }
     
-    private void ResizeAndCenter()
+    protected void ResizeAndCenter()
     {
         // Get content size
         if (_contentContainer.GetChildCount() > 0)
