@@ -13,65 +13,13 @@ using TriangleNet.Topology;
 public static class DelaunayTriangulator
 {
     /// <summary>
-    /// Performs Delaunay triangulation on GraphNodes projected to XZ plane
-    /// Returns a list of edges (pairs of node indices) instead of modifying nodes directly
-    /// </summary>
-    /// <param name="nodes">List of GraphNodes to triangulate</param>
-    /// <returns>List of edges as (nodeIndexA, nodeIndexB) tuples</returns>
-    public static List<(int, int)> TriangulateAndGetEdges(List<GraphNode> nodes)
-    {
-        if (nodes == null || nodes.Count < 3)
-        {
-            GD.Print($"DelaunayTriangulator: Need at least 3 nodes for triangulation, got {nodes?.Count ?? 0}");
-            return new List<(int, int)>();
-        }
-
-        // Project to 2D and triangulate
-        var triangles = Triangulate2D(nodes);
-        
-        // Track unique edges to avoid duplicates
-        var edges = new HashSet<(int, int)>();
-        
-        // Collect all edges from triangles
-        foreach (var triangle in triangles)
-        {
-            AddUniqueEdge(edges, triangle.A, triangle.B);
-            AddUniqueEdge(edges, triangle.B, triangle.C);
-            AddUniqueEdge(edges, triangle.C, triangle.A);
-        }
-
-        GD.Print($"DelaunayTriangulator: {triangles.Count} triangles, {edges.Count} edges created for {nodes.Count} nodes");
-        return edges.ToList();
-    }
-
-    /// <summary>
-    /// DEPRECATED: Use TriangulateAndGetEdges instead. 
-    /// This method modifies nodes directly which breaks the new centralized data structure model.
-    /// </summary>
-    [Obsolete("Use TriangulateAndGetEdges instead and register edges with Terrain")]
-    public static List<GraphNode> TriangulateAndConnect(List<GraphNode> nodes, bool clearExistingConnections = true)
-    {
-        // For backward compatibility, but should not be used
-        GD.PrintErr("TriangulateAndConnect is deprecated. Use TriangulateAndGetEdges instead.");
-        return nodes ?? new List<GraphNode>();
-    }
-
-    /// <summary>
-    /// Adds an edge to the set, ensuring smaller index comes first
-    /// </summary>
-    private static void AddUniqueEdge(HashSet<(int, int)> edges, int a, int b)
-    {
-        edges.Add(a < b ? (a, b) : (b, a));
-    }
-
-    /// <summary>
     /// Performs 2D Delaunay triangulation without connecting nodes (useful for analysis)
     /// Uses Triangle.NET library for robust and correct Delaunay triangulation
     /// </summary>
     /// <param name="nodes">List of GraphNodes to triangulate</param>
     /// <param name="quality">Quality options for mesh refinement (null for basic triangulation)</param>
     /// <returns>List of triangles as index triplets</returns>
-    public static List<Triangle> Triangulate2D(List<GraphNode> nodes, TriangleNet.Meshing.ConstraintOptions quality = null)
+    public static List<Triangle> Triangulate2D(List<Vector3> nodes, TriangleNet.Meshing.ConstraintOptions quality = null)
     {
         if (nodes == null || nodes.Count < 3)
             return new List<Triangle>();
@@ -86,7 +34,7 @@ public static class DelaunayTriangulator
             {
                 var node = nodes[i];
                 // Project 3D position to 2D (XZ plane)
-                polygon.Add(new Vertex(node.Position.X, node.Position.Z) { ID = i });
+                polygon.Add(new Vertex(node.X, node.Z) { ID = i });
             }
 
             // Perform Delaunay triangulation with optional quality refinement
@@ -111,7 +59,7 @@ public static class DelaunayTriangulator
                 mesh = (TriangleNet.Mesh)polygon.Triangulate();
             }
 
-            // Convert Triangle.NET result to our Triangle structs
+            // Convert Triangle.NET result to our Triangle structs with correct winding
             var result = new List<Triangle>();
             foreach (var triangle in mesh.Triangles)
             {
@@ -120,10 +68,31 @@ public static class DelaunayTriangulator
                 var v1 = triangle.GetVertex(1).ID;
                 var v2 = triangle.GetVertex(2).ID;
                 
-                result.Add(new Triangle(v0, v1, v2));
+                // Get actual 3D positions to determine winding order
+                var pos0 = nodes[v0];
+                var pos1 = nodes[v1];
+                var pos2 = nodes[v2];
+                
+                // Calculate cross product in XZ plane to determine winding
+                // For Godot terrain (normal pointing up +Y), we want clockwise winding when viewed from above
+                var edge1 = new Vector2(pos1.X - pos0.X, pos1.Z - pos0.Z);
+                var edge2 = new Vector2(pos2.X - pos0.X, pos2.Z - pos0.Z);
+                var cross = edge1.X * edge2.Y - edge1.Y * edge2.X;
+                
+                // If cross product is negative, triangle is counter-clockwise (viewed from above)
+                // If positive, it's clockwise - which is what we want for upward-facing normals
+                if (cross < 0)
+                {
+                    // Swap v1 and v2 to reverse winding to clockwise
+                    result.Add(new Triangle(v0, v2, v1));
+                }
+                else
+                {
+                    result.Add(new Triangle(v0, v1, v2));
+                }
             }
 
-            GD.Print($"Triangle.NET: Created {result.Count} triangles from {nodes.Count} nodes");
+            GD.Print($"Triangle.NET: Created {result.Count} triangles from {nodes.Count} nodes with correct winding");
             return result;
         }
         catch (Exception ex)
@@ -150,8 +119,8 @@ public static class DelaunayTriangulator
     /// <param name="origin">Terrain origin (for boundary constraints)</param>
     /// <param name="size">Terrain size (for boundary constraints)</param>
     /// <returns>The same list of nodes with updated positions</returns>
-    public static List<GraphNode> ApplyLloydsRelaxation(
-        List<GraphNode> nodes, 
+    public static List<Vector3> ApplyLloydsRelaxation(
+        List<Vector3> nodes, 
         int iterations, 
         Vector3 origin, 
         Vector3 size)
@@ -196,7 +165,7 @@ public static class DelaunayTriangulator
                 var neighbors = nodeNeighbors[i];
                 if (neighbors.Count == 0)
                 {
-                    newPositions[i] = nodes[i].Position;
+                    newPositions[i] = nodes[i];
                     continue;
                 }
 
@@ -204,12 +173,12 @@ public static class DelaunayTriangulator
                 Vector3 centroid = Vector3.Zero;
                 foreach (var neighborIdx in neighbors)
                 {
-                    centroid += nodes[neighborIdx].Position;
+                    centroid += nodes[neighborIdx];
                 }
                 centroid /= neighbors.Count;
 
                 // Preserve Y coordinate (height) - only relax in XZ plane
-                centroid.Y = nodes[i].Position.Y;
+                centroid.Y = nodes[i].Y;
 
                 // Clamp to bounds
                 centroid.X = Mathf.Clamp(centroid.X, minX, maxX);
@@ -221,7 +190,7 @@ public static class DelaunayTriangulator
             // Update node positions
             for (int i = 0; i < nodes.Count; i++)
             {
-                nodes[i].Position = newPositions[i];
+                nodes[i] = newPositions[i];
             }
         }
 
@@ -230,21 +199,4 @@ public static class DelaunayTriangulator
     }
 }
 
-/// <summary>
-/// Represents a triangle by three node indices 
-/// </summary>
-public struct Triangle
-{
-    public int A { get; }
-    public int B { get; }
-    public int C { get; }
-    
-    public Triangle(int a, int b, int c)
-    {
-        A = a;
-        B = b;
-        C = c;
-    }
-    
-    public override string ToString() => $"Triangle({A}, {B}, {C})";
-}
+

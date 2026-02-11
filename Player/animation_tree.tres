@@ -1,0 +1,86 @@
+[gd_resource type="AnimationNodeBlendTree" format=3 uid="uid://66lehlf1u1xt"]
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_tygp5"]
+animation = &"SwordSlash"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_bis3e"]
+animation = &"Cast"
+
+[sub_resource type="AnimationNodeBlend2" id="AnimationNodeBlend2_bis3e"]
+filter_enabled = true
+filters = ["CharacterArmature/Skeleton3D:Fist.L", "CharacterArmature/Skeleton3D:Fist.R", "CharacterArmature/Skeleton3D:LowerArm.L", "CharacterArmature/Skeleton3D:LowerArm.R", "CharacterArmature/Skeleton3D:Shoulder.L", "CharacterArmature/Skeleton3D:Shoulder.R", "CharacterArmature/Skeleton3D:UpperArm.L", "CharacterArmature/Skeleton3D:UpperArm.R"]
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_dmsau"]
+filter_enabled = true
+filters = ["CharacterArmature/Skeleton3D:Fist.L", "CharacterArmature/Skeleton3D:Fist.R", "CharacterArmature/Skeleton3D:LowerArm.L", "CharacterArmature/Skeleton3D:LowerArm.R", "CharacterArmature/Skeleton3D:Shoulder.L", "CharacterArmature/Skeleton3D:Shoulder.R", "CharacterArmature/Skeleton3D:UpperArm.L", "CharacterArmature/Skeleton3D:UpperArm.R"]
+fadein_time = 0.3
+fadeout_time = 0.1
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_tygp5"]
+fadein_time = 0.05
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_ke6dn"]
+animation = &"Jump"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_w8y02"]
+animation = &"Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_mlalt"]
+animation = &"Reel"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_epjoc"]
+animation = &"Reel"
+play_mode = 1
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_olqqg"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_w8y02")
+blend_point_0/pos = 0.0
+blend_point_1/node = SubResource("AnimationNodeAnimation_mlalt")
+blend_point_1/pos = 1.0
+blend_point_2/node = SubResource("AnimationNodeAnimation_epjoc")
+blend_point_2/pos = -1.0
+
+[sub_resource type="AnimationNodeOneShot" id="AnimationNodeOneShot_e8fwf"]
+filter_enabled = true
+filters = ["CharacterArmature/Skeleton3D:Fist.R", "CharacterArmature/Skeleton3D:LowerArm.R", "CharacterArmature/Skeleton3D:Shoulder.R", "CharacterArmature/Skeleton3D:UpperArm.R"]
+fadein_time = 0.1
+fadeout_time = 0.1
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_dmsau"]
+animation = &"Idle"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_e8fwf"]
+animation = &"Walk"
+
+[sub_resource type="AnimationNodeAnimation" id="AnimationNodeAnimation_hb2ru"]
+animation = &"Run"
+
+[sub_resource type="AnimationNodeBlendSpace1D" id="AnimationNodeBlendSpace1D_epjoc"]
+blend_point_0/node = SubResource("AnimationNodeAnimation_dmsau")
+blend_point_0/pos = -1.0
+blend_point_1/node = SubResource("AnimationNodeAnimation_e8fwf")
+blend_point_1/pos = 0.5
+blend_point_2/node = SubResource("AnimationNodeAnimation_hb2ru")
+blend_point_2/pos = 0.90000004
+
+[resource]
+nodes/output/position = Vector2(1986.6666, 160)
+nodes/Walking/node = SubResource("AnimationNodeBlendSpace1D_epjoc")
+nodes/Walking/position = Vector2(373.33334, 133.33333)
+nodes/Blend2/node = SubResource("AnimationNodeBlend2_bis3e")
+nodes/Blend2/position = Vector2(706.6667, 146.66667)
+nodes/Reeling/node = SubResource("AnimationNodeBlendSpace1D_olqqg")
+nodes/Reeling/position = Vector2(373.33334, 346.66666)
+nodes/Jump/node = SubResource("AnimationNodeOneShot_tygp5")
+nodes/Jump/position = Vector2(1200, 146.66667)
+nodes/JumpA/node = SubResource("AnimationNodeAnimation_ke6dn")
+nodes/JumpA/position = Vector2(893.3333, 346.66666)
+nodes/Cast/node = SubResource("AnimationNodeOneShot_dmsau")
+nodes/Cast/position = Vector2(1426.6666, 146.66667)
+nodes/Animation/node = SubResource("AnimationNodeAnimation_bis3e")
+nodes/Animation/position = Vector2(1226.6666, 493.33334)
+nodes/Swing/node = SubResource("AnimationNodeOneShot_e8fwf")
+nodes/Swing/position = Vector2(1626.6666, 146.66667)
+"nodes/Animation 2/node" = SubResource("AnimationNodeAnimation_tygp5")
+"nodes/Animation 2/position" = Vector2(1453.3334, 493.33334)
+node_connections = [&"output", 0, &"Swing", &"Blend2", 0, &"Walking", &"Blend2", 1, &"Reeling", &"Jump", 0, &"Blend2", &"Jump", 1, &"JumpA", &"Cast", 0, &"Jump", &"Cast", 1, &"Animation", &"Swing", 0, &"Cast", &"Swing", 1, &"Animation 2"]

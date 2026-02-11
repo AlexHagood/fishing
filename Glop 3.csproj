@@ -4,8 +4,13 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>Glop3</RootNamespace>
     <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>    
+    <GenerateTargetFrameworkAttribute>false</GenerateTargetFrameworkAttribute>
   </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0">
+      <ExcludeAssets>compile</ExcludeAssets>
+    </PackageReference>
+  </ItemGroup>
   <ItemGroup>
     <PackageReference Include="gdUnit4.analyzers" Version="1.0.0">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>

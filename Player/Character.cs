@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Specialized;
 using System.Dynamic;
 using Godot;
@@ -179,6 +180,8 @@ public partial class Character : CharacterBody3D
             ConnectInputSignals();
         }
 
+        _inventoryManager.InventoryUpdate += () => Rpc(nameof(UpdateEquippedTool), HotbarSlot);
+
 
         
         // Create hold position for physics items (attached to active camera)
@@ -340,8 +343,16 @@ public partial class Character : CharacterBody3D
             // Remove old tool
             if (_currentTool != null)
             {
-                _currentTool.QueueFree();
-                _currentTool = null;
+                if (_currentTool.itemInstance.InstanceId != item.InstanceId)
+                {
+                    _currentTool.QueueFree();
+                    _currentTool = null;
+                }
+                 else
+                {
+                    GD.Print($"[Character] Tool in slot {slot} is already equipped, no need to update");
+                    return;
+                }
             }
                 
 
@@ -376,7 +387,10 @@ public partial class Character : CharacterBody3D
 
     private void OnHotbarSlotSelected(int slotIndex)
     {
-        HotbarSlot = slotIndex;
+        if (_inputHandler.CurrentContext == InputHandler.InputContext.Gameplay)
+        {
+            HotbarSlot = slotIndex;
+        }
     }
 
     private void OnHotbarScroll(int direction)

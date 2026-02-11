@@ -518,11 +518,28 @@ public partial class InventoryManager : Node
     public void SpawnWorldItem(int itemid, long peerId)
     {
         Character requestingPlayer = _networkManager.IdToPlayer[peerId];
-        PackedScene item = GD.Load<PackedScene>(GetItem(itemid).ItemData.ScenePath);
+        ItemInstance itemInstance = GetItem(itemid);
+        string scenePath = itemInstance.ItemData.ScenePath;
+        
+        GD.Print($"[IM] Attempting to spawn world item: {itemInstance.ItemData.Name} with scene path: '{scenePath}'");
+        
+        if (string.IsNullOrEmpty(scenePath) || scenePath == "res://")
+        {
+            GD.PrintErr($"[IM] Item '{itemInstance.ItemData.Name}' does not have a valid scene path assigned, cannot spawn in world. Path: '{scenePath}'");
+            return;
+        }
+        
+        PackedScene item = GD.Load<PackedScene>(scenePath);
+        if (item == null)
+        {
+            GD.PrintErr($"[IM] Failed to load scene at path: {scenePath}");
+            return;
+        }
+        
         Node instance = item.Instantiate();
         if (instance == null)
         {
-            throw new Exception($"Failed to instantiate item scene at path {GetItem(itemid).ItemData.ScenePath}");
+            throw new Exception("Failed to instantiate item scene for " + itemInstance.ItemData.Name);
         }
 
         if (requestingPlayer.holdPosition != null && instance is Node3D node3D)
@@ -543,6 +560,7 @@ public partial class InventoryManager : Node
         var item = GetItem(instanceId);
         var inventory = GetInventory(item.InventoryId);
         inventory.Items.Remove(item);
+        inventory.HotbarItems = inventory.HotbarItems.Where(kvp => kvp.Value.InstanceId != instanceId).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
         _itemInstances.Remove(item.InstanceId);
         EmitSignal(nameof(InventoryUpdate));
     }

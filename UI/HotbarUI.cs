@@ -52,6 +52,7 @@ public partial class HotbarUI : Control
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
         _inventoryManager.HotbarUpdate += Refresh;
+        _inventoryManager.InventoryUpdate += Refresh;
     }
 
     public void Refresh()

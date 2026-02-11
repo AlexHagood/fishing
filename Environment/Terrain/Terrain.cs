@@ -2,6 +2,39 @@ using Godot;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices;
+
+
+/// <summary>
+/// Represents a triangle by three node indices 
+/// </summary>
+[StructLayout(LayoutKind.Sequential)]
+public readonly struct Triangle
+{
+    public readonly int A;
+    public readonly int B;
+    public readonly int C;
+    
+    public Triangle(int a, int b, int c)
+    {
+        A = a;
+        B = b;
+        C = c;
+    }
+    
+    public override string ToString() => $"Triangle({A}, {B}, {C})";
+}
+
+public class Chunk 
+{
+	public int ChunkX;
+	public int ChunkZ;
+	public List<int> TriangleIndices = new List<int>(); // Indices into the Terrain.Triangles array
+	
+	public MeshInstance3D ChunkMesh;
+	public StaticBody3D ChunkCollision;
+	public Aabb Bounds;
+}
 [Tool]
 public partial class Terrain : Node3D
 {
@@ -10,25 +43,14 @@ public partial class Terrain : Node3D
 
 	// === Core Data Structures ===
 	
-	// All nodes in the terrain
-	private List<GraphNode> nodes;
-		private int _nodeCount = 0;
-	
-	// Node connectivity (adjacency list)
-	// Key: GraphNode, Value: Set of connected neighbor nodes
-	private Dictionary<GraphNode, HashSet<GraphNode>> _edges = new();
-	
-	// Triangle registry
-	// All ground meshes in the terrain
-	private List<GroundMesh> _triangles = new();
-	
-	// Triangle to its three nodes
-	// Key: GroundMesh, Value: tuple of (nodeA, nodeB, nodeC)
-	private Dictionary<GroundMesh, (GraphNode a, GraphNode b, GraphNode c)> _triangleNodes = new();
-	
-	// Inverse index: which triangles use which node
-	// Key: GraphNode, Value: Set of GroundMeshes that use this node as a vertex
-	private Dictionary<GraphNode, HashSet<GroundMesh>> _nodeToTriangles = new();
+
+	public Vector3[] Vertices;
+
+	public Triangle[] Triangles;
+
+	public Dictionary<Vector2I, Chunk> ChunkMap = new Dictionary<Vector2I, Chunk>();
+
+	public int[] Indices;
 	
 	// === Configuration ===
 	[Export]
@@ -37,29 +59,41 @@ public partial class Terrain : Node3D
 	public int NodeCount = 20;
 	[Export]
 	Vector3 TerrainOrigin = Vector3.Zero;
+	
+	[Export]
+	public float ChunkSize = 30.0f; // Size of each chunk in world units
+	
+	private Node3D _terrainElements;
 
-	public Terrain()
-	{
-		nodes = new List<GraphNode>();
-	}
+	MeshInstance3D heightmapPreview;
 
-	public GraphNode newNode(Vector3 position)
+	private static StandardMaterial3D _grassMaterial;
+    private static StandardMaterial3D _rockMaterial;
+	
+
+	[Export]
+	Curve HeightCurve; // Curve to control height distribution (X=normalized distance, Y=height multiplier)
+
+	public override void _Ready()
 	{
-		var node = new GraphNode
-		{
-			Id = _nodeCount++,
-			Position = position
-		};
-		AddChild(node);
+		base._Ready();
+
+		heightmapPreview = GetNode<MeshInstance3D>("Heightmap");
 		
-		// Allow the node to be saved to the scene file
+		_grassMaterial = CreateGrassMaterial();
+		_rockMaterial = CreateRockMaterial();
+		
+		// Only regenerate in editor, never in game
 		if (Engine.IsEditorHint())
 		{
-			node.Owner = GetTree().EditedSceneRoot;
+			GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
+			Reset();
 		}
-		
-		nodes.Add(node);
-		return node;
+		else
+		{
+			GD.Print("Terrain: Game mode - using pre-generated terrain from editor.");
+			// Don't regenerate - use the terrain that was saved in the editor
+		}
 	}
 
 
@@ -67,68 +101,123 @@ public partial class Terrain : Node3D
 	public void Reset()
 	{
 		GD.Print("Resetting terrain...");
-		foreach (var child in GetChildren())
-		{
-			// Don't delete the brush if it's a child of the terrain
-			if (child is TerrainBrush)
-				continue;
 
-			RemoveChild(child);
-			child.QueueFree();
-		}
-		nodes.Clear();
-		_nodeCount = 0; // Reset node count
-		ClearDataStructures(); // Clear centralized data structures
+		heightmapPreview.Scale = new Vector3(TerrainSize.X, TerrainSize.Z, 0);
+		
+		
+		Vertices = new Vector3[NodeCount];
+	
 
 		// Regenerate terrain
-		var generatedNodes = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
-		
+		var generatedPositions = GenerateNodes(NodeCount, TerrainOrigin, TerrainSize, 0);
+
 		// Apply Lloyd's relaxation to improve triangle quality
 		if (RelaxationIterations > 0)
 		{
-			generatedNodes = DelaunayTriangulator.ApplyLloydsRelaxation(
-				generatedNodes, 
+			generatedPositions = DelaunayTriangulator.ApplyLloydsRelaxation(
+				generatedPositions, 
 				RelaxationIterations, 
 				TerrainOrigin, 
 				TerrainSize
 			);
 			GD.Print($"Applied {RelaxationIterations} iterations of Lloyd's relaxation.");
 		}
-		
-		// Get edges from triangulation (new system - doesn't modify nodes)
-		var edges = DelaunayTriangulator.TriangulateAndGetEdges(generatedNodes);
-		
-		// Register edges in our centralized data structure
-		foreach (var (nodeAIdx, nodeBIdx) in edges)
-		{
-			AddEdge(generatedNodes[nodeAIdx], generatedNodes[nodeBIdx]);
-		}
-		
-		// Apply height smoothing to reduce spikiness
-		if (HeightSmoothingIterations > 0)
-		{
-			SmoothTerrainHeights(generatedNodes, HeightSmoothingIterations, HeightSmoothingStrength);
-			GD.Print($"Applied {HeightSmoothingIterations} iterations of height smoothing (strength: {HeightSmoothingStrength}).");
-		}
-		
-		// Create triangles from edges
-		ForEachTriangleFromEdges(generatedNodes, (nodeA, nodeB, nodeC) =>
-		{
-			var mesh = new GroundMesh(nodeA.Position, nodeB.Position, nodeC.Position);
-			AddChild(mesh);
-			
-			// Register triangle in centralized data structure
-			RegisterTriangle(mesh, nodeA, nodeB, nodeC);
-			
-			// In editor mode, set owner so terrain persists to scene file for game mode
-			if (Engine.IsEditorHint())
-			{
-				CallDeferred(nameof(SetMeshOwner), mesh);
-			}
-		});
 
-		CreateDebugLine(Vector3.Zero, Vector3.Up * 10);
-		nodes.AddRange(generatedNodes);
+		Vertices = generatedPositions.ToArray();
+		Triangles = DelaunayTriangulator.Triangulate2D(generatedPositions).ToArray();
+
+		int[] indices = new int[Triangles.Length * 3];
+		for (int i = 0; i < Triangles.Length; i++)
+		{
+			indices[i*3 + 0] = Triangles[i].A;
+			indices[i*3 + 1] = Triangles[i].B;
+			indices[i*3 + 2] = Triangles[i].C;
+		}
+
+		Indices = indices;
+		
+		// === PARTITION INTO CHUNKS ===
+		PartitionIntoChunks();
+
+		// Calculate normals for proper lighting (shared across all chunks)
+		Vector3[] normals = new Vector3[Vertices.Length];
+		Vector3[] faceNormals = new Vector3[Triangles.Length];
+		
+		// Calculate face normals and accumulate at vertices
+		for (int i = 0; i < Triangles.Length; i++)
+		{
+			var v0 = Vertices[Triangles[i].A];
+			var v1 = Vertices[Triangles[i].B];
+			var v2 = Vertices[Triangles[i].C];
+			
+			// Calculate face normal using cross product
+			var edge1 = v1 - v0;
+			var edge2 = v2 - v0;
+			var faceNormal = -edge1.Cross(edge2).Normalized();
+			
+			// Store face normal for later use
+			faceNormals[i] = faceNormal;
+			
+			// Accumulate normal at each vertex
+			normals[Triangles[i].A] += faceNormal;
+			normals[Triangles[i].B] += faceNormal;
+			normals[Triangles[i].C] += faceNormal;
+		}
+		
+		// Normalize accumulated normals (smooth shading)
+		for (int i = 0; i < normals.Length; i++)
+		{
+			normals[i] = normals[i].Normalized();
+		}
+
+		// Generate UV coordinates based on world-space XZ position for tiling (shared across all chunks)
+		Vector2[] uvs = new Vector2[Vertices.Length];
+		float uvScale = 0.1f; // Adjust this to control texture tiling (smaller = more tiles)
+		
+		for (int i = 0; i < Vertices.Length; i++)
+		{
+			// Use XZ position for UV coordinates
+			uvs[i] = new Vector2(Vertices[i].X * uvScale, Vertices[i].Z * uvScale);
+		}
+
+		// Ensure we have a container to put generated terrain elements (debug lines, mesh, etc.)
+		if (_terrainElements == null || !IsInstanceValid(_terrainElements))
+		{
+			_terrainElements = GetNodeOrNull<Node3D>("TerrainElements");
+			if (_terrainElements == null)
+			{
+				_terrainElements = new Node3D();
+				_terrainElements.Name = "TerrainElements";
+				AddChild(_terrainElements);
+				if (Engine.IsEditorHint())
+				{
+					_terrainElements.Owner = GetTree().EditedSceneRoot;
+				}
+			}
+		}
+		
+		// Clear previous chunks
+		foreach (Node child in _terrainElements.GetChildren())
+		{
+			child.QueueFree();
+		}
+
+		// === GENERATE MESH AND COLLISION PER CHUNK ===
+		foreach (var kvp in ChunkMap)
+		{
+			var chunk = kvp.Value;
+			GenerateChunkMeshAndCollision(chunk, normals, uvs, faceNormals);
+		}
+		
+		GD.Print($"Generated {ChunkMap.Count} chunk meshes and collisions");
+
+		
+
+
+
+		
+		
+		
 
 		// Mark the scene as unsaved in the editor
 		if (Engine.IsEditorHint())
@@ -138,73 +227,12 @@ public partial class Terrain : Node3D
 #endif
 		}
 
-		GD.Print($"Terrain regenerated: {generatedNodes.Count} nodes, {edges.Count} edges, {_triangles.Count} triangles.");
+		GD.Print($"Terrain regenerated: {Vertices.Length} nodes, {Triangles.Length} triangles.");
 	}
 
-	private void SetMeshOwner(GroundMesh mesh)
-	{
-		if (!Engine.IsEditorHint() || !IsInsideTree())
-			return;
-			
-		var editedSceneRoot = GetTree().EditedSceneRoot;
-		if (editedSceneRoot == null)
-			return;
-			
-		// Set owner for the GroundMesh itself
-		mesh.Owner = editedSceneRoot;
-		
-		// DO NOT set owner for children (MeshInstance3D, CollisionShape3D)
-		// They will be recreated in _Ready() and don't need to persist separately
-	}
-
-	public override void _Ready()
-	{
-		base._Ready();
-		
-		// Only regenerate in editor, never in game
-		if (!Engine.IsEditorHint())
-		{
-			GD.Print("Terrain: Game mode - using pre-generated terrain from editor.");
-			return;
-		}
-
-		GD.Print("Terrain: Editor mode. Use 'Click me!' button to generate terrain.");
-		
-		// Connect to all GraphNode position change signals
-		ConnectNodeSignals();
-	}
+	
 	
 	// Connect to position change signals for all nodes
-	private void ConnectNodeSignals()
-	{
-		foreach (var node in nodes)
-		{
-			if (node != null && IsInstanceValid(node))
-			{
-				node.PositionChanged += OnNodePositionChanged;
-			}
-		}
-	}
-	
-	// Handle when a node's position changes - PUBLIC so editor plugin can connect
-	public void OnNodePositionChanged(GraphNode node)
-	{
-		// Update all triangles that use this node
-		if (_nodeToTriangles.TryGetValue(node, out var triangles))
-		{
-			foreach (var triangle in triangles)
-			{
-				if (triangle != null && IsInstanceValid(triangle))
-				{
-					// Get the three nodes for this triangle
-					if (_triangleNodes.TryGetValue(triangle, out var nodes))
-					{
-						triangle.UpdateMeshFromPositions(nodes.a.Position, nodes.b.Position, nodes.c.Position);
-					}
-				}
-			}
-		}
-	}
 
 	[Export(PropertyHint.Range, "0,10")]
 	public int RelaxationIterations = 2; // Number of Lloyd's relaxation iterations to improve triangle quality
@@ -214,420 +242,377 @@ public partial class Terrain : Node3D
 	
 	[Export(PropertyHint.Range, "0,1")]
 	public float HeightSmoothingStrength = 0.5f; // How much to blend with neighbors (0=none, 1=full average)
+	
+	[Export]
+	public string HeightmapPath = "res://heightmap.png"; // Path to heightmap texture
+	
+	[Export]
+	public float HeightmapScale = 50.0f; // Multiplier for heightmap values (black=0, white=HeightmapScale)
+	
+	private Image _heightmapImage;
 
-	public List<GraphNode> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
+	public List<Vector3> GenerateNodes(int count, Vector3 startLocation, Vector3 spread, int seed = 0)
 	{
-		var generatedNodes = new List<GraphNode>();
+		var generatedPositions = new List<Vector3>();
 		var rng = seed == 0 ? new Random() : new Random(seed);
-		var centerXZ = new Vector2(startLocation.X, startLocation.Z);
+		
+		var texture = GD.Load<Texture2D>(HeightmapPath);
+		if (texture != null)
+		{
+			_heightmapImage = texture.GetImage();
+			
+			// Decompress the image if it's compressed so we can use GetPixel()
+			if (_heightmapImage.IsCompressed())
+			{
+				_heightmapImage.Decompress();
+				GD.Print("Heightmap decompressed for pixel access");
+			}
+			
+			GD.Print($"Heightmap loaded: {_heightmapImage.GetWidth()}x{_heightmapImage.GetHeight()}");
+		}
+		else
+		{
+			GD.PrintErr($"Failed to load heightmap from: {HeightmapPath}");
+		}
+	
 		
 		// Generate random points
 		for (int i = 0; i < count; i++)
 		{
 			// Center the spread around the start location
 			float x = (float)(startLocation.X + (rng.NextDouble() - 0.5) * spread.X);
-			float y = (float)(startLocation.Y + (rng.NextDouble() - 0.5) * spread.Y);
 			float z = (float)(startLocation.Z + (rng.NextDouble() - 0.5) * spread.Z);
 
-			// Calculate distance from center in XZ plane
-			
-			var posXZ = new Vector2(x, z);
-			var distFromCenter = posXZ.DistanceTo(centerXZ);
-			var maxDist = Mathf.Min(spread.X, spread.Z) / 2.0f;
-
-			// If in the outer 50% (distance > 0.5 * maxDist), slope down in -Y direction
-			if (distFromCenter > maxDist * 0.5f)
+			// Sample heightmap for Y value
+			float y = startLocation.Y;
+			if (_heightmapImage != null)
 			{
-				// Slope factor: 0 at 0.5*maxDist, 1 at maxDist
-				float slopeT = Mathf.Clamp((distFromCenter - maxDist * 0.5f) / (maxDist * 0.5f), 0, 1);
-				// Lower the y value in the negative Y direction
-				y -= slopeT * spread.Y * 4f;
-			}
-			
-			var node = new GraphNode
-			{
-				Name = $"Node_{_nodeCount}",
-				Id = _nodeCount++,
-				Position = new Vector3(x, y, z)
-			};
-			AddChild(node);
-			
-			// Connect to position change signal
-			node.PositionChanged += OnNodePositionChanged;
-			
-			// Allow the node to be saved to the scene file
-			if (Engine.IsEditorHint())
-			{
-				node.Owner = GetTree().EditedSceneRoot;
-			}
-			
-			generatedNodes.Add(node);
-		}
-		
-		GD.Print($"{count} nodes generated with random distribution at {startLocation} with spread {spread}.");
-		return generatedNodes;
-	}
-	
-	/// <summary>
-	/// Smooths terrain heights by averaging each node's Y position with its neighbors.
-	/// Requires edges to already be registered in _edges dictionary.
-	/// </summary>
-	/// <param name="nodes">List of nodes to smooth</param>
-	/// <param name="iterations">Number of smoothing passes</param>
-	/// <param name="strength">Blend factor (0=no change, 1=full average)</param>
-	private void SmoothTerrainHeights(List<GraphNode> nodes, int iterations, float strength)
-	{
-		for (int iter = 0; iter < iterations; iter++)
-		{
-			// Store new heights temporarily to avoid order-dependent results
-			var newHeights = new Dictionary<GraphNode, float>();
-			
-			foreach (var node in nodes)
-			{
-				// Get neighbors from edge dictionary
-				if (!_edges.TryGetValue(node, out var neighbors) || neighbors.Count == 0)
-				{
-					newHeights[node] = node.Position.Y;
-					continue;
-				}
+				// Normalize x,z to heightmap coordinates (0 to 1)
+				float normalizedX = (x - (startLocation.X - spread.X / 2.0f)) / spread.X;
+				float normalizedZ = (z - (startLocation.Z - spread.Z / 2.0f)) / spread.Z;
 				
-				// Calculate average height of neighbors
-				float avgHeight = 0f;
-				int validNeighbors = 0;
+				// Clamp to valid range
+				normalizedX = Mathf.Clamp(normalizedX, 0.0f, 1.0f);
+				normalizedZ = Mathf.Clamp(normalizedZ, 0.0f, 1.0f);
 				
-				foreach (var neighbor in neighbors)
-				{
-					if (neighbor != null && IsInstanceValid(neighbor))
-					{
-						avgHeight += neighbor.Position.Y;
-						validNeighbors++;
-					}
-				}
+				// Convert to pixel coordinates
+				int pixelX = (int)(normalizedX * (_heightmapImage.GetWidth() - 1));
+				int pixelY = (int)(normalizedZ * (_heightmapImage.GetHeight() - 1));
 				
-				if (validNeighbors > 0)
+				// Sample the heightmap (grayscale value)
+				Color pixelColor = _heightmapImage.GetPixel(pixelX, pixelY);
+				float heightValue = pixelColor.R; // Use red channel for grayscale (0 to 1)
+				
+				// If HeightCurve is set, use it to map the heightmap value to height
+				if (HeightCurve != null)
 				{
-					avgHeight /= validNeighbors;
-					
-					// Blend current height with average based on strength
-					float currentHeight = node.Position.Y;
-					float smoothedHeight = Mathf.Lerp(currentHeight, avgHeight, strength);
-					newHeights[node] = smoothedHeight;
+					// Sample the curve: heightValue (0-1) is the X axis, curve output is multiplied by scale
+					float curveValue = HeightCurve.Sample(heightValue);
+					y = startLocation.Y + (curveValue * HeightmapScale);
 				}
 				else
 				{
-					newHeights[node] = node.Position.Y;
+					// Fallback to direct linear mapping if no curve is set
+					y = startLocation.Y + (heightValue * HeightmapScale);
 				}
+			}
+			else
+			{
+				// Fallback to random Y if heightmap not available
+				y = (float)(startLocation.Y + (rng.NextDouble() - 0.5) * spread.Y);
 			}
 			
-			// Apply new heights
-			foreach (var node in nodes)
-			{
-				if (newHeights.TryGetValue(node, out float newHeight))
-				{
-					var pos = node.Position;
-					pos.Y = newHeight;
-					node.Position = pos;
-				}
-			}
+			// Add the position directly to the list
+			generatedPositions.Add(new Vector3(x, y, z));
 		}
+		
+		GD.Print($"{count} positions generated with random distribution at {startLocation} with spread {spread}.");
+		return generatedPositions;
 	}
-
-	/// <summary>
-	/// Iterates over every triangle based on centralized edge data.
-	/// Finds triangles by looking for sets of 3 nodes that are all connected to each other.
-	/// </summary>
-	/// <param name="graphNodes">List of all nodes</param>
-	/// <param name="action">Action to call for each triangle (nodeA, nodeB, nodeC)</param>
-	public void ForEachTriangleFromEdges(List<GraphNode> graphNodes, Action<GraphNode, GraphNode, GraphNode> action)
-	{
-		if (graphNodes == null || graphNodes.Count < 3)
-		{
-			GD.Print("ForEachTriangleFromEdges: Need at least 3 nodes to form triangles");
-			return;
-		}
-
-		// Use a HashSet of sorted node tuples for efficient duplicate detection
-		var processedTriangles = new HashSet<(GraphNode, GraphNode, GraphNode)>();
-		int triangleCount = 0;
-
-		// For each node, check all pairs of its neighbors to see if they form triangles
-		foreach (var nodeA in graphNodes)
-		{
-			var neighbors = GetNeighbors(nodeA).ToList();
-			if (neighbors.Count < 2)
-				continue;
-
-			// Check all pairs of neighbors from nodeA
-			for (int i = 0; i < neighbors.Count; i++)
-			{
-				var nodeB = neighbors[i];
-				if (nodeB == nodeA) continue;
-
-				for (int j = i + 1; j < neighbors.Count; j++)
-				{
-					var nodeC = neighbors[j];
-					if (nodeC == nodeA || nodeC == nodeB) continue;
-
-					// Check if nodeB and nodeC are also connected to each other
-					if (_edges.TryGetValue(nodeB, out var nodeBNeighbors) && nodeBNeighbors.Contains(nodeC))
-					{
-						// Sort nodes to create unique triangle key
-						var sortedNodes = new[] { nodeA, nodeB, nodeC }.OrderBy(n => n.Id).ToArray();
-						var triangleKey = (sortedNodes[0], sortedNodes[1], sortedNodes[2]);
-
-						// Check if we've already processed this triangle
-						if (!processedTriangles.Contains(triangleKey))
-						{
-							processedTriangles.Add(triangleKey);
-							action(nodeA, nodeB, nodeC);
-							triangleCount++;
-						}
-					}
-				}
-			}
-		}
-
-		GD.Print($"ForEachTriangleFromEdges: Processed {triangleCount} triangles from edge data");
-	}
-
+	
 	/// <summary>
 	/// Creates a debug line as a pink cylinder between two 3D points. If addToScene is false, does not add to scene tree (for dynamic lines).
 	/// </summary>
 	/// <param name="pointA">Start point</param>
 	/// <param name="pointB">End point</param>
 	/// <param name="addToScene">If true, adds to scene tree. If false, caller manages it.</param>
-	/// <returns>MeshInstance3D representing the debug line</returns>
-	public MeshInstance3D CreateDebugLine(Vector3 pointA, Vector3 pointB, bool addToScene = true)
+
+	public void CreateDebugLine(Vector3 pointA, Vector3 pointB, bool addToScene = true)
 	{
-		var meshInstance = new MeshInstance3D();
+		DebugDraw3D.DrawArrow(pointA, pointB);
+	}
+
+	private static StandardMaterial3D CreateGrassMaterial()
+    {
+        var grassMaterial = new StandardMaterial3D();
+        grassMaterial.AlbedoColor = new Color(0.3f, 0.6f, 0.2f, 1.0f);
+        grassMaterial.Roughness = 0.9f;
+        grassMaterial.Metallic = 0.0f;
+        grassMaterial.AlbedoTexture = CreateNoiseTexture(42, 0.3f, 0.6f, 0.2f); // Green grass
+        grassMaterial.Uv1Triplanar = true;
+        grassMaterial.Uv1Scale = new Vector3(1.0f, 1.0f, 1.0f);
+        
+        return grassMaterial;
+    }
+    
+    private static StandardMaterial3D CreateRockMaterial()
+    {
+        var rockMaterial = new StandardMaterial3D();
+        rockMaterial.AlbedoColor = new Color(0.5f, 0.5f, 0.5f, 1.0f);
+        rockMaterial.Roughness = 0.95f;
+        rockMaterial.Metallic = 0.0f;
+        rockMaterial.AlbedoTexture = CreateNoiseTexture(123, 0.4f, 0.4f, 0.45f); // Gray rock
+        rockMaterial.Uv1Triplanar = true;
+        rockMaterial.Uv1Scale = new Vector3(1.0f, 1.0f, 1.0f);
+        
+        return rockMaterial;
+    }
+
+
+	private static ImageTexture CreateNoiseTexture(int seed, float baseR, float baseG, float baseB)
+    {
+        const int textureSize = 32;
+        var random = new Random(seed);
+        
+        // Create byte array for RGB8 format (3 bytes per pixel)
+        byte[] data = new byte[textureSize * textureSize * 3];
+        
+        for (int y = 0; y < textureSize; y++)
+        {
+            for (int x = 0; x < textureSize; x++)
+            {
+                float variation = (float)(random.NextDouble() * 0.3 - 0.15);
+                
+                float r = Mathf.Clamp(baseR + variation, 0.0f, 1.0f);
+                float g = Mathf.Clamp(baseG + variation, 0.0f, 1.0f);
+                float b = Mathf.Clamp(baseB + variation, 0.0f, 1.0f);
+                
+                // Convert to byte values (0-255)
+                int index = (y * textureSize + x) * 3;
+                data[index + 0] = (byte)(r * 255);
+                data[index + 1] = (byte)(g * 255);
+                data[index + 2] = (byte)(b * 255);
+            }
+        }
+        
+        // Create image from byte array
+        var image = Image.CreateFromData(textureSize, textureSize, false, Image.Format.Rgb8, data);
+        
+        return ImageTexture.CreateFromImage(image);
+    }
+    
+	// === CHUNK SYSTEM ===
+	
+	/// <summary>
+	/// Partitions all triangles into spatial chunks based on their centroid position
+	/// </summary>
+	private void PartitionIntoChunks()
+	{
+		ChunkMap.Clear();
 		
-		// Create cylinder mesh with correct properties
-		var cylinder = new CylinderMesh();
-		cylinder.TopRadius = 0.01f;
-		cylinder.BottomRadius = 0.01f;
-		cylinder.Height = pointA.DistanceTo(pointB);
-		
-		meshInstance.Mesh = cylinder;
-		
-		// Create pink material
-		var material = new StandardMaterial3D();
-		material.AlbedoColor = Colors.HotPink;
-		material.ShadingMode = BaseMaterial3D.ShadingModeEnum.Unshaded;
-		material.NoDepthTest = true;
-		meshInstance.MaterialOverride = material;
-		
-		// Position at midpoint
-		var midpoint = (pointA + pointB) / 2;
-		meshInstance.Position = midpoint;
-		
-		// Calculate direction and rotation
-		var direction = (pointB - pointA).Normalized();
-		
-		// Only rotate if we have a valid direction
-		if (direction.LengthSquared() > 0.001f)
+		// First pass: assign triangles to chunks based on centroid
+		for (int i = 0; i < Triangles.Length; i++)
 		{
-			// Cylinder starts aligned with Y-axis, we want it aligned with our direction
-			var from = Vector3.Up;
-			var to = direction;
+			var tri = Triangles[i];
 			
-			// Check if vectors are nearly parallel
-			var dot = from.Dot(to);
-			if (Mathf.Abs(dot) < 0.999f)
+			// Calculate triangle centroid
+			var v0 = Vertices[tri.A];
+			var v1 = Vertices[tri.B];
+			var v2 = Vertices[tri.C];
+			var centroid = (v0 + v1 + v2) / 3.0f;
+			
+			// Determine which chunk this triangle belongs to
+			var chunkCoord = GetChunkCoordinate(centroid);
+			
+			// Get or create chunk
+			if (!ChunkMap.TryGetValue(chunkCoord, out var chunk))
 			{
-				// Vectors are not parallel, use cross product for rotation axis
-				var axis = from.Cross(to).Normalized();
-				var angle = Mathf.Acos(Mathf.Clamp(dot, -1.0f, 1.0f));
-				meshInstance.Basis = new Basis(axis, angle);
+				chunk = new Chunk
+				{
+					ChunkX = chunkCoord.X,
+					ChunkZ = chunkCoord.Y,
+					TriangleIndices = new List<int>()
+				};
+				ChunkMap[chunkCoord] = chunk;
 			}
-			else if (dot < -0.999f)
-			{
-				// Vectors are opposite, rotate 180 degrees around any perpendicular axis
-				var perpendicular = Mathf.Abs(from.Dot(Vector3.Right)) < 0.9f ? Vector3.Right : Vector3.Forward;
-				meshInstance.Basis = new Basis(perpendicular, Mathf.Pi);
-			}
-			// If dot > 0.999f, vectors are nearly the same, no rotation needed (identity basis)
+			
+			// Add triangle index to chunk
+			chunk.TriangleIndices.Add(i);
 		}
 		
-		if (addToScene)
-			AddChild(meshInstance);
-		
-		
-		return meshInstance;
-	}
-
-	public void CrackPanel(GraphNode newNode, GroundMesh groundMesh)
-	{
-		// Get the three nodes that form this triangle from our data structure
-		if (!_triangleNodes.TryGetValue(groundMesh, out var triangleNodes))
+		// Calculate bounds for each chunk
+		foreach (var kvp in ChunkMap)
 		{
-			GD.PrintErr("CrackPanel: Ground mesh not found in triangle registry");
-			return;
-		}
-		
-		var nodeA = triangleNodes.a;
-		var nodeB = triangleNodes.b;
-		var nodeC = triangleNodes.c;
-		
-		// Create debug lines
-		var line1 = CreateDebugLine(newNode.Position, nodeA.Position, true);
-		var line2 = CreateDebugLine(newNode.Position, nodeB.Position, true);
-		var line3 = CreateDebugLine(newNode.Position, nodeC.Position, true);
-
-		// Add edges from new node to triangle corners
-		AddEdge(newNode, nodeA);
-		AddEdge(newNode, nodeB);
-		AddEdge(newNode, nodeC);
-
-		// Unregister the old triangle
-		UnregisterTriangle(groundMesh);
-		groundMesh.QueueFree();
-
-		// Create new triangles with correct winding order
-		GroundMesh groundMesh1 = new GroundMesh(nodeA.Position, nodeB.Position, newNode.Position);
-		GroundMesh groundMesh2 = new GroundMesh(nodeB.Position, nodeC.Position, newNode.Position);
-		GroundMesh groundMesh3 = new GroundMesh(nodeC.Position, nodeA.Position, newNode.Position);
-
-		AddChild(groundMesh1);
-		AddChild(groundMesh2);
-		AddChild(groundMesh3);
-		
-		// Register new triangles
-		RegisterTriangle(groundMesh1, nodeA, nodeB, newNode);
-		RegisterTriangle(groundMesh2, nodeB, nodeC, newNode);
-		RegisterTriangle(groundMesh3, nodeC, nodeA, newNode);
-
-		// Set owners for persistence in editor
-		if (Engine.IsEditorHint() && IsInsideTree())
-		{
-			var editedRoot = GetTree().EditedSceneRoot;
-			if (editedRoot != null)
+			var chunk = kvp.Value;
+			
+			if (chunk.TriangleIndices.Count == 0)
+				continue;
+			
+			// Initialize bounds with first vertex
+			var firstTri = Triangles[chunk.TriangleIndices[0]];
+			Vector3 min = Vertices[firstTri.A];
+			Vector3 max = Vertices[firstTri.A];
+			
+			// Expand bounds to include all vertices in this chunk's triangles
+			foreach (int triIndex in chunk.TriangleIndices)
 			{
-				groundMesh1.Owner = editedRoot;
-				groundMesh2.Owner = editedRoot;
-				groundMesh3.Owner = editedRoot;
+				var tri = Triangles[triIndex];
 				
-				SetOwnerRecursive(groundMesh1, editedRoot);
-				SetOwnerRecursive(groundMesh2, editedRoot);
-				SetOwnerRecursive(groundMesh3, editedRoot);
+				min = min.Min(Vertices[tri.A]);
+				min = min.Min(Vertices[tri.B]);
+				min = min.Min(Vertices[tri.C]);
+				
+				max = max.Max(Vertices[tri.A]);
+				max = max.Max(Vertices[tri.B]);
+				max = max.Max(Vertices[tri.C]);
+			}
+			
+			chunk.Bounds = new Aabb(min, max - min);
+		}
+		
+		GD.Print($"Partitioned {Triangles.Length} triangles into {ChunkMap.Count} chunks (chunk size: {ChunkSize})");
+	}
+	
+	/// <summary>
+	/// Converts a world position to chunk coordinates
+	/// </summary>
+	private Vector2I GetChunkCoordinate(Vector3 worldPos)
+	{
+		return new Vector2I(
+			Mathf.FloorToInt((worldPos.X - TerrainOrigin.X) / ChunkSize),
+			Mathf.FloorToInt((worldPos.Z - TerrainOrigin.Z) / ChunkSize)
+		);
+	}
+	
+	/// <summary>
+	/// Generates mesh and collision for a single chunk
+	/// </summary>
+	private void GenerateChunkMeshAndCollision(Chunk chunk, Vector3[] normals, Vector2[] uvs, Vector3[] faceNormals)
+	{
+		if (chunk.TriangleIndices.Count == 0)
+			return;
+		
+		// Ensure materials are initialized
+		if (_grassMaterial == null)
+			_grassMaterial = CreateGrassMaterial();
+		if (_rockMaterial == null)
+			_rockMaterial = CreateRockMaterial();
+		
+		// Separate triangles into grass and stone based on slope
+		var grassIndices = new List<int>();
+		var stoneIndices = new List<int>();
+		
+		float slopeThreshold = Mathf.Cos(Mathf.DegToRad(50)); // 50 degrees from vertical
+		
+		foreach (int triIndex in chunk.TriangleIndices)
+		{
+			var tri = Triangles[triIndex];
+			var faceNormal = faceNormals[triIndex];
+			
+			// Check angle from up vector (Y axis)
+			float dotWithUp = faceNormal.Dot(Vector3.Up);
+			
+			// If angle is greater than 50 degrees from up, use stone
+			if (dotWithUp < slopeThreshold)
+			{
+				stoneIndices.Add(tri.A);
+				stoneIndices.Add(tri.B);
+				stoneIndices.Add(tri.C);
+			}
+			else
+			{
+				grassIndices.Add(tri.A);
+				grassIndices.Add(tri.B);
+				grassIndices.Add(tri.C);
 			}
 		}
-
-		GD.Print($"Panel Cracked: 3 new meshes created");
-	}
-	
-	private void SetOwnerRecursive(Node node, Node owner)
-	{
-		foreach (Node child in node.GetChildren())
+		
+		// Create mesh for this chunk
+		ArrayMesh chunkMesh = new ArrayMesh();
+		int surfaceIndex = 0;
+		
+		// Add grass surface
+		if (grassIndices.Count > 0)
 		{
-			child.Owner = owner;
-			SetOwnerRecursive(child, owner);
+			Godot.Collections.Array grassArrays = new Godot.Collections.Array();
+			grassArrays.Resize((int)Mesh.ArrayType.Max);
+			grassArrays[(int)Mesh.ArrayType.Vertex] = Vertices;
+			grassArrays[(int)Mesh.ArrayType.Normal] = normals;
+			grassArrays[(int)Mesh.ArrayType.TexUV] = uvs;
+			grassArrays[(int)Mesh.ArrayType.Index] = grassIndices.ToArray();
+			
+			chunkMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, grassArrays);
+			chunkMesh.SurfaceSetMaterial(surfaceIndex, _grassMaterial);
+			surfaceIndex++;
+		}
+		
+		// Add stone surface
+		if (stoneIndices.Count > 0)
+		{
+			Godot.Collections.Array stoneArrays = new Godot.Collections.Array();
+			stoneArrays.Resize((int)Mesh.ArrayType.Max);
+			stoneArrays[(int)Mesh.ArrayType.Vertex] = Vertices;
+			stoneArrays[(int)Mesh.ArrayType.Normal] = normals;
+			stoneArrays[(int)Mesh.ArrayType.TexUV] = uvs;
+			stoneArrays[(int)Mesh.ArrayType.Index] = stoneIndices.ToArray();
+			
+			chunkMesh.AddSurfaceFromArrays(Mesh.PrimitiveType.Triangles, stoneArrays);
+			chunkMesh.SurfaceSetMaterial(surfaceIndex, _rockMaterial);
+		}
+		
+		// Create StaticBody3D as the chunk container
+		StaticBody3D chunkBody = new StaticBody3D();
+		chunkBody.Name = $"Chunk_{chunk.ChunkX}_{chunk.ChunkZ}";
+		_terrainElements.AddChild(chunkBody);
+		
+		if (Engine.IsEditorHint())
+		{
+			chunkBody.Owner = GetTree().EditedSceneRoot;
+		}
+		
+		chunk.ChunkCollision = chunkBody;
+		
+		// Add MeshInstance3D as child of StaticBody3D
+		MeshInstance3D chunkMeshInstance = new MeshInstance3D();
+		chunkMeshInstance.Name = "ChunkMesh";
+		chunkMeshInstance.Mesh = chunkMesh;
+		chunkBody.AddChild(chunkMeshInstance);
+		
+		if (Engine.IsEditorHint())
+		{
+			chunkMeshInstance.Owner = GetTree().EditedSceneRoot;
+		}
+		
+		chunk.ChunkMesh = chunkMeshInstance;
+		
+		// Add CollisionShape3D as child of StaticBody3D
+		CollisionShape3D chunkCollider = new CollisionShape3D();
+		chunkCollider.Name = "CollisionShape3D";
+		
+		// Build flat array of triangle vertices for this chunk
+		Vector3[] chunkFaces = new Vector3[chunk.TriangleIndices.Count * 3];
+		for (int i = 0; i < chunk.TriangleIndices.Count; i++)
+		{
+			int triIndex = chunk.TriangleIndices[i];
+			var tri = Triangles[triIndex];
+			
+			chunkFaces[i * 3 + 0] = Vertices[tri.A];
+			chunkFaces[i * 3 + 1] = Vertices[tri.B];
+			chunkFaces[i * 3 + 2] = Vertices[tri.C];
+		}
+		
+		ConcavePolygonShape3D chunkShape = new ConcavePolygonShape3D();
+		chunkShape.SetFaces(chunkFaces);
+		
+		chunkCollider.Shape = chunkShape;
+		chunkBody.AddChild(chunkCollider);
+		
+		if (Engine.IsEditorHint())
+		{
+			chunkCollider.Owner = GetTree().EditedSceneRoot;
 		}
 	}
 
-	// === Data Structure Helper Methods ===
-	
-	/// <summary>
-	/// Add an edge (connection) between two nodes
-	/// </summary>
-	public void AddEdge(GraphNode a, GraphNode b)
-	{
-		if (!_edges.ContainsKey(a))
-			_edges[a] = new HashSet<GraphNode>();
-		if (!_edges.ContainsKey(b))
-			_edges[b] = new HashSet<GraphNode>();
-		
-		_edges[a].Add(b);
-		_edges[b].Add(a);
-	}
-	
-	/// <summary>
-	/// Get all neighbor nodes connected to the given node
-	/// </summary>
-	public IEnumerable<GraphNode> GetNeighbors(GraphNode node)
-	{
-		if (_edges.TryGetValue(node, out var neighbors))
-			return neighbors;
-		return Enumerable.Empty<GraphNode>();
-	}
-	
-	/// <summary>
-	/// Register a triangle mesh with its three vertex nodes
-	/// </summary>
-	public void RegisterTriangle(GroundMesh mesh, GraphNode a, GraphNode b, GraphNode c)
-	{
-		_triangles.Add(mesh);
-		_triangleNodes[mesh] = (a, b, c);
-		
-		// Update inverse index
-		if (!_nodeToTriangles.ContainsKey(a))
-			_nodeToTriangles[a] = new HashSet<GroundMesh>();
-		if (!_nodeToTriangles.ContainsKey(b))
-			_nodeToTriangles[b] = new HashSet<GroundMesh>();
-		if (!_nodeToTriangles.ContainsKey(c))
-			_nodeToTriangles[c] = new HashSet<GroundMesh>();
-		
-		_nodeToTriangles[a].Add(mesh);
-		_nodeToTriangles[b].Add(mesh);
-		_nodeToTriangles[c].Add(mesh);
-	}
-	
-	/// <summary>
-	/// Get all triangles that use the given node as a vertex
-	/// </summary>
-	public IEnumerable<GroundMesh> GetTrianglesUsingNode(GraphNode node)
-	{
-		if (_nodeToTriangles.TryGetValue(node, out var triangles))
-			return triangles;
-		return Enumerable.Empty<GroundMesh>();
-	}
-	
-	/// <summary>
-	/// Get the three nodes that form a triangle
-	/// </summary>
-	public (GraphNode a, GraphNode b, GraphNode c)? GetTriangleNodes(GroundMesh mesh)
-	{
-		if (_triangleNodes.TryGetValue(mesh, out var nodes))
-			return nodes;
-		return null;
-	}
-	
-	/// <summary>
-	/// Get the next available node ID
-	/// </summary>
-	public int GetNextNodeId()
-	{
-		return _nodeCount++;
-	}
-	
-	/// <summary>
-	/// Unregister a triangle (e.g., when cracking a panel)
-	/// </summary>
-	public void UnregisterTriangle(GroundMesh mesh)
-	{
-		if (_triangleNodes.TryGetValue(mesh, out var nodes))
-		{
-			// Remove from node-to-triangle index
-			if (_nodeToTriangles.ContainsKey(nodes.a))
-				_nodeToTriangles[nodes.a].Remove(mesh);
-			if (_nodeToTriangles.ContainsKey(nodes.b))
-				_nodeToTriangles[nodes.b].Remove(mesh);
-			if (_nodeToTriangles.ContainsKey(nodes.c))
-				_nodeToTriangles[nodes.c].Remove(mesh);
-		}
-		
-		_triangleNodes.Remove(mesh);
-		_triangles.Remove(mesh);
-	}
-	
-	/// <summary>
-	/// Clear all data structures (useful for Reset)
-	/// </summary>
-	public void ClearDataStructures()
-	{
-		_edges.Clear();
-		_triangles.Clear();
-		_triangleNodes.Clear();
-		_nodeToTriangles.Clear();
-	}
 
 }
+
