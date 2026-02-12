@@ -1,8 +1,9 @@
 using Godot;
 
-public class 
-ItemInstance
+namespace InventorySystem
 {
+    public class ItemInstance
+    {
     public int InventoryId { get; set; }
     public int InstanceId { get; set; }
     public ItemDefinition ItemData { get; set; }
@@ -20,4 +21,5 @@ ItemInstance
             return ItemData.Size;
         }
     }
+}
 }

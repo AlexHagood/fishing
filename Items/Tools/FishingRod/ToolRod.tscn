@@ -3,6 +3,7 @@
 [ext_resource type="Script" uid="uid://ce7lvupegpwla" path="res://Items/Tools/FishingRod/FishingRodTool.cs" id="1_78gr2"]
 [ext_resource type="Script" uid="uid://cykwhivrtfm0s" path="res://Items/Tools/FishingRod/BobberSpawner.cs" id="3_1kyt6"]
 [ext_resource type="Texture2D" uid="uid://d2jobbr65ff64" path="res://Textures/fish/smallmouth.png" id="3_hndgl"]
+[ext_resource type="Script" uid="uid://bosqbx8jyi0r6" path="res://Items/Tools/FishingRod/ReelStrength.cs" id="4_1kyt6"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_0juja"]
 albedo_color = Color(0.71352416, 0.3557741, 1.92523e-07, 1)
@@ -20,6 +21,12 @@ transparency = 1
 albedo_texture = ExtResource("3_hndgl")
 billboard_mode = 2
 billboard_keep_scale = true
+
+[sub_resource type="Gradient" id="Gradient_hndgl"]
+colors = PackedColorArray(1.0829419e-06, 0.3022016, 0.30249354, 1, 0.1882353, 1, 1, 1)
+
+[sub_resource type="GradientTexture2D" id="GradientTexture2D_1kyt6"]
+gradient = SubResource("Gradient_hndgl")
 
 [node name="Node3D" type="Node3D" unique_id=214598079]
 script = ExtResource("1_78gr2")
@@ -48,3 +55,28 @@ spawn_limit = 1
 script = ExtResource("3_1kyt6")
 
 [node name="Bobbers" type="Node3D" parent="." unique_id=1909332171]
+
+[node name="Control" type="Control" parent="." unique_id=713172381]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+script = ExtResource("4_1kyt6")
+
+[node name="CanvasLayer" type="CanvasLayer" parent="Control" unique_id=53126223]
+follow_viewport_enabled = true
+
+[node name="TextureProgressBar" type="TextureProgressBar" parent="Control/CanvasLayer" unique_id=882039204]
+custom_minimum_size = Vector2(25, 0)
+anchors_preset = 11
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -1.0
+grow_horizontal = 0
+grow_vertical = 2
+step = 0.1
+value = 10.0
+fill_mode = 3
+nine_patch_stretch = true
+texture_progress = SubResource("GradientTexture2D_1kyt6")

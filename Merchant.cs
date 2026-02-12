@@ -15,7 +15,7 @@ public partial class Merchant : Npc
     // Called when the node enters the scene tree for the first time.
     public override void _Ready()
 	{
-        _inventoryManager.CreateInventory(new Vector2I(6, 12), ShopId);
+        _inventoryManager.CreateInventory(new Vector2I(6, 12), ShopId, true);
 		if (IsMultiplayerAuthority())
 		{
             if (ShopInventory != null)

@@ -37,6 +37,8 @@ public partial class Gui : CanvasLayer
 
     private ContextMenu _contextMenu;
 
+    private Dialog _dialog;
+
 
 
     private InputHandler _inputHandler = null!;
@@ -79,6 +81,15 @@ public partial class Gui : CanvasLayer
         _inputHandler.ItemRotateRequested += HandleRotateAction;
         _inputHandler.EscPressed += CloseAllWindows;
 
+        _dialog = GetNode<Dialog>("Dialog");
+
+        character.DialogMessage += ShowDialog;
+
+    }
+
+    public void ShowDialog(string message)
+    {
+        _dialog.SendMessage(message);
     }
 
 

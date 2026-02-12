@@ -20,6 +20,9 @@ public partial class Character : CharacterBody3D
     public delegate void HintFUpdatedEventHandler(string hint);
 
     [Signal]
+    public delegate void DialogMessageEventHandler(string message);
+
+    [Signal]
     public delegate void ToolAnimationEventHandler();
 
     [Export] public float Speed = 5.0f;
@@ -519,6 +522,7 @@ public partial class Character : CharacterBody3D
         // Handle jump using InputHandler
         if (isOnFloor && _inputHandler.IsJumpJustPressed())
         {
+            EmitSignal(SignalName.DialogMessage, "Jump!");
             Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
             if (animTree != null)
             {

@@ -1,23 +1,23 @@
-
-
 using Godot;
-using InventoryState;
 using System;
 using System.Collections.Generic;
 using System.Drawing;
 using System.IO;
 using System.Linq;
+using System.Net.Security;
 using System.Numerics;
 using System.Runtime.CompilerServices;
 using System.Text.Json;
+using TriangleNet;
 
 #nullable enable
 
-
-
-[GlobalClass]
-public partial class InventoryManager : Node
+namespace InventorySystem
 {
+
+    [GlobalClass]
+    public partial class InventoryManager : Node
+    {
     private Dictionary<int, Inventory> _Inventories = new Dictionary<int, Inventory>();
     
     // Cache for fast item lookup by instance ID
@@ -33,7 +33,9 @@ public partial class InventoryManager : Node
     public override void _Ready()
     {
         _networkManager = GetNode<NetworkManager>("/root/NetworkManager");
+        ClickablePrint.Log($"[InventoryManager] Hellooo world!");
     }
+
 
     /// <summary>
     /// Generates a new unique item instance ID by finding the first available ID not in use
@@ -84,7 +86,7 @@ public partial class InventoryManager : Node
         }
         
         var inventory = GetInventory(inventoryId);
-        var dto = InventoryState.InventoryDTO.FromInventory(inventory);
+        var dto = InventoryDTO.FromInventory(inventory);
         return JsonSerializer.Serialize(dto, new JsonSerializerOptions { WriteIndented = true });
     }
 
@@ -93,7 +95,7 @@ public partial class InventoryManager : Node
     /// </summary>
     public int SetInventoryFromJson(string json)
     {
-        var dto = JsonSerializer.Deserialize<InventoryState.InventoryDTO>(json);
+        var dto = JsonSerializer.Deserialize<InventoryDTO>(json);
         if (dto == null)
         {
             throw new Exception("Failed to deserialize inventory");
@@ -127,9 +129,19 @@ public partial class InventoryManager : Node
     {
         GD.Print($"MoveItem: {instanceId} to Inventory {targetInventoryId} at {targetPosition} rotated={rotated} count={count}");
 
-        var item = GetItem(instanceId);
-        var currentInventory = _Inventories[item.InventoryId];
-        var targetInventory = _Inventories[targetInventoryId];
+        ItemInstance item = GetItem(instanceId);
+        Inventory currentInventory = GetInventory(item.InventoryId);
+        Inventory targetInventory = GetInventory(targetInventoryId);
+
+        if (currentInventory.IsShop)
+        {
+            GD.Print("Purchasing item from shop");
+
+        }
+        else if (targetInventory.IsShop)
+        {
+            GD.Print("Selling item to shop");
+        }
 
         int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated);
         ItemInstance? existingItem = targetInventory.GetItemAtPosition(targetPosition);
@@ -236,6 +248,7 @@ public partial class InventoryManager : Node
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void RequestItemMove(int itemId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
     {
+        ClickablePrint.Log($"[InventoryManager] Hellooo world!");
         ItemInstance item = GetItem(itemId);
         Inventory sourceInventory = GetInventory(item.InventoryId);
         Inventory targetInventory = GetInventory(targetInventoryId);
@@ -329,7 +342,7 @@ public partial class InventoryManager : Node
             InstanceId = newInstanceId,
             ItemData = itemDef,
             InventoryId = inventoryId,
-            CurrentStackSize = 1,
+            CurrentStackSize = infinite ? itemDef.StackSize : 1,
             Infinite = infinite
         };
 
@@ -435,10 +448,10 @@ public partial class InventoryManager : Node
         }
     }
 
-    public void CreateInventory(Vector2I size, int id)
+    public void CreateInventory(Vector2I size, int id, bool isShop = false)
     {
-        GD.Print($"{Multiplayer.GetUniqueId()} Creating inventory" + size + " with specified ID " + id);
-        _Inventories[id] = new Inventory(size, id);
+        GD.Print($"{Multiplayer.GetUniqueId()} Creating {(isShop ? "shop" : "regular")} inventory" + size + " with specified ID " + id);
+        _Inventories[id] = new Inventory(size, id, isShop);
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -588,4 +601,5 @@ public partial class InventoryManager : Node
     }
 
 
+}
 }

@@ -51,6 +51,8 @@ public partial class FishingRodTool : ToolScript
     private InventoryManager _inventoryManager;
 
     ItemDefinition hookedItem;
+
+    private ReelStrength _reelStrength;
     
     public override void _Ready()
     {
@@ -84,6 +86,8 @@ public partial class FishingRodTool : ToolScript
         
         // Position and rotation are now controlled by the hand bone and tool scene positioning
         // No need to set them here anymore
+
+        _reelStrength = GetNode<ReelStrength>("ReelStrength");
     }
     
     public override void PrimaryFire(Character character)
@@ -163,6 +167,7 @@ public partial class FishingRodTool : ToolScript
                     
                     // Reel in
                     _currentLength = Mathf.Max(MinLength, _currentLength - (ReelSpeed * (float)delta));
+                    _reelStrength.UpdateReelStrength(1.2f);
                     
                     // Check if fully reeled in - reset to idle
                     if (_currentLength <= MinLength)
@@ -179,6 +184,7 @@ public partial class FishingRodTool : ToolScript
                     }
                     
                     // Let out
+                    _reelStrength.UpdateReelStrength(.9f);
                     _currentLength = Mathf.Min(MaxLength, _currentLength + (ReelSpeed * (float)delta));
                 }
                 else

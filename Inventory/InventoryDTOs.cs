@@ -10,7 +10,7 @@ using System.Text.Json.Serialization;
 /// <summary>
 /// Data Transfer Objects for serializing/deserializing inventory state to JSON
 /// </summary>
-namespace InventoryState
+namespace InventorySystem
 {
     public class ItemInstanceDTO
     {

@@ -1,5 +1,6 @@
 using Godot;
 using System;
+using System.Collections.Generic;
 
 public partial class Npc : StaticBody3D, IInteractable
 {
@@ -56,7 +57,17 @@ public partial class Npc : StaticBody3D, IInteractable
 
     public void InteractE(Character character)
     {
-        GD.Print($"Talking to NPC: {Name}");
+		List<String> greetings = new List<string>
+        {
+            "Hello there!",
+			"Nice to see you!",
+			"How can I help you?",
+			"Good day!",
+			"Welcome to our village!"
+        };
+		var random = new Random();
+		var greeting = greetings[random.Next(greetings.Count)];
+        character.EmitSignal("DialogMessage", greeting);
         // TODO: Implement dialogue system
     }
 	

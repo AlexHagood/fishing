@@ -10,6 +10,7 @@
 [ext_resource type="AudioStream" uid="uid://cny6s3cb8lk68" path="res://Sounds/drop.ogg" id="7_67jta"]
 [ext_resource type="Script" uid="uid://cji0cvrryc564" path="res://UI/ContextMenu.cs" id="9_p8208"]
 [ext_resource type="Script" uid="uid://cafdx3hab30sx" path="res://UI/Chat.cs" id="10_axmix"]
+[ext_resource type="Script" uid="uid://cakrr7tqxvh2d" path="res://Dialog.cs" id="11_7u6ry"]
 
 [sub_resource type="Animation" id="Animation_wfnr8"]
 resource_name = "BadWiggle"
@@ -264,3 +265,29 @@ editable = false
 
 [node name="ChatEntry" type="LineEdit" parent="ChatContainer" unique_id=1227064330]
 layout_mode = 2
+
+[node name="Dialog" type="Panel" parent="." unique_id=949696379]
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -150.0
+offset_top = -275.0
+offset_right = 150.0
+offset_bottom = -175.0
+grow_horizontal = 2
+grow_vertical = 0
+script = ExtResource("11_7u6ry")
+
+[node name="Label" type="Label" parent="Dialog" unique_id=451418290]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+text = "You don't have enough inventory space!"
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 3

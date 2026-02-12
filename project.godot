@@ -25,6 +25,7 @@ NetworkManager="*res://NetworkManager.cs"
 InventoryManager="*res://Inventory/InventoryManager.cs"
 FishManager="*res://FishManager.cs"
 InputHandler="*res://Player/InputHandler.cs"
+gg="*uid://bne1gbwmsj2yp"
 
 [debug_draw_3d]
 
@@ -41,7 +42,6 @@ project/assembly_name="Glop 3"
 
 [editor_plugins]
 
-enabled=PackedStringArray()
 project/assembly_name="Glop 3"
 
 [gdunit4]

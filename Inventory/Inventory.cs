@@ -2,20 +2,25 @@ using Godot;
 using System;
 using System.Collections.Generic;
 
-public class Inventory
+namespace InventorySystem
 {
+    public class Inventory
+    {
     public int Id;
     public Vector2I Size { get; set; }
     public List<ItemInstance> Items { get; set; }
     // Hotbar mapping: slot index -> item instance ID
     public Dictionary<int, ItemInstance> HotbarItems;
     public List<long> subscribedPlayers = new List<long>();
-    public Inventory(Vector2I size, int id)
+
+    public bool IsShop = false;
+    public Inventory(Vector2I size, int id, bool isShop = false)
     {
         Size = size;
         Items = new List<ItemInstance>();
         HotbarItems = new Dictionary<int, ItemInstance>();
         Id = id;
+        IsShop = isShop;
         subscribedPlayers = new List<long>();
         subscribedPlayers.Add(1);
     }
@@ -112,4 +117,5 @@ public class Inventory
         return null;
     }
 
+}
 }
