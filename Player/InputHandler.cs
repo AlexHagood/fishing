@@ -50,7 +50,7 @@ public partial class InputHandler : Node
         set 
         {
             _currentContext = value;
-            GD.Print($"[InputHandler] Context changed to: {value}");
+            Log($"Context changed to: {value}");
             
             // Update mouse mode based on context
             if (value == InputContext.UI || value == InputContext.Paused)
@@ -66,7 +66,6 @@ public partial class InputHandler : Node
 
     public override void _Ready()
     {
-        GD.Print("[InputHandler] Initialized");
         // Start in gameplay mode
         CurrentContext = InputContext.Gameplay;
     }

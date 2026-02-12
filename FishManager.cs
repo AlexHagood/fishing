@@ -40,7 +40,7 @@ public partial class FishManager : Node
         float totalChance = _fishLootTable.Sum(entry => entry.DropChance);
         if (Mathf.Abs(totalChance - 100.0f) > 0.01f)
         {
-            GD.PushWarning($"[FishManager] Loot table percentages don't add up to 100%! Current total: {totalChance}%");
+            GD.PushWarning($"Loot table percentages don't add up to 100%! Current total: {totalChance}%");
         }
     }
     
@@ -51,14 +51,14 @@ public partial class FishManager : Node
     {
         if (_fishLootTable.Count == 0)
         {
-            GD.PushError("[FishManager] Loot table is empty!");
+            GD.PushError("Loot table is empty!");
             return null;
         }
         
         // Roll a random number between 0 and 100
         float roll = (float)GD.RandRange(0.0, 100.0);
         
-        GD.Print($"[FishManager] Rolled {roll:F2}%");
+        Log($"Rolled {roll:F2}%");
         
         // Find which fish was rolled
         float cumulative = 0.0f;
@@ -67,14 +67,14 @@ public partial class FishManager : Node
             cumulative += entry.DropChance;
             if (roll <= cumulative)
             {
-                GD.Print($"[FishManager] Caught: {entry.Fish.Name}!");
+                Log($"Caught: {entry.Fish.Name}!");
                 Rpc("UI.Chat.SendChatMessage", "System", $"You caught a {entry.Fish.Name}!");
                 return entry.Fish;
             }
         }
         
         // Fallback to last item if something goes wrong (shouldn't happen if percentages add to 100)
-        GD.PushWarning("[FishManager] Fallback to last item in loot table");
+        GD.PushWarning("Fallback to last item in loot table");
         return _fishLootTable[_fishLootTable.Count - 1].Fish;
     }
 }

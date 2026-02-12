@@ -49,22 +49,22 @@ namespace InventorySystem
 
         if (position.X < 0)
         {
-            GD.Print("[Inventory] GetSpaceAt: Position out of bounds -X");
+            Log("GetSpaceAt: Position out of bounds -X");
             return 0; // Out of bounds
         } 
         else if (position.Y < 0)
         {
-            GD.Print("[Inventory] GetSpaceAt: Position out of bounds -Y");
+            Log("GetSpaceAt: Position out of bounds -Y");
             return 0; // Out of bounds
         }
         else if (position.X + itemSize.X > Size.X)
         {
-            GD.Print("[Inventory] GetSpaceAt: Position out of bounds +X");
+            Log("GetSpaceAt: Position out of bounds +X");
             return 0; // Out of bounds
         }
         else if (position.Y + itemSize.Y > Size.Y)
         {
-            GD.Print("[Inventory] GetSpaceAt: Position out of bounds +Y");
+            Log("GetSpaceAt: Position out of bounds +Y");
             return 0; // Out of bounds
         }
 
@@ -85,13 +85,13 @@ namespace InventorySystem
             {
                 if (otherItem.ItemData == item.ItemData && item.ItemData.Stackable)
                 {
-                    GD.Print($"[Inventory] Item overlaps, but is stackable. How many will fit here?" + (item.ItemData.StackSize - otherItem.CurrentStackSize));
+                    Log($"Item overlaps, but is stackable with space to fit" + (item.ItemData.StackSize - otherItem.CurrentStackSize));
                     // slot is occupied by another item of the same type
                     return item.ItemData.StackSize - otherItem.CurrentStackSize;
                 }
                 else
                 {
-                    GD.Print("[Inventory] Item overlaps with non-stackable item or different type");
+                    Log($"Item {item.Name} ({item.InstanceId}) illegally overlaps with {otherItem.Name} ({otherItem.InstanceId})");
                     // slot is occupied by another item
                     return 0;
                 }

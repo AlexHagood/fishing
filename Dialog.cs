@@ -21,7 +21,7 @@ public partial class Dialog : Panel
 
 	public void SendMessage(string message)
 	{
-		GD.Print($"Dialog: {message}");
+		Log($"Dialog: {message}");
 		DialogText.Text = message;
 		
 		// Kill existing tween if it's still running

@@ -59,7 +59,7 @@ public partial class FishingRodTool : ToolScript
         _fishManager = GetTree().Root.GetNode<FishManager>("FishManager");
         _inventoryManager = GetTree().Root.GetNode<InventoryManager>("InventoryManager");
         base._Ready();
-        GD.Print("[FishingRodTool] Ready");
+        Log("Ready");
         
         // Position and rotation are now controlled by the hand bone and tool scene positioning
         // No need to set them here anymore
@@ -104,7 +104,7 @@ public partial class FishingRodTool : ToolScript
         {
             // Cast the bobber
             character.animTree.Cast();
-            GD.Print("[FishingRodTool] Casting bobber animation triggered");
+            Log("Casting bobber animation triggered");
             CastBobber();
         }
         else if (_state == FishingState.Cast)
@@ -272,14 +272,14 @@ public partial class FishingRodTool : ToolScript
     private void CastBobber()
     {
         
-        GD.Print("[FishingRodTool] Starting cast animation - bobber will spawn in 0.9 seconds");
+        Log("Starting cast animation - bobber will spawn in 0.9 seconds");
         
         // Delay the actual bobber spawn/launch by 0.9 seconds to sync with animation
         GetTree().CreateTimer(0.9).Timeout += () => {
             // Make sure we're still in a valid state
             if (holdingCharacter == null || _rodTip == null || _bobberScene == null)
             {
-                GD.PushWarning("[FishingRodTool] Cast cancelled - character or rod no longer valid");
+                GD.PushWarning("Cast cancelled - character or rod no longer valid");
                 return;
             }
             SpawnAndLaunchBobber();
@@ -293,7 +293,7 @@ public partial class FishingRodTool : ToolScript
         _bobber = _bobberScene.Instantiate() as RigidBody3D;
         _bobber.SetMultiplayerAuthority(GetMultiplayerAuthority());
         GetNode("/root/Main").AddChild(_bobber);
-        GD.Print($"[FishingRodTool] SpawnNetworkBobbers called - bobber added to scene on player {Multiplayer.GetUniqueId()} with authority {_bobber.GetMultiplayerAuthority()}");
+        Log($"SpawnNetworkBobbers called - bobber added to scene on player {Multiplayer.GetUniqueId()} with authority {_bobber.GetMultiplayerAuthority()}");
         
     }
 
@@ -303,12 +303,12 @@ public partial class FishingRodTool : ToolScript
     {
         _fishMesh.Visible = false;
         
-        GD.Print("[FishingRodTool] Spawning and launching bobber!");
+        Log("Spawning and launching bobber!");
         
         // Duplicate the bobber template and add it to the world
         Rpc(nameof(SpawnNetworkBobbers));
 
-        GD.Print($"[FishingRodTool] Bobber instantiated and added to world with authority {_bobber.GetMultiplayerAuthority()}");
+        Log($"Bobber instantiated and added to world with authority {_bobber.GetMultiplayerAuthority()}");
         
         // Get the camera's forward direction (where the character is looking)
         Camera3D camera = holdingCharacter.GetNode<Camera3D>("Camera3D");
@@ -317,9 +317,9 @@ public partial class FishingRodTool : ToolScript
         // Position bobber at the rod tip position
         _bobber.GlobalPosition = _rodTip.GlobalPosition;
         
-        GD.Print($"[FishingRodTool] Rod tip position: {_rodTip.GlobalPosition}");
-        GD.Print($"[FishingRodTool] Cast direction: {castDirection}");
-        GD.Print($"[FishingRodTool] Bobber spawned at: {_bobber.GlobalPosition}");
+        Log($"Rod tip position: {_rodTip.GlobalPosition}");
+        Log($"Cast direction: {castDirection}");
+        Log($"Bobber spawned at: {_bobber.GlobalPosition}");
         
         
         // Set physics properties
@@ -341,7 +341,7 @@ public partial class FishingRodTool : ToolScript
         // Combine forward and upward force for an arc
         Vector3 launchVelocity = (castDirection * CastForceForward) + (upDirection * CastForceUp);
         
-        GD.Print($"[FishingRodTool] Launch velocity: {launchVelocity}");
+        Log($"Launch velocity: {launchVelocity}");
         
         // Apply impulse to launch the bobber
         _bobber.LinearVelocity = Vector3.Zero;
@@ -374,7 +374,7 @@ public partial class FishingRodTool : ToolScript
     
     private void ResetRod()
     {
-        GD.Print("[FishingRodTool] Bobber fully reeled in - resetting rod");
+        Log("Bobber fully reeled in - resetting rod");
 
         hookedItem = _fishManager.GetFishingLoot();
         if (hookedItem != null && hookedItem.Icon != null)
@@ -435,7 +435,7 @@ public partial class FishingRodTool : ToolScript
                     float landingDistance = _rodTip.GlobalPosition.DistanceTo(_bobber.GlobalPosition);
                     _currentLength = Mathf.Clamp(landingDistance, MinLength, MaxLength);
                     
-                    GD.Print($"[FishingRodTool] Bobber landed in water! Line length: {_currentLength:F2}m");
+                    Log($"Bobber landed in water! Line length: {_currentLength:F2}m");
                 }
                 
                 // Reset cast cooldown so player can immediately start reeling
@@ -453,7 +453,7 @@ public partial class FishingRodTool : ToolScript
             float landingDistance = _rodTip.GlobalPosition.DistanceTo(_bobber.GlobalPosition);
             _currentLength = Mathf.Clamp(landingDistance, MinLength, MaxLength);
             
-            GD.Print($"[FishingRodTool] Bobber landed! Line length: {_currentLength:F2}m");
+            Log($"Bobber landed! Line length: {_currentLength:F2}m");
         }
     }
     
@@ -461,22 +461,22 @@ public partial class FishingRodTool : ToolScript
     {
         if (_lineMesh == null)
         {
-            GD.Print("Cannot draw line: _lineMesh is null");
+            Log("Cannot draw line: _lineMesh is null");
             return;
         }
         if (_rodTip == null)
         {
-            GD.Print("Cannot draw line: _rodTip is null");
+            Log("Cannot draw line: _rodTip is null");
             return;
         }
         if (_bobber == null)
         {
-            GD.Print("Cannot draw line: _bobber is null");
+            Log("Cannot draw line: _bobber is null");
             return;
         }
         if (!IsInstanceValid(_bobber))
         {
-            GD.Print("Cannot draw line: _bobber is not a valid instance");
+            Log("Cannot draw line: _bobber is not a valid instance");
             return;
         }
 

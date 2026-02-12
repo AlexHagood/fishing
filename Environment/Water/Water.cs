@@ -49,7 +49,7 @@ public partial class Water : Node3D
 		_waterVolume.BodyEntered += OnBodyEnteredWater;
 		_waterVolume.BodyExited += OnBodyExitedWater;
 		
-		GD.Print($"Water system initialized. Water surface at Y={_waterSurfaceY}");
+		Log($"Water system initialized. Water surface at Y={_waterSurfaceY}");
 	}
 	
 	public override void _PhysicsProcess(double delta)
@@ -70,7 +70,7 @@ public partial class Water : Node3D
 		{
 			_bodiesInWater.Add(rigidBody);
 			PlaySplash(rigidBody.GlobalPosition);
-			GD.Print($"{rigidBody.Name} entered water");
+			Log($"{rigidBody.Name} entered water");
 		}
 	}
 	
@@ -79,7 +79,7 @@ public partial class Water : Node3D
 		if (body is RigidBody3D rigidBody)
 		{
 			_bodiesInWater.Remove(rigidBody);
-			GD.Print($"{rigidBody.Name} exited water");
+			Log($"{rigidBody.Name} exited water");
 		}
 	}
 	

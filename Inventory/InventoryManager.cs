@@ -14,7 +14,6 @@ using TriangleNet;
 
 namespace InventorySystem
 {
-
     [GlobalClass]
     public partial class InventoryManager : Node
     {
@@ -33,7 +32,6 @@ namespace InventorySystem
     public override void _Ready()
     {
         _networkManager = GetNode<NetworkManager>("/root/NetworkManager");
-        ClickablePrint.Log($"[InventoryManager] Hellooo world!");
     }
 
 
@@ -127,7 +125,6 @@ namespace InventorySystem
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void MoveItem(int instanceId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
     {
-        GD.Print($"MoveItem: {instanceId} to Inventory {targetInventoryId} at {targetPosition} rotated={rotated} count={count}");
 
         ItemInstance item = GetItem(instanceId);
         Inventory currentInventory = GetInventory(item.InventoryId);
@@ -135,19 +132,18 @@ namespace InventorySystem
 
         if (currentInventory.IsShop)
         {
-            GD.Print("Purchasing item from shop");
+            Log("Purchasing item from shop");
 
         }
         else if (targetInventory.IsShop)
         {
-            GD.Print("Selling item to shop");
+            Log("Selling item to shop");
         }
 
         int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated);
         ItemInstance? existingItem = targetInventory.GetItemAtPosition(targetPosition);
 
         var dto = InventoryDTO.FromInventory(targetInventory);
-        GD.Print($"Target Inventory: {JsonSerializer.Serialize(dto)}");
 
         
         // Item exists, try to stack it there.
@@ -155,24 +151,24 @@ namespace InventorySystem
         {
             if (existingItem.InstanceId == item.InstanceId)
             {
-                GD.Print("[IM] Will not move item onto itself");
+                Log("Will not move item onto itself");
                 return;
             }
             if (existingItem.CurrentStackSize + count > item.ItemData.StackSize)
             {
-                GD.Print("[IM] Target stack full");
+                Error($"Target stack full: {existingItem.CurrentStackSize} + {count} > {item.ItemData.StackSize}");
                 throw new Exception("Target stack is already full");
             }
 
             if (count > item.CurrentStackSize)
             {
-                GD.Print("[IM] Not enough items to transfer");
+                Error($"Not enough items to transfer: requested {count}, available {item.CurrentStackSize}");
                 throw new Exception("Not enough items to transfer");
             }
 
             if (count == item.CurrentStackSize)
             {
-                GD.Print("[IM] Moving entire stack to existing stack");
+                Log($"Moving entire stack of {count} {item.Name} ({item.InstanceId}) to existing stack of {existingItem.CurrentStackSize} ({existingItem.InstanceId})");
                 // Remove from current inventory
                 if (!item.Infinite)
                 {
@@ -183,7 +179,7 @@ namespace InventorySystem
             }
             else
             {
-                GD.Print("[IM] Moving partial stack to existing stack");
+                Log($"Moving {count} to existing stack");
                 if (!item.Infinite)
                 {
                     item.CurrentStackSize -= count;
@@ -199,7 +195,7 @@ namespace InventorySystem
             {
                 if (count == item.CurrentStackSize && !item.Infinite)
                 {
-                    GD.Print("[IM] Moving existing itemdef to position");
+                    Log($"Moving existing itemdef {item.Name} ({item.InstanceId}) to position {targetPosition} in inventory {targetInventoryId} {(targetInventory.Id != currentInventory.Id ? "from {currentInventory.Id}" : "")}");
                     currentInventory.Items.Remove(item);
                     item.InventoryId = targetInventoryId;
                     item.GridPosition = targetPosition;
@@ -208,7 +204,6 @@ namespace InventorySystem
                 }
                 else if (count < item.CurrentStackSize || item.Infinite)
                 {
-                    GD.Print("[IM] Moving new itemdef to position");
                     ItemInstance newItem = new ItemInstance
                     {
                         InstanceId = GenerateItemInstanceId(),
@@ -218,6 +213,7 @@ namespace InventorySystem
                         GridPosition = targetPosition,
                         IsRotated = rotated ^ item.IsRotated
                     };
+                    Log($"Moving new itemdef {item.Name} ({newItem.InstanceId} from {item.InstanceId})to position {targetPosition} in inventory {targetInventoryId} {(targetInventory.Id != currentInventory.Id ? "from {currentInventory.Id}" : "")}");
                     if (!item.Infinite)
                     {
                         item.CurrentStackSize -= count;
@@ -227,11 +223,13 @@ namespace InventorySystem
                 }
                 else
                 {
+                    Error($"Invalid move count {count} from stacksize {item.CurrentStackSize}");
                     throw new Exception("Not enough items to transfer or invalid count? Infinite broken?");
                 }
             }
             else
             {
+                Error($"Not enough space in target inventory {targetInventoryId}");
                 throw new Exception("Not enough space in target inventory");
             }
         }
@@ -241,24 +239,18 @@ namespace InventorySystem
         {
             EmitSignal(nameof(InventoryUpdate), targetInventoryId);
         }
-        
-        
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void RequestItemMove(int itemId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
     {
-        ClickablePrint.Log($"[InventoryManager] Hellooo world!");
         ItemInstance item = GetItem(itemId);
         Inventory sourceInventory = GetInventory(item.InventoryId);
         Inventory targetInventory = GetInventory(targetInventoryId);
         if (targetInventory.GetSpaceAt(item, targetPosition, rotated) < count)
         {
-            GD.Print("[IM] RequestItemMove: Not enough space in target inventory, aborting request.");
+            Log($"RequestItemMove: Not enough space in target inventory {targetInventoryId}, aborting request.");
             return;
-        }
-        else {
-            GD.Print("[IM] RequestItemMove: Validated locally!");
         }
         if (Multiplayer.IsServer())
         {
@@ -278,8 +270,6 @@ namespace InventorySystem
                     RpcId(peerId, nameof(InventorySubscribeCallback), targetInventoryJson);
                 }
             });
-
-            GD.Print($"Notifying subscribed clients of move {targetInventory.subscribedPlayers.ToString()}");
 
             targetInventory.Notify(peerId => {
                 {
@@ -316,7 +306,6 @@ namespace InventorySystem
             {
                 Vector2I pos = new Vector2I(x, y);
                 int space = inv.GetSpaceAt(item, pos, item.IsRotated);
-                GD.Print("-> Space to fit item at " + pos + ": " + space);
                 if (space >= item.CurrentStackSize)
                 {
                     return pos;
@@ -330,11 +319,6 @@ namespace InventorySystem
     public bool SpawnInstance(string itemResourcePath, int inventoryId, NodePath DeleteItemPath, bool check=false, bool infinite = false)
     {
         int newInstanceId = GenerateItemInstanceId();
-        GD.Print($"[IM] SpawnInstance called: check={check}, infinite={infinite}, InstanceId will be {newInstanceId}");
-        if (check)
-        {
-            GD.Print("[IM] Server checking spawn validity");
-        }
         ItemDefinition itemDef = GD.Load<ItemDefinition>(itemResourcePath);
         var inventory = GetInventory(inventoryId);
         var newItem = new ItemInstance
@@ -348,9 +332,9 @@ namespace InventorySystem
 
         _itemInstances[newItem.InstanceId] = newItem;
         inventory.Items.Add(newItem);
-        GD.Print($"[IM] Created item {newItem.InstanceId}, inventory now has {inventory.Items.Count} items");
         Vector2I? position = FindSpotToFitItem(newItem, inventoryId);
-        GD.Print($"[IM] Space to fit new item {newItem.InstanceId} at {position}, infinite = {infinite}");
+        
+
 
 
         // We find no valid position to spawn an item
@@ -358,12 +342,12 @@ namespace InventorySystem
         {
             _itemInstances.Remove(newItem.InstanceId);
             inventory.Items.Remove(newItem);
-            GD.Print($"[IM] No position found, cleaned up. Inventory now has {inventory.Items.Count} items");
+            Log($"No position found, cleaned up. Inventory now has {inventory.Items.Count} items");
 
 
             if (!check)
             {
-                GD.Print("[IM] Spawning failed on non-check!");
+                Log("Spawning failed on non-check!");
                 throw new Exception("Illegal spawn attempt");
             }
             else
@@ -380,17 +364,16 @@ namespace InventorySystem
             {
                 _itemInstances.Remove(newItem.InstanceId);
                 inventory.Items.Remove(newItem);
-                GD.Print($"[IM] Check successful, cleaned up. Inventory now has {inventory.Items.Count} items");
                 return true;
             }
             // Set position directly instead of using MoveItem to avoid creating duplicates
-            GD.Print("[IM] Spawning item at " + position.Value);
+            Log($"Created item {newItem.Name} ({newItem.Name} in inventory {inventoryId} at {position.Value} {(infinite ? "infinite" : "")}");
             newItem.GridPosition = position.Value;
             // Item already added to inventory.Items at line ~425, just set position here
             EmitSignal(nameof(InventoryUpdate), inventoryId);
             if (!DeleteItemPath.IsEmpty)
             {
-                GD.Print("[IM] Deleting spawned item from world");
+                Log($"Deleting spawned item from world {DeleteItemPath}");
                 Node? node = GetNodeOrNull(DeleteItemPath);
                 if (node != null)
                 {
@@ -399,19 +382,19 @@ namespace InventorySystem
                     {
                         if (Multiplayer.IsServer())
                         {
-                            GD.Print("[IM] Calling Destroy RPC on WorldItem");
+                            Log("Calling Destroy RPC on WorldItem");
                             worldItem.Rpc(nameof(worldItem.Destroy));
                         }
                     }
                 }
                 else
                 {
-                    GD.Print("[IM] Warning: Could not find node to delete at path " + DeleteItemPath);
+                    Log("Warning: Could not find node to delete at path " + DeleteItemPath);
                 }
             }
             else
             {
-                GD.Print("[IM] No delete path provided, not deleting any world item");
+                Log("No delete path provided, not deleting any world item");
             }
             return true;
         }
@@ -425,7 +408,7 @@ namespace InventorySystem
             if (SpawnInstance(itemResourcePath, inventoryId, deleteNodePath, check: true, infinite: infinite))
             {
                 Inventory inventory = GetInventory(inventoryId);
-                GD.Print($"[IM] Server accepts spawn instance of {itemResourcePath}, sending to clients");
+                Log($"Server accepts spawn instance of {itemResourcePath} in inventory {inventoryId}, sending to clients");
                 inventory.Notify(peerId =>
                 {
                     RpcId(peerId, nameof(SpawnInstance), itemResourcePath, inventoryId, deleteNodePath, false, infinite);
@@ -433,24 +416,28 @@ namespace InventorySystem
             }
             else
             {
-                GD.Print("[IM] Server rejects spawn instance");
+                Log($"Server rejects spawn instance of {itemResourcePath} in inventory {inventoryId}");
             }
         }
         else
         {
             if (infinite == true)
             {
-                GD.Print("[IM] Client requesting infinite item spawn");
+                Error("Client requesting infinite item spawn");
                 throw new Exception("Clients cannot spawn infinite items!");
             }
-            GD.Print("[IM] Client requesting item spawn");
+            Log("Client requesting item spawn");
             RpcId(1, nameof(RequestSpawnInstance), itemResourcePath, inventoryId, deleteNodePath, false);
         }
     }
 
     public void CreateInventory(Vector2I size, int id, bool isShop = false)
     {
-        GD.Print($"{Multiplayer.GetUniqueId()} Creating {(isShop ? "shop" : "regular")} inventory" + size + " with specified ID " + id);
+        if (!Multiplayer.IsServer())
+        {
+            return;
+        }
+        Log($"{Multiplayer.GetUniqueId()} Creating {(isShop ? "shop" : "regular")} inventory" + size + " with specified ID " + id);
         _Inventories[id] = new Inventory(size, id, isShop);
     }
 
@@ -461,18 +448,18 @@ namespace InventorySystem
         ItemInstance itemInstance = GetItem(itemid);
         string scenePath = itemInstance.ItemData.ScenePath;
         
-        GD.Print($"[IM] Attempting to spawn world item: {itemInstance.ItemData.Name} with scene path: '{scenePath}'");
+        Log($"Attempting to spawn world item: {itemInstance.ItemData.Name} with scene path: '{scenePath}' for player {peerId}");
         
         if (string.IsNullOrEmpty(scenePath) || scenePath == "res://")
         {
-            GD.PrintErr($"[IM] Item '{itemInstance.ItemData.Name}' does not have a valid scene path assigned, cannot spawn in world. Path: '{scenePath}'");
+            Error($"Item '{itemInstance.ItemData.Name}' does not have a valid scene path assigned, cannot spawn in world. Path: '{scenePath}'");
             return;
         }
         
         PackedScene item = GD.Load<PackedScene>(scenePath);
         if (item == null)
         {
-            GD.PrintErr($"[IM] Failed to load scene at path: {scenePath}");
+            Error($"Failed to load scene at path: {scenePath}");
             return;
         }
         
@@ -496,11 +483,11 @@ namespace InventorySystem
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     private void DeleteItem(int instanceId)
     {
-        GD.Print("[IM] Deleting item instance " + instanceId);
+        Log("Deleting item instance " + instanceId);
         var item = GetItem(instanceId);
         if (item.Infinite)
         {
-            throw new Exception("[IM] Item instance " + instanceId + " is infinite, not deleting");
+            throw new Exception("Item instance " + instanceId + " is infinite, not deleting");
         }
         var inventory = GetInventory(item.InventoryId);
         inventory.Items.Remove(item);
@@ -515,12 +502,13 @@ namespace InventorySystem
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void RequestDeleteItem(int itemId)
     {
+        ItemInstance item = GetItem(itemId);
         if (Multiplayer.IsServer())
         {
 
-            ItemInstance item = GetItem(itemId);
+            
             Inventory inventory = GetInventory(item.InventoryId);
-            GD.Print("[IM] Server deleting item instance " + itemId);
+            Log($"Server deleting item {item.Name} instance {itemId}");
             Rpc(nameof(SpawnWorldItem), itemId, Multiplayer.GetRemoteSenderId());
 
             inventory.Notify(peerId => {
@@ -529,7 +517,7 @@ namespace InventorySystem
         }
         else
         {
-            GD.Print("[IM] Client requesting item deletion " + itemId);
+            Log($"Client requesting item {item.Name} deletion " + itemId);
             RpcId(1, nameof(RequestDeleteItem), itemId);
         }
     }
@@ -546,12 +534,12 @@ namespace InventorySystem
 
         if (item.InventoryId != inventoryId)
         {
-            GD.Print("[IM] Attempted to bind illegal item!");
+            Log($"Attempted to bind illegal item! item in {item.InventoryId} but inventoryId is {inventoryId}");
             throw new Exception("Attempted to bind item that does not belong to inventory");
         }
         if (slotIndex < 0 || slotIndex > 5)
         {
-            GD.Print("[IM] Attempted to bind to illegal slot!");
+            Log("Attempted to bind to slot out of range!");
             throw new Exception("Attempted to bind item to invalid hotbar slot");
         }
 
@@ -567,7 +555,7 @@ namespace InventorySystem
 
         inventory.HotbarItems[slotIndex] = item;
         EmitSignal(nameof(InventoryUpdate), inventoryId);
-        GD.Print($"[IM] Bound item {item.ItemData.Name} to hotbar slot {slotIndex}");
+        Log($"Bound item {item.Name} to hotbar slot {slotIndex}");
     }
 
 
@@ -584,7 +572,7 @@ namespace InventorySystem
         if (!inventory.subscribedPlayers.Contains(requestingPeer))
         {
             inventory.subscribedPlayers.Add(requestingPeer);
-            GD.Print($"[IM] Player {requestingPeer} subscribed to inventory {inventoryId}, sending...");
+            Log($"Player {requestingPeer} subscribed to inventory {inventoryId}, sending...");
             RpcId(requestingPeer, nameof(InventorySubscribeCallback), GetInventoryAsJson(inventoryId));
         } 
         else
@@ -596,7 +584,7 @@ namespace InventorySystem
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void InventorySubscribeCallback(string jsonState)
     {
-        GD.Print($"[IM] InventorySubscribeCallback called, receiving inventory state on peer {Multiplayer.GetUniqueId()}");
+        Log($"InventorySubscribeCallback called, receiving inventory on peer {Multiplayer.GetUniqueId()}");
         SetInventoryFromJson(jsonState);
     }
 

@@ -23,19 +23,19 @@ public partial class ContextMenu : Godot.PopupMenu
     {
         if (item == null)
         {
-            GD.Print("Context menu action attempted on empty slot");
+            Log("Context menu action attempted on empty slot");
             return;
         }
 
         switch (id)
         {
             case 0: // Drop
-                GD.Print($"[GUI] Context menu: Drop item {item.ItemData.Name}");
+                Log($"Context menu: Drop item {item.ItemData.Name}");
                 _inventoryManager.RequestDeleteItem(item.InstanceId);
                 break;
 
             case 1: // Rotate
-                GD.Print($"[GUI] Context menu: Rotate item {item.ItemData.Name}");
+                Log($"Context menu: Rotate item {item.ItemData.Name}");
                 _inventoryManager.RequestItemRotate(item);
                 break;
         }

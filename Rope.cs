@@ -168,7 +168,7 @@ public partial class Rope : Node3D
 		// Set the last joint to connect back to itself (or disable if it would create a loop)
 		if (lastJoint.NodeA == lastSegment.GetPath())
 		{
-			GD.Print("Last joint would connect segment to itself. Disabling joint.");
+			Log("Last joint would connect segment to itself. Disabling joint.");
 			// If the joint would connect the segment to itself, disable it
 			lastJoint.NodeB = lastSegment.GetPath();
 			lastJoint.SetPhysicsProcessInternal(false);

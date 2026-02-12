@@ -76,7 +76,7 @@ public partial class WorldItem : RigidBody3D, IInteractable
     /// </summary>
     public virtual void InteractE(Character character)
     {
-        GD.Print($"[WorldItem] InteractE on {InvItemData.Name} - override this in subclasses");
+        Log($"InteractE on {InvItemData.Name} - override this in subclasses");
     }
 
     /// <summary>
@@ -84,7 +84,7 @@ public partial class WorldItem : RigidBody3D, IInteractable
     /// </summary>
     public virtual void InteractF(Character character)
     {
-        GD.Print($"[WorldItem] InteractF on {InvItemData.Name} - override this in subclasses");
+        Log($"InteractF on {InvItemData.Name} - override this in subclasses");
     }
 
     /// <summary>
@@ -138,7 +138,7 @@ public partial class WorldItem : RigidBody3D, IInteractable
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public void Destroy()
     {
-        GD.Print($"Destroying worlditem on pickup on client {Multiplayer.GetUniqueId()}");
+        Log($"Destroying worlditem on pickup on client {Multiplayer.GetUniqueId()}");
         QueueFree();
     }
 

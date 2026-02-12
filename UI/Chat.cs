@@ -22,7 +22,7 @@ public partial class Chat : VBoxContainer
 
         if (inputHandler == null)
         {
-            GD.Print("Chat: Could not find InputHandler node at /root/InputHandler");
+            Log("Chat: Could not find InputHandler node at /root/InputHandler");
             return;
         }
 

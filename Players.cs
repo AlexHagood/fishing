@@ -16,6 +16,6 @@ public partial class Players : Node3D
 
 	public void ChildAdded(Node child)
     {
-        GD.Print($"[Players {Multiplayer.GetUniqueId()}] Child entered tree: {child.Name}");
+        Log($"Child entered tree: {child.Name}");
     }
 }

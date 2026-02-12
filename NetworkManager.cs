@@ -17,6 +17,7 @@ public partial class NetworkManager : Node
     public override void _Ready()
     {
         ParseCommandLineArgs();
+        ClickablePrint.playerId = Multiplayer.GetUniqueId();
 
         DisplayServer.WindowSetTitle("Fishing game");
         
@@ -27,13 +28,13 @@ public partial class NetworkManager : Node
 
     private void OnPeerDisconnected(long peerId)
     {
-        GD.Print($"[NetworkManager {Multiplayer.GetUniqueId()}] Peer {peerId} disconnected");
+        Log($"Peer {peerId} disconnected");
         GetTree().Quit();
     }
     
     private void OnPeerConnected(long peerId)
     {
-        GD.Print($"[NetworkManager {Multiplayer.GetUniqueId()}] Peer {peerId} connected");
+        Log($"Peer {peerId} connected");
 
         var pnode = GetNode("/root/Main/Players");
         var players = pnode.GetChildren();
@@ -56,7 +57,7 @@ public partial class NetworkManager : Node
         // Check for --host flag
         if (args.Contains("--host"))
         {
-            GD.Print("[NetworkManager] --host flag detected, starting as server");
+            Log("--host flag detected, starting as server");
             StartServer();
             return;
         }
@@ -71,12 +72,12 @@ public partial class NetworkManager : Node
             {
                 serverIp = args[clientIndex + 1];
             }
-            GD.Print($"[NetworkManager] --client flag detected, connecting to {serverIp}");
+            Log($"--client flag detected, connecting to {serverIp}");
             ConnectToServer(serverIp);
             return;
         }
         
-        GD.Print("[NetworkManager] Starting as server by default");
+        Log("Starting as server by default");
         StartServer();
         
     }
@@ -86,8 +87,8 @@ public partial class NetworkManager : Node
         PeerInstance = new ENetMultiplayerPeer();
         PeerInstance.CreateServer(SERVER_PORT, 32);
         Multiplayer.MultiplayerPeer = PeerInstance;
-        GD.Print("[NetworkManager] Server started on port " + SERVER_PORT);
-        GD.Print("Servier Peer ID: " + Multiplayer.GetUniqueId());
+        Log("Server started on port " + SERVER_PORT);
+        Log("Servier Peer ID: " + Multiplayer.GetUniqueId());
         CallDeferred("SpawnPlayer", Multiplayer.GetUniqueId());
     }
 
@@ -96,18 +97,18 @@ public partial class NetworkManager : Node
         PeerInstance = new ENetMultiplayerPeer();
         PeerInstance.CreateClient(serverIp, SERVER_PORT);
         Multiplayer.MultiplayerPeer = PeerInstance;
-        GD.Print("[NetworkManager] Connecting to server at " + serverIp + ":" + SERVER_PORT);
+        Log("Connecting to server at " + serverIp + ":" + SERVER_PORT);
     }
 
     public void SpawnPlayer(long peerId)
     {
-        GD.Print($"[NetworkManager] SpawnPlayer called for {peerId}.");
+        Log($"SpawnPlayer called for {peerId}.");
         if (!Multiplayer.IsServer())
         {
-            GD.PrintErr("[NetworkManager] SpawnPlayer called on client, ignoring.");
+            Error("SpawnPlayer called on client, ignoring.");
             return;
         }
-        GD.Print($"[NetworkManager] Spawning player with peer ID: {peerId}");
+        Log($"Spawning player with peer ID: {peerId}");
         
         // Try to use MultiplayerSpawner if it exists
         var spawner = GetNode<MultiplayerSpawner>("/root/Main/MultiplayerSpawner");
@@ -120,13 +121,13 @@ public partial class NetworkManager : Node
 
         Character player = spawner.Spawn(spawnData) as Character;
 
-        GD.Print($"Spawned player {player.Name}");
+        Log($"Spawned player {player.Name}");
 
         IdToPlayer[peerId] = player;
         
         // Fallback to manual spawning if no spawner exists
         
-        GD.Print($"[NetworkManager {Multiplayer.GetUniqueId()}] Spawned player {peerId} on server, authority is {player.GetMultiplayerAuthority()}");
+        Log($"Spawned player {peerId} on server, authority is {player.GetMultiplayerAuthority()}");
         
         // Use RPC to tell ALL clients (including this one if it's also a client) to set authority
     }

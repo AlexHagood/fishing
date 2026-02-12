@@ -32,22 +32,22 @@ public partial class ShovelScript : ToolScript
 		// Get hit position
 		var hitPosition = (Vector3)hit["position"];
 		
-		GD.Print($"Hit position: {hitPosition}");
-		GD.Print($"Collider: {collider.Obj.GetType().Name}, Parent: {body.GetParent()?.Name}");
+		Log($"Hit position: {hitPosition}");
+		Log($"Collider: {collider.Obj.GetType().Name}, Parent: {body.GetParent()?.Name}");
 		
 		// Find the triangle and closest vertex
 		int triangleIndex = terrain.GetTriangleAtPosition(hitPosition);
 		if (triangleIndex == -1)
 		{
-			GD.Print($"No triangle found at position {hitPosition}");
-			GD.Print($"Terrain ChunkSize: {terrain.ChunkSize}, Total chunks: {terrain.ChunkMap.Count}");
+			Log($"No triangle found at position {hitPosition}");
+			Log($"Terrain ChunkSize: {terrain.ChunkSize}, Total chunks: {terrain.ChunkMap.Count}");
 			return;
 		}
 		
 		int vertexIndex = terrain.GetClosestVertexInTriangle(triangleIndex, hitPosition);
 		if (vertexIndex == -1)
 		{
-			GD.Print("No vertex found");
+			Log("No vertex found");
 			return;
 		}
 		
@@ -55,7 +55,7 @@ public partial class ShovelScript : ToolScript
 		var currentPos = terrain.Vertices[vertexIndex];
 		terrain.ModifyVertex(vertexIndex, currentPos - Vector3.Up * 1.0f);
 		
-		GD.Print($"Lowered vertex {vertexIndex} at {currentPos}");
+		Log($"Lowered vertex {vertexIndex} at {currentPos}");
 	}
 	
 	public override void SecondaryFire(Character character)
@@ -81,14 +81,14 @@ public partial class ShovelScript : ToolScript
 		int triangleIndex = terrain.GetTriangleAtPosition(hitPosition);
 		if (triangleIndex == -1)
 		{
-			GD.Print("No triangle found at position");
+			Log("No triangle found at position");
 			return;
 		}
 		
 		int vertexIndex = terrain.GetClosestVertexInTriangle(triangleIndex, hitPosition);
 		if (vertexIndex == -1)
 		{
-			GD.Print("No vertex found");
+			Log("No vertex found");
 			return;
 		}
 		
@@ -96,6 +96,6 @@ public partial class ShovelScript : ToolScript
 		var currentPos = terrain.Vertices[vertexIndex];
 		terrain.ModifyVertex(vertexIndex, currentPos + Vector3.Up * 1.0f);
 		
-		GD.Print($"Raised vertex {vertexIndex} at {currentPos}");
+		Log($"Raised vertex {vertexIndex} at {currentPos}");
 	}
 }

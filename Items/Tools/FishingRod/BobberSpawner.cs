@@ -16,6 +16,6 @@ public partial class BobberSpawner : MultiplayerSpawner
 
 	public void OnSpawn(Node spawnedNode)
 	{
-		GD.Print($"[BobberSpawner {Multiplayer.GetUniqueId()}] OnSpawn called for node: " + spawnedNode.Name);
+		Log($"[BobberSpawner {Multiplayer.GetUniqueId()}] OnSpawn called for node: " + spawnedNode.Name);
 	}
 }

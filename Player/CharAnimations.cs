@@ -53,7 +53,7 @@ public partial class CharAnimations : AnimationTree
 	[Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
 	public void FireRemoteAnimation(string anim)
 	{
-		GD.Print($"[CharAnimations] Firing remote animation on {Multiplayer.GetUniqueId()} from {Multiplayer.GetRemoteSenderId()}: {anim}");
+		Log($"Firing remote animation on {Multiplayer.GetUniqueId()} from {Multiplayer.GetRemoteSenderId()}: {anim}");
 		Set("parameters/" + anim + "/request", (int)AnimationNodeOneShot.OneShotRequest.Fire);
 	}
 

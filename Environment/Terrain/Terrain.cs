@@ -118,7 +118,7 @@ public partial class Terrain : Node3D
 
 	public void Reset()
 	{
-		GD.Print("Resetting terrain...");
+		Log("Resetting terrain...");
 
 		heightmapPreview.Scale = new Vector3(TerrainSize.X, TerrainSize.Z, 0);
 		
@@ -138,7 +138,7 @@ public partial class Terrain : Node3D
 				TerrainOrigin, 
 				TerrainSize
 			);
-			GD.Print($"Applied {RelaxationIterations} iterations of Lloyd's relaxation.");
+			Log($"Applied {RelaxationIterations} iterations of Lloyd's relaxation.");
 		}
 
 		Vertices = generatedPositions.ToArray();
@@ -230,7 +230,7 @@ public partial class Terrain : Node3D
 			GenerateChunkMeshAndCollision(chunk, _cachedNormals, _cachedUVs, _cachedFaceNormals);
 		}
 		
-		GD.Print($"Generated {ChunkMap.Count} chunk meshes and collisions");
+		Log($"Generated {ChunkMap.Count} chunk meshes and collisions");
 
 		
 
@@ -248,7 +248,7 @@ public partial class Terrain : Node3D
 #endif
 		}
 
-		GD.Print($"Terrain regenerated: {Vertices.Length} nodes, {Triangles.Length} triangles.");
+		Log($"Terrain regenerated: {Vertices.Length} nodes, {Triangles.Length} triangles.");
 	}
 
 	
@@ -269,14 +269,14 @@ public partial class Terrain : Node3D
 			if (_heightmapImage.IsCompressed())
 			{
 				_heightmapImage.Decompress();
-				GD.Print("Heightmap decompressed for pixel access");
+				Log("Heightmap decompressed for pixel access");
 			}
 			
-			GD.Print($"Heightmap loaded: {_heightmapImage.GetWidth()}x{_heightmapImage.GetHeight()}");
+			Log($"Heightmap loaded: {_heightmapImage.GetWidth()}x{_heightmapImage.GetHeight()}");
 		}
 		else
 		{
-			GD.PrintErr($"Failed to load heightmap from: {HeightmapPath}");
+			Error($"Failed to load heightmap from: {HeightmapPath}");
 		}
 	
 		
@@ -330,7 +330,7 @@ public partial class Terrain : Node3D
 			generatedPositions.Add(new Vector3(x, y, z));
 		}
 		
-		GD.Print($"{count} positions generated with random distribution at {startLocation} with spread {spread}.");
+		Log($"{count} positions generated with random distribution at {startLocation} with spread {spread}.");
 		return generatedPositions;
 	}
 	
@@ -478,7 +478,7 @@ public partial class Terrain : Node3D
 			chunk.Bounds = new Aabb(min, max - min);
 		}
 		
-		GD.Print($"Partitioned {Triangles.Length} triangles into {ChunkMap.Count} chunks (chunk size: {ChunkSize})");
+		Log($"Partitioned {Triangles.Length} triangles into {ChunkMap.Count} chunks (chunk size: {ChunkSize})");
 	}
 	
 	/// <summary>
@@ -676,7 +676,7 @@ public partial class Terrain : Node3D
 			_vertexToTriangles[tri.C].Add(i);
 		}
 		
-		GD.Print($"Built vertex-to-triangle mapping: {_vertexToTriangles.Count} vertices");
+		Log($"Built vertex-to-triangle mapping: {_vertexToTriangles.Count} vertices");
 	}
 	
 	/// <summary>
@@ -686,7 +686,7 @@ public partial class Terrain : Node3D
 	{
 		if (vertexIndex < 0 || vertexIndex >= Vertices.Length)
 		{
-			GD.PrintErr($"Invalid vertex index: {vertexIndex}");
+			Error($"Invalid vertex index: {vertexIndex}");
 			return;
 		}
 		
@@ -696,7 +696,7 @@ public partial class Terrain : Node3D
 		// Find all affected triangles
 		if (!_vertexToTriangles.TryGetValue(vertexIndex, out var affectedTriangles))
 		{
-			GD.PrintErr($"No triangles found for vertex {vertexIndex}");
+			Error($"No triangles found for vertex {vertexIndex}");
 			return;
 		}
 		
@@ -722,7 +722,7 @@ public partial class Terrain : Node3D
 			}
 		}
 		
-		GD.Print($"Modified vertex {vertexIndex}, regenerated {affectedChunks.Count} chunks");
+		Log($"Modified vertex {vertexIndex}, regenerated {affectedChunks.Count} chunks");
 	}
 	
 	/// <summary>
@@ -769,7 +769,7 @@ public partial class Terrain : Node3D
 			}
 		}
 		
-		GD.Print($"Modified area at {worldPosition} (radius {radius}), regenerated {affectedChunks.Count} chunks");
+		Log($"Modified area at {worldPosition} (radius {radius}), regenerated {affectedChunks.Count} chunks");
 	}
 	
 	/// <summary>

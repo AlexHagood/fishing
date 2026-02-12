@@ -145,7 +145,7 @@ public partial class Character : CharacterBody3D
         var nametag = GetNode<Label3D>("Nametag");
         nametag.Text = Name;
 
-        GD.Print($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with am i OP? {IsMultiplayerAuthority()}");
+        Log($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with am i OP? {IsMultiplayerAuthority()}");
         
         // Initialize animation tree for ALL characters (local and remote)
         animTree = GetNode<CharAnimations>("AnimationTree");
@@ -156,9 +156,9 @@ public partial class Character : CharacterBody3D
         _playerBodyMesh.Visible = true;
         
         // Early return for non-authority characters (remote players on your screen)
-        GD.Print($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with authority {IsMultiplayerAuthority()}");
+        Log($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with authority {IsMultiplayerAuthority()}");
         
-        GD.Print($"[Character {Multiplayer.GetUniqueId()}] {Name} is local authority player, initializing...");
+        Log($"[Character {Multiplayer.GetUniqueId()}] {Name} is local authority player, initializing...");
         
         
         // Get tool position helper (optional, but recommended)
@@ -173,7 +173,7 @@ public partial class Character : CharacterBody3D
 
         if (Multiplayer.IsServer())
         {
-            GD.Print("[Character] Server creating inventory for player " + Name + " with inventoryId " + inventoryId);
+            Log("Server creating inventory for player " + Name + " with inventoryId " + inventoryId);
             _inventoryManager.CreateInventory(new Vector2I(6, 4), inventoryId);
         }
 
@@ -225,19 +225,19 @@ public partial class Character : CharacterBody3D
     
     private void SetupCameraSystem()
     {
-        GD.Print($"[Character] Setting up camera system on {Multiplayer.GetUniqueId()} for node {Name} - {IsMultiplayerAuthority()}");
+        Log($"Setting up camera system on {Multiplayer.GetUniqueId()} for node {Name} - {IsMultiplayerAuthority()}");
         // Get camera target from scene (created in editor)
         _cameraTarget = GetNodeOrNull<Node3D>("CameraTarget");
         if (_cameraTarget == null)
         {
-            GD.PrintErr("[Character] ERROR: CameraTarget node not found! Create a Node3D called 'CameraTarget' as a child of Character.");
+            Error("ERROR: CameraTarget node not found! Create a Node3D called 'CameraTarget' as a child of Character.");
         }
         
         // Get spring arm
         _springArm = GetNodeOrNull<SpringArm3D>("CameraTarget/SpringArm3D");
         if (_springArm == null)
         {
-            GD.PrintErr("[Character] ERROR: SpringArm3D not found! Create a SpringArm3D as a child of CameraTarget.");
+            Error("ERROR: SpringArm3D not found! Create a SpringArm3D as a child of CameraTarget.");
         }
         else
         {
@@ -256,14 +256,14 @@ public partial class Character : CharacterBody3D
             _activeCamera = _firstPersonCamera;
             _activeCamera.SetCurrent(true);
             _thirdPersonCamera.Current = false;
-            GD.Print("[Character] Camera system initialized successfully");
+            Log("Camera system initialized successfully");
         }
         else
         {
-            GD.PrintErr("[Character] ERROR: Camera system failed to initialize - missing camera nodes!");
+            Error("ERROR: Camera system failed to initialize - missing camera nodes!");
         }
 
-        GD.Print($"{_firstPersonCamera}");
+        Log($"{_firstPersonCamera}");
         
         // Initialize camera angles
         _cameraPitch = 0.0f;
@@ -272,7 +272,7 @@ public partial class Character : CharacterBody3D
 
     private void ConnectInputSignals()
     {
-        GD.Print("[Character] Connecting to InputHandler signals");
+        Log("Connecting to InputHandler signals");
         
         // Mouse and camera
         _inputHandler.MouseMotion += OnMouseMotion;
@@ -337,7 +337,7 @@ public partial class Character : CharacterBody3D
     {
         
         // For remote players, we only show the visual mesh, not the full tool script
-        GD.Print($"{Name} Updating equipped tool. Rpc call? " + (Multiplayer.GetRemoteSenderId() != 0));
+        Log($"{Name} Updating equipped tool. Rpc call? " + (Multiplayer.GetRemoteSenderId() != 0));
         
         if (IsMultiplayerAuthority())
         {
@@ -352,12 +352,12 @@ public partial class Character : CharacterBody3D
                     _currentTool.QueueFree();
                     _currentTool = null;
                 }
-                GD.Print($"[Character] No item in hotbar slot {HotbarSlot}");
+                Log($"No item in hotbar slot {HotbarSlot}");
                 return;
             }
 
             ItemInstance heldItem = hotbarItems[HotbarSlot];
-            GD.Print($"[Character] Equipping item: {heldItem.ItemData.Name}");
+            Log($"Equipping item: {heldItem.ItemData.Name}");
             
             // Remove old tool
             if (_currentTool != null)
@@ -369,7 +369,7 @@ public partial class Character : CharacterBody3D
                 }
                  else
                 {
-                    GD.Print($"[Character] Tool in slot {HotbarSlot} is already equipped, no need to update");
+                    Log($"Tool in slot {HotbarSlot} is already equipped, no need to update");
                     return;
                 }
             }
@@ -383,7 +383,7 @@ public partial class Character : CharacterBody3D
                 _currentTool.itemInstance = heldItem;
                 _currentTool.holdingCharacter = this;
                 _toolPosition.AddChild(_currentTool);
-                GD.Print("[Character] Authority player equipped tool with full functionality");
+                Log("Authority player equipped tool with full functionality");
             }
         }
         else // Remote players only
@@ -401,7 +401,7 @@ public partial class Character : CharacterBody3D
                 PackedScene toolScene = GD.Load<PackedScene>(toolScenePath);
                 _currentTool = toolScene.Instantiate<ToolScript>();
                 _toolPosition.AddChild(_currentTool);
-                GD.Print("[Character] Remote player equipped tool with visual mesh only");
+                Log("Remote player equipped tool with visual mesh only");
                 _currentTool.holdingCharacter = this;
             }
         }
@@ -425,7 +425,7 @@ public partial class Character : CharacterBody3D
         {
             HotbarSlot = (HotbarSlot - 1 + 6) % 6;
         }
-        GD.Print($"[Character] Hotbar scrolled to slot {HotbarSlot}");
+        Log($"Hotbar scrolled to slot {HotbarSlot}");
     }
 
     private void OnCameraToggled()
@@ -451,7 +451,7 @@ public partial class Character : CharacterBody3D
 
     public void OpenInventory(int id)
     {
-        GD.Print($"{Name} - Opening inventory with Id " + id);
+        Log($"{Name} - Opening inventory with Id " + id);
         EmitSignal(SignalName.InventoryRequested, id);
     }
 
@@ -510,10 +510,6 @@ public partial class Character : CharacterBody3D
             targetVelocity.Z + _externalVelocity.Z
         );
 
-        if (Engine.GetPhysicsFrames() % 60 == 0 && direction.Length() > 0)
-        {
-            GD.Print($"[Character {Name}] Direction: {direction}, Sprint: {_isSprinting}, Velocity: {Velocity} ");
-        }
 
         // Apply gravity
         if (!isOnFloor)
@@ -606,7 +602,7 @@ public partial class Character : CharacterBody3D
         // Check if cameras are initialized
         if (_firstPersonCamera == null || _thirdPersonCamera == null)
         {
-            GD.PrintErr("[Character] Cannot toggle camera - cameras not initialized!");
+            Error("Cannot toggle camera - cameras not initialized!");
             return;
         }
         
@@ -614,7 +610,7 @@ public partial class Character : CharacterBody3D
         if (_activeCamera == _thirdPersonCamera)
         {
             // Switch to first-person camera
-            GD.Print("[Character] Switched to first-person camera");
+            Log("Switched to first-person camera");
             
             _firstPersonCamera.Current = true;
             _thirdPersonCamera.Current = false;
@@ -629,7 +625,7 @@ public partial class Character : CharacterBody3D
         else
         {
             // Switch to third-person camera
-            GD.Print("[Character] Switched to third-person camera");
+            Log("Switched to third-person camera");
             
             _thirdPersonCamera.Current = true;
             _firstPersonCamera.Current = false;
@@ -652,7 +648,7 @@ public partial class Character : CharacterBody3D
     {
         if (externalCamera == null)
         {
-            GD.PrintErr("[Character] Cannot set null external camera!");
+            Error("Cannot set null external camera!");
             return;
         }
 
@@ -666,7 +662,7 @@ public partial class Character : CharacterBody3D
         externalCamera.Current = true;
         _activeCamera = externalCamera;
 
-        GD.Print("[Character] Switched to external camera");
+        Log("Switched to external camera");
     }
 
     /// <summary>
@@ -676,7 +672,7 @@ public partial class Character : CharacterBody3D
     {
         if (_firstPersonCamera == null)
         {
-            GD.PrintErr("[Character] Cannot restore camera - first person camera not initialized!");
+            Error("Cannot restore camera - first person camera not initialized!");
             return;
         }
 
@@ -690,14 +686,14 @@ public partial class Character : CharacterBody3D
         _cameraPitch = 0.0f;
         _firstPersonCamera.RotationDegrees = new Vector3(_cameraPitch, 0, 0);
 
-        GD.Print("[Character] Restored character camera");
+        Log("Restored character camera");
     }
 
     public GodotObject RaycastFromCamera(float range = 5.0f)
     {
         if (_activeCamera == null)
         {
-            GD.PrintErr("[Character] Cannot raycast - active camera not initialized!");
+            Error("Cannot raycast - active camera not initialized!");
             return null;
         }
         var spaceState = GetWorld3D().DirectSpaceState;
@@ -720,7 +716,7 @@ public partial class Character : CharacterBody3D
     {
                 if (_activeCamera == null)
         {
-            GD.PrintErr("[Character] Cannot raycast - active camera not initialized!");
+            Error("Cannot raycast - active camera not initialized!");
             return null;
         }
         var spaceState = GetWorld3D().DirectSpaceState;
@@ -757,7 +753,7 @@ public partial class Character : CharacterBody3D
                     }
                     else
                     {
-                        GD.Print($"[Character] Too far away for E: {distance:F1}m");
+                        Log($"Too far away for E: {distance:F1}m");
                     }
                 }
                 else
@@ -794,7 +790,7 @@ public partial class Character : CharacterBody3D
                     }
                     else
                     {
-                        GD.Print($"[Character] Too far away for F: {distance:F1}m");
+                        Log($"Too far away for F: {distance:F1}m");
                     }
                 }
                 else

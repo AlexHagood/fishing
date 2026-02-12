@@ -43,12 +43,12 @@ public partial class HotbarUI : Control
             Panel slot = GetNode<Panel>($"Slot{i}");
             if (slot == null)
             {
-                GD.PrintErr($"[HotbarUI] Failed to find Slot{i}!");
+                Error($"Failed to find Slot{i}!");
             }
             slot.AddThemeStyleboxOverride("panel", normalStyle);
             slots.Add(slot);
         }
-        GD.Print($"[HotbarUI] Ready - initialized {slots.Count} slots");
+        Log($"Ready - initialized {slots.Count} slots");
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
         _inventoryManager.InventoryUpdate += (updatedInventoryId) => 
@@ -62,7 +62,7 @@ public partial class HotbarUI : Control
 
     public void Refresh()
     {
-        GD.Print($"[HotbarUI] Refreshing hotbar UI from inventory {inventoryId}");
+        Log($"Refreshing hotbar UI from inventory {inventoryId}");
         
 
         
@@ -85,12 +85,12 @@ public partial class HotbarUI : Control
 
     public void HighlightSlot(int slot)
     {
-        GD.Print($"[HotbarUI] Highlighting slot {slot}, {slots.Count} total");
+        Log($"Highlighting slot {slot}, {slots.Count} total");
         
         // Guard against invalid slot indices or uninitialized slots
         if (slot < 0 || slot >= slots.Count)
         {
-            GD.PrintErr($"[HotbarUI] Invalid slot index: {slot} (max: {slots.Count - 1})");
+            Error($"Invalid slot index: {slot} (max: {slots.Count - 1})");
             return;
         }
         
@@ -106,7 +106,7 @@ public partial class HotbarUI : Control
         }
         else
         {
-            GD.PrintErr($"[HotbarUI] Slot {slot} panel is null!");
+            Error($"Slot {slot} panel is null!");
         }
     }
 }

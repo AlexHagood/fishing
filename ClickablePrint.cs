@@ -1,4 +1,5 @@
 using Godot;
+using System.Collections.Generic;
 using System.Runtime.CompilerServices;
 
 /// <summary>
@@ -7,6 +8,7 @@ using System.Runtime.CompilerServices;
 /// </summary>
 public static class ClickablePrint
 {
+    public static long playerId;
     /// <summary>
     /// Prints a message with a clickable link to the source file and line number.
     /// Only works when running in the Godot editor.
@@ -28,13 +30,19 @@ public static class ClickablePrint
 
         string messageStr = message?.ToString() ?? "";
         string fileName = System.IO.Path.GetFileName(callerFilePath);
-        
+
         // Use absolute file path with forward slashes
         string absolutePath = callerFilePath.Replace("\\", "/");
+
+        string visibleText = $"({fileName}:{callerLineNumber}, {playerId})";
+        string sender = $"[url={absolutePath}:{callerLineNumber}]{visibleText}[/url]";
         
-        // Format: absolute/path:line
-        // The plugin will intercept this and open in VS Code
-        GD.PrintRich($"  At: [url={absolutePath}:{callerLineNumber}]{fileName}:{callerLineNumber}[/url] - {messageStr}");
+        // Use monospace font or tabs to preserve spacing
+        // Option 1: Add dots/characters that won't be stripped
+        int paddingLength = System.Math.Max(0, 32 - visibleText.Length);
+        string padding = new string('\u00A0', paddingLength); // Use non-breaking spaces to preserve spacing
+        
+        GD.PrintRich($"{sender}{padding} - {messageStr}");
     }
 
     /// <summary>

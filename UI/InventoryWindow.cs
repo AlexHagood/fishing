@@ -17,7 +17,6 @@ public partial class InventoryWindow : UIWindow
 
     private void OnItemClicked(ItemTile item)
     {
-        GD.Print($"[InventoryWindow] Item grabbed: {item.ItemInstance.InstanceId}");
         EmitSignal(SignalName.ItemGrab, item);
     }
 
@@ -29,7 +28,7 @@ public partial class InventoryWindow : UIWindow
         inventoryManager.InventoryUpdate += OnInventoryUpdate;
 
         // Subscribe to the inventory from the server
-        GD.Print($"[InventoryWindow] Subscribing to inventory {inventoryId}");
+        Log($"Subscribing to inventory {inventoryId}");
         if (!Multiplayer.IsServer())
         {
             inventoryManager.SubscribeToInventory(inventoryId);
@@ -46,7 +45,7 @@ public partial class InventoryWindow : UIWindow
         // Only refresh if this is our inventory
         if (updatedInventoryId == inventoryId)
         {
-            GD.Print($"[InventoryWindow] Inventory {inventoryId} updated, refreshing");
+            Log($"Inventory {inventoryId} updated, refreshing");
             RefreshItems();
         }
     }
@@ -109,7 +108,6 @@ public partial class InventoryWindow : UIWindow
         List<ItemInstance> items = inventoryManager.GetInventory(inventoryId).Items;
         foreach (var item in items)
         {
-            GD.Print($"Refreshing item in inventory: {item.ItemData.Name} (ID: {item.InstanceId})");
             
             // Create the item tile
             var itemTileScene = GD.Load<PackedScene>("res://UI/ItemTile.tscn");
@@ -123,7 +121,6 @@ public partial class InventoryWindow : UIWindow
                     mb.ButtonIndex == MouseButton.Left &&
                     mb.Pressed)
                 {
-                    GD.Print($"Clicked item {item.InstanceId}");
                     OnItemClicked(itemTile);
                     // Mark the event as handled so Gui._Input() doesn't see it
                     itemTile.GetViewport().SetInputAsHandled();

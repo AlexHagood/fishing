@@ -27,7 +27,7 @@ public partial class Car : VehicleBody3D, IInteractable
 				_wheels.Add(wheel);
 		}
 		if (_wheels.Count == 0)
-			GD.Print("[Car] No VehicleWheel3D nodes found as children. Make sure wheels are direct children of the VehicleBody3D.");
+			Log("No VehicleWheel3D nodes found as children. Make sure wheels are direct children of the VehicleBody3D.");
 
 		_camera3D = GetNode<Camera3D>("Camera3D");
 	}
@@ -117,7 +117,7 @@ public partial class Car : VehicleBody3D, IInteractable
 		}
 		else
 		{
-			GD.PrintErr("[Car] No camera found on car! Add a Camera3D node as a child.");
+			Error("No camera found on car! Add a Camera3D node as a child.");
 		}
 		
 		// Disable character's physics/movement
@@ -127,7 +127,7 @@ public partial class Car : VehicleBody3D, IInteractable
 		// For now, just hide them
 		character.Visible = false;
 		
-		GD.Print("[Car] Driver entered vehicle");
+		Log("Driver entered vehicle");
 	}
 
 	private void ExitVehicle()
@@ -150,6 +150,6 @@ public partial class Car : VehicleBody3D, IInteractable
 		// Apply brake
 		Brake = MaxBrakeForce;
 		
-		GD.Print("[Car] Driver exited vehicle");
+		Log("Driver exited vehicle");
 	}
 }

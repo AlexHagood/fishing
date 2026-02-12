@@ -203,7 +203,7 @@
 // 			var node = new GraphNode();
 // 			node.Position = pos;
 // 			Character.GetTree().CurrentScene.AddChild(node);
-// 			GD.Print($"[TOOL: CreateNode] Placed GraphNode at {pos}");
+// 			Log($"[TOOL: CreateNode] Placed GraphNode at {pos}");
 // 		}
 // 	}
 

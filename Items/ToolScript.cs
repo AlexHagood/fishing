@@ -11,12 +11,12 @@ public partial class ToolScript: Node3D
     
     public virtual void PrimaryFire(Character character)
     {
-        GD.Print($"[ToolScript] PrimaryFire - by item {itemInstance.ItemData.Name}");
+        Log($"PrimaryFire - by item {itemInstance.ItemData.Name}");
     }
     
     public virtual void SecondaryFire(Character character)
     {
-        GD.Print($"[ToolScript] SecondaryFire - by item {itemInstance.ItemData.Name}");
+        Log($"SecondaryFire - by item {itemInstance.ItemData.Name}");
     }
     
     // Override these in subclasses if you need per-frame updates

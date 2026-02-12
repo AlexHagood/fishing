@@ -134,14 +134,14 @@ public partial class Gui : CanvasLayer
         // Only handle this in UI context (when inventory is open)
         if (_inputHandler.CurrentContext == InputHandler.InputContext.Gameplay)
         {
-            GD.Print($"[GUI] Hotbar slot selected: {slotIndex}");
+            Log($"Hotbar slot selected: {slotIndex}");
             _hotbarUI.HighlightSlot(slotIndex);
             _hotbarUI.Refresh(); // Update thumbnails when slot changes
             
         } 
         else if (_inputHandler.CurrentContext == InputHandler.InputContext.UI)
         {
-        GD.Print($"[GUI] InputHandler hotbar key pressed: {slotIndex}");
+        Log($"InputHandler hotbar key pressed: {slotIndex}");
         Vector2 mousePos = GetViewport().GetMousePosition();
         var slotUnder = GetSlotAtPosition(mousePos);
 
@@ -153,7 +153,7 @@ public partial class Gui : CanvasLayer
 
             if (item != null)
             {
-                GD.Print($"[GUI] Hotbar key pressed over item at position: {item.ItemData.Name}");
+                Log($"Hotbar key pressed over item at position: {item.ItemData.Name}");
                 _inventoryManager.BindItemToSlot(inv.Id, slotIndex, item.InstanceId);
             }
         }
@@ -181,7 +181,7 @@ public partial class Gui : CanvasLayer
                     ItemInstance? item = inv.GetItemAtPosition(slotUnder.slotPosition);
                     if (item != null)
                     {
-                        GD.Print($"[GUI] Right-clicked on item - {item.ItemData.Name}");
+                        Log($"Right-clicked on item - {item.ItemData.Name}");
                         // There's an item here - show context menu
                         _contextMenu.Position = (Vector2I)mousePos;
                         _contextMenu.item = item;
@@ -195,12 +195,10 @@ public partial class Gui : CanvasLayer
             {
                 if (mouseButton.ButtonIndex == MouseButton.Left)
                 {
-                    GD.Print("[GUI] Left click detected for dropping item");
                     OnDraggingItemClick(false);
                 }
                 else if (mouseButton.ButtonIndex == MouseButton.Right)
                 {
-                    GD.Print("[GUI] Right click detected for dropping item");
                     OnDraggingItemClick(true);
                 }
                 // Only drop if we're clicking on empty space or a slot, not on another item
@@ -354,7 +352,7 @@ public partial class Gui : CanvasLayer
 
         }
 
-        GD.Print($"[GUI] Window closed. Windows open: {openWindows}");
+        Log($"Window closed. Windows open: {openWindows}");
     }
 
     // Call this when any UIWindow is opened
@@ -371,7 +369,7 @@ public partial class Gui : CanvasLayer
             _inputHandler.CurrentContext = InputHandler.InputContext.UI;
         }
 
-        GD.Print($"[GUI] On Window opened. Windows open: {openWindows}");
+        Log($"On Window opened. Windows open: {openWindows}");
     }
 
 
@@ -401,7 +399,7 @@ public partial class Gui : CanvasLayer
         OpenWindow(inventoryWindow);
 
 
-        GD.Print($"[GUI] Inventory opened. Total windows: {windows.Count}");
+        Log($"Inventory opened. Total windows: {windows.Count}");
 
 
     }
@@ -424,7 +422,7 @@ public partial class Gui : CanvasLayer
             _rotateHeld = !_rotateHeld;
 
 
-            GD.Print($"[GUI] Rotate toggle. _rotateHeld: {_rotateHeld}");
+            Log($"Rotate toggle. _rotateHeld: {_rotateHeld}");
             HighlightSlots(true);
             return; // Done - fit checking happens in _Process
         }
@@ -441,7 +439,7 @@ public partial class Gui : CanvasLayer
 
                 if (itemAtSlot == null)
                 {
-                    GD.Print("Attempted to rotate an empty slot.");
+                    Log("Attempted to rotate an empty slot.");
                     return;
                 }
 
@@ -449,11 +447,11 @@ public partial class Gui : CanvasLayer
                 if (_inventoryManager.CanRotateItem(itemAtSlot))
                 {
                     _inventoryManager.RequestItemRotate(itemAtSlot);
-                    GD.Print($"[GUI] Requested rotated item {itemAtSlot.InstanceId} in place. IsRotated: {itemAtSlot.IsRotated}");
+                    Log($"Requested rotated item {itemAtSlot.InstanceId} in place. IsRotated: {itemAtSlot.IsRotated}");
                 }
                 else
                 {
-                    GD.Print("[GUI] Cannot rotate item - not enough space");
+                    Log("Cannot rotate item - not enough space");
                 }
             }
         }
@@ -462,7 +460,7 @@ public partial class Gui : CanvasLayer
 
     private void OnStartDraggingItem(ItemTile itemTile)
     {
-        GD.Print($"[GUI] Item grabbed: {itemTile.ItemInstance.InstanceId}");
+        Log($"Item grabbed: {itemTile.ItemInstance.InstanceId}");
         _dragGhost = new ItemGhost();
         _dragGhost.MouseDefaultCursorShape = Control.CursorShape.Move;
         _dragGhost.Count = itemTile.ItemInstance.CurrentStackSize;
@@ -480,7 +478,6 @@ public partial class Gui : CanvasLayer
         if (_dragGhost == null)
             return;
 
-        GD.Print("[GUI] Attempting to place dragged item");
 
         // Get the slot under the detection point
         Vector2 detectionPoint = _dragGhost.Position + new Vector2(32, 32);
@@ -496,7 +493,7 @@ public partial class Gui : CanvasLayer
             {
                 if (targetInv.GetItemAtPosition(targetSlot.slotPosition)?.InstanceId == itemInstance.InstanceId && leftClick && !_rotateHeld && targetSlot.slotPosition == itemInstance.GridPosition)
                 {
-                    GD.Print("[GUI] Placed item onto self, exitting dragging");
+                    Log("Placed item onto self, exitting dragging");
                     StopDragging();
                     return;
                 }
@@ -509,7 +506,7 @@ public partial class Gui : CanvasLayer
                 {
                     if (leftClick)
                     {
-                        GD.Print($"[GUI] Left click, drop all, rotating? {_rotateHeld}");
+                        Log($"Left click, drop all, rotating? {_rotateHeld}");
 
                         _inventoryManager.RequestItemMove(
                             itemInstance.InstanceId,
@@ -518,13 +515,12 @@ public partial class Gui : CanvasLayer
                             _rotateHeld,
                             Math.Min(canPlace, _dragGhost.Count));
                         _dragGhost.Count -= Math.Min(canPlace, _dragGhost.Count);
-                        GD.Print($"[GUI] Placed {Math.Min(canPlace, _dragGhost.Count)} items, {_dragGhost.Count} remaining");
 
                     }
                     else if (rightClick)
                     {
 
-                        GD.Print("[GUI] Trying to place 1");
+                        Log("Trying to place 1");
                         _inventoryManager.RequestItemMove(
                             itemInstance.InstanceId,
                             targetSlot.inventoryId,
@@ -532,32 +528,33 @@ public partial class Gui : CanvasLayer
                             _rotateHeld,
                             1);
                         _dragGhost.Count -= 1;
-                        GD.Print("[GUI] Placed 1, remaining in ghost: " + _dragGhost.Count);
+                        Log("Placed 1, remaining in ghost: " + _dragGhost.Count);
 
                     }
                     else
                     {
-                        GD.Print("[GUI] Not a click I know");
+                        Log("Not a click I know");
                         throw new System.Exception("Unknown click type in OnDraggingItemClick");
                     }
                 }
                 else
                 {
-                    GD.Print("[GUI] Cannot place item here - doesn't fit");
+                    Log("Cannot place item here - doesn't fit");
                 }
             }
             else
             {
-                GD.Print("[GUI] Dropped outside inventory - returning item");
+                Log("Dropped outside inventory - returning item");
             }
             if (_dragGhost.Count < 0)
             {
-                GD.Print("[GUI] Error: Drag ghost count below zero");
+                Error("Error: Drag ghost count below zero");
                 StopDragging();
                 throw new System.Exception("Drag ghost count below zero");
             }
             if (_dragGhost.Count == 0)
             {
+                Log("Drag ghost count is zero, stopping drag");
                 StopDragging();
             }
 

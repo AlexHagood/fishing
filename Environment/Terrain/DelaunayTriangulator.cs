@@ -92,12 +92,12 @@ public static class DelaunayTriangulator
                 }
             }
 
-            GD.Print($"Triangle.NET: Created {result.Count} triangles from {nodes.Count} nodes with correct winding");
+            Log($"Triangle.NET: Created {result.Count} triangles from {nodes.Count} nodes with correct winding");
             return result;
         }
         catch (Exception ex)
         {
-            GD.PrintErr($"DelaunayTriangulator error: {ex.Message}");
+            Error($"DelaunayTriangulator error: {ex.Message}");
             
             // Fallback: create a simple triangulation for 3 nodes
             if (nodes.Count == 3)
@@ -194,7 +194,7 @@ public static class DelaunayTriangulator
             }
         }
 
-        GD.Print($"Lloyd's relaxation: {iterations} iterations completed for {nodes.Count} nodes");
+        Log($"Lloyd's relaxation: {iterations} iterations completed for {nodes.Count} nodes");
         return nodes;
     }
 }
