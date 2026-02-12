@@ -114,6 +114,12 @@ chat={
 ]
 }
 
+[layer_names]
+
+3d_physics/layer_1="Terrain/World"
+3d_physics/layer_2="WorldItems"
+3d_physics/layer_3="Player"
+
 [physics]
 
 3d/physics_engine="Jolt Physics"
