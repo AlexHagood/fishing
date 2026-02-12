@@ -228,18 +228,6 @@ public partial class InventoryManager : Node
             _itemInstances[item.InstanceId] = item;
         }
         
-        // Reconstruct hotbar references using the now-populated item cache
-        foreach (var kvp in dto.HotbarItemIds)
-        {
-            int slotIndex = kvp.Key;
-            int instanceId = kvp.Value;
-            
-            if (_itemInstances.ContainsKey(instanceId))
-            {
-                inventory.HotbarItems[slotIndex] = _itemInstances[instanceId];
-            }
-        }
-        
         // Store or update the inventory
         _Inventories[inventory.Id] = inventory;
         
@@ -311,7 +299,6 @@ public partial class InventoryManager : Node
                 }
                 existingItem.CurrentStackSize += count;
             }
-            EmitSignal(nameof(InventoryUpdate));
 
         }
         // No existing item, check for space
@@ -327,8 +314,6 @@ public partial class InventoryManager : Node
                     item.GridPosition = targetPosition;
                     item.IsRotated = rotated ^ item.IsRotated;
                     targetInventory.Items.Add(item);
-                    EmitSignal(nameof(InventoryUpdate));
-                    return;
                 }
                 else if (count < item.CurrentStackSize || item.Infinite)
                 {
@@ -348,9 +333,6 @@ public partial class InventoryManager : Node
                     }
                     targetInventory.Items.Add(newItem);
                     _itemInstances[newItem.InstanceId] = newItem;
-                    EmitSignal(nameof(InventoryUpdate), targetInventoryId);
-                    EmitSignal(nameof(InventoryUpdate), currentInventory.Id);
-                    return;
                 }
                 else
                 {
@@ -362,6 +344,14 @@ public partial class InventoryManager : Node
                 throw new Exception("Not enough space in target inventory");
             }
         }
+
+        EmitSignal(nameof(InventoryUpdate), currentInventory.Id);
+        if (targetInventoryId != currentInventory.Id)
+        {
+            EmitSignal(nameof(InventoryUpdate), targetInventoryId);
+        }
+        
+        
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
@@ -396,6 +386,8 @@ public partial class InventoryManager : Node
                     RpcId(peerId, nameof(InventorySubscribeCallback), targetInventoryJson);
                 }
             });
+
+            GD.Print($"Notifying subscribed clients of move {targetInventory.subscribedPlayers.ToString()}");
 
             targetInventory.Notify(peerId => {
                 {

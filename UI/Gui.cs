@@ -350,6 +350,10 @@ public partial class Gui : CanvasLayer
     public void OpenWindow(UIWindow window)
     {
         window.Visible = true;
+        if (window is InventoryWindow invWindow)
+        {
+            invWindow.RefreshItems();
+        }
         // If this is the first window, release mouse capture for UI interaction
         if (openWindows > 0)
         {

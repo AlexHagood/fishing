@@ -21,6 +21,7 @@ namespace InventoryState
         public int GridPositionX { get; set; }
         public int GridPositionY { get; set; }
         public bool IsRotated { get; set; }
+        public bool Infinite { get; set; }
 
         public static ItemInstanceDTO FromItemInstance(ItemInstance item)
         {
@@ -32,7 +33,8 @@ namespace InventoryState
                 CurrentStackSize = item.CurrentStackSize,
                 GridPositionX = item.GridPosition.X,
                 GridPositionY = item.GridPosition.Y,
-                IsRotated = item.IsRotated
+                IsRotated = item.IsRotated,
+                Infinite = item.Infinite
             };
         }
 
@@ -51,7 +53,8 @@ namespace InventoryState
                 ItemData = itemData,
                 CurrentStackSize = CurrentStackSize,
                 GridPosition = new Vector2I(GridPositionX, GridPositionY),
-                IsRotated = IsRotated
+                IsRotated = IsRotated,
+                Infinite = Infinite
             };
         }
     }
@@ -61,7 +64,6 @@ namespace InventoryState
         public int SizeX { get; set; }
         public int SizeY { get; set; }
         public List<ItemInstanceDTO> Items { get; set; } = new();
-        public Dictionary<int, int> HotbarItemIds { get; set; } = new();
         public int Id { get; set; }
 
         public static InventoryDTO FromInventory(Inventory inventory)
@@ -71,7 +73,6 @@ namespace InventoryState
                 SizeX = inventory.Size.X,
                 SizeY = inventory.Size.Y,
                 Items = inventory.Items.Select(ItemInstanceDTO.FromItemInstance).ToList(),
-                HotbarItemIds = inventory.HotbarItems.ToDictionary(k => k.Key, v => v.Value.InstanceId),
                 Id = inventory.Id
             };
         }
@@ -81,7 +82,7 @@ namespace InventoryState
             var inventory = new Inventory(new Vector2I(SizeX, SizeY), Id);
             inventory.Items = Items.Select(dto => dto.ToItemInstance()).ToList();
             
-            // Reconstruct hotbar references (will be populated after all items are loaded)
+            // Hotbar will be managed separately
             inventory.HotbarItems = new Dictionary<int, ItemInstance>();
             
             return inventory;

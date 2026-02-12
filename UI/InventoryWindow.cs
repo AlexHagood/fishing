@@ -25,12 +25,20 @@ public partial class InventoryWindow : UIWindow
     {
         base._Ready();
 
+        // Connect to inventory updates FIRST before any refresh attempts
+        inventoryManager.InventoryUpdate += OnInventoryUpdate;
+
         // Subscribe to the inventory from the server
         GD.Print($"[InventoryWindow] Subscribing to inventory {inventoryId}");
-        inventoryManager.SubscribeToInventory(inventoryId);
-        
-        // Wait for this specific inventory to be available before displaying items
-        inventoryManager.InventoryUpdate += OnInventoryUpdate;
+        if (!Multiplayer.IsServer())
+        {
+            inventoryManager.SubscribeToInventory(inventoryId);
+        }
+        else
+        {
+            // Now that signal is connected, refresh will work properly
+            RefreshItems();
+        }
     }
 
     private void OnInventoryUpdate(int updatedInventoryId)
@@ -53,7 +61,7 @@ public partial class InventoryWindow : UIWindow
 
         if (_gridContainer == null)
         {
-                        // Get the content container from the base UIWindow
+            // Get the content container from the base UIWindow
             var contentContainer = GetNode<PanelContainer>("Panel/VBoxContainer/Content");
             Vector2I inventorySize = inventoryManager.GetInventorySize(inventoryId);
             // Create and add the GridContainer to the content area

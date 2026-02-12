@@ -112,7 +112,6 @@ public partial class Terrain : Node3D
 		_grassMaterial = CreateGrassMaterial();
 		_rockMaterial = CreateRockMaterial();
 		
-		Reset();
 	}
 
 

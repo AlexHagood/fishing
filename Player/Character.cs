@@ -170,6 +170,7 @@ public partial class Character : CharacterBody3D
 
         if (Multiplayer.IsServer())
         {
+            GD.Print("[Character] Server creating inventory for player " + Name + " with inventoryId " + inventoryId);
             _inventoryManager.CreateInventory(new Vector2I(6, 4), inventoryId);
         }
 

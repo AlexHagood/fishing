@@ -15,10 +15,14 @@ run/main_scene="uid://cldbqjys6m8o0"
 config/features=PackedStringArray("4.6", "C#", "Forward Plus")
 config/icon="uid://24hiptuipe8q"
 
+[audio]
+
+buses/default_bus_layout="uid://cqtc8h6b87b0u"
+
 [autoload]
 
 NetworkManager="*res://NetworkManager.cs"
-InventoryManager="*res://Items/InventoryManager.cs"
+InventoryManager="*res://Inventory/InventoryManager.cs"
 FishManager="*res://FishManager.cs"
 InputHandler="*res://Player/InputHandler.cs"
 
