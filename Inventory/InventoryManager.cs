@@ -132,12 +132,20 @@ namespace InventorySystem
 
         if (currentInventory.IsShop)
         {
-            Log("Purchasing item from shop");
-
+            Log($"Purchasing {item.Name} from shop");
         }
         else if (targetInventory.IsShop)
         {
-            Log("Selling item to shop");
+            Log($"Selling {item.Name} to shop");
+            DeleteItem(instanceId);
+            RequestSpawnInstance("res://Items/Coin.tres", currentInventory.Id, new NodePath(), infinite: false);
+            return;
+        }
+
+        if (currentInventory.IsShop && targetInventory.IsShop)
+        {
+            Log($"Illegal move: cannot move items directly between shops");
+            return;
         }
 
         int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated);
@@ -300,6 +308,14 @@ namespace InventorySystem
     public Vector2I? FindSpotToFitItem(ItemInstance item, int inventoryId)
     {
         Inventory inv = GetInventory(inventoryId);
+
+        ItemInstance? stackCandidate = inv.Items.FirstOrDefault(i => i.Name == item.Name && i.Count + item.Count <= i.ItemData.StackSize);
+        if (stackCandidate != null)
+        {
+            Log("Found existing stack to drop this item on.");
+            return stackCandidate.GridPosition;
+        }
+
         for (int x = 0; x <= inv.Size.X - item.Size.X; x++)
         {
             for (int y = 0; y <= inv.Size.Y - item.Size.Y; y++)
@@ -366,37 +382,51 @@ namespace InventorySystem
                 inventory.Items.Remove(newItem);
                 return true;
             }
-            // Set position directly instead of using MoveItem to avoid creating duplicates
-            Log($"Created item {newItem.Id} ({newItem.Name}) in inventory {inventoryId} at {position.Value} {(infinite ? "infinite" : "")}");
-            newItem.GridPosition = position.Value;
-            // Item already added to inventory.Items at line ~425, just set position here
-            EmitSignal(nameof(InventoryUpdate), inventoryId);
-            if (!DeleteItemPath.IsEmpty)
+
+            ItemInstance? existingItem = inventory.GetItemAtPosition(position.Value);
+            if (existingItem != null)
             {
-                Log($"Deleting spawned item from world {DeleteItemPath}");
-                Node? node = GetNodeOrNull(DeleteItemPath);
-                if (node != null)
+                Log($"Stacking onto existing stack of {existingItem.Name} ({existingItem.Id}) with count {existingItem.Count}");
+                existingItem.Count += newItem.Count;
+                _itemInstances.Remove(newItem.Id);
+                inventory.Items.Remove(newItem);
+                return true;
+                
+            }
+            else
+            {
+                // Set position directly instead of using MoveItem to avoid creating duplicates
+                Log($"Created item {newItem.Id} ({newItem.Name}) in inventory {inventoryId} at {position.Value} {(infinite ? "infinite" : "")}");
+                newItem.GridPosition = position.Value;
+                // Item already added to inventory.Items at line ~425, just set position here
+                EmitSignal(nameof(InventoryUpdate), inventoryId);
+                if (!DeleteItemPath.IsEmpty)
                 {
-                    // Call RPC on the WorldItem to delete it on all clients
-                    if (node is WorldItem worldItem)
+                    Log($"Deleting spawned item from world {DeleteItemPath}");
+                    Node? node = GetNodeOrNull(DeleteItemPath);
+                    if (node != null)
                     {
-                        if (Multiplayer.IsServer())
+                        // Call RPC on the WorldItem to delete it on all clients
+                        if (node is WorldItem worldItem)
                         {
-                            Log("Calling Destroy RPC on WorldItem");
-                            worldItem.Rpc(nameof(worldItem.Destroy));
+                            if (Multiplayer.IsServer())
+                            {
+                                Log("Calling Destroy RPC on WorldItem");
+                                worldItem.Rpc(nameof(worldItem.Destroy));
+                            }
                         }
+                    }
+                    else
+                    {
+                        Log("Warning: Could not find node to delete at path " + DeleteItemPath);
                     }
                 }
                 else
                 {
-                    Log("Warning: Could not find node to delete at path " + DeleteItemPath);
+                    Log("No delete path provided, not deleting any world item");
                 }
+                return true;
             }
-            else
-            {
-                Log("No delete path provided, not deleting any world item");
-            }
-            return true;
         }
     }
 

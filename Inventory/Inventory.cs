@@ -117,5 +117,21 @@ namespace InventorySystem
         return null;
     }
 
+    public int CoinCount 
+    {
+        get
+        {
+            int count = 0;
+            foreach (var item in Items)
+            {
+                if (item.ItemData.Name == "Coin")
+                {
+                    count += item.Count;
+                }
+            }
+            return count;
+        }
+    }
+
 }
 }
