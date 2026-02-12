@@ -145,7 +145,6 @@ public partial class Character : CharacterBody3D
         var nametag = GetNode<Label3D>("Nametag");
         nametag.Text = Name;
 
-        Log($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with am i OP? {IsMultiplayerAuthority()}");
         
         // Initialize animation tree for ALL characters (local and remote)
         animTree = GetNode<CharAnimations>("AnimationTree");
@@ -154,11 +153,6 @@ public partial class Character : CharacterBody3D
         // Get mesh for visibility control (ALL characters need this)
         _playerBodyMesh = GetNode<MeshInstance3D>("CharacterArmature/Skeleton3D/Body");
         _playerBodyMesh.Visible = true;
-        
-        // Early return for non-authority characters (remote players on your screen)
-        Log($"[Character {Multiplayer.GetUniqueId()}] _Ready called for character {Name} with authority {IsMultiplayerAuthority()}");
-        
-        Log($"[Character {Multiplayer.GetUniqueId()}] {Name} is local authority player, initializing...");
         
         
         // Get tool position helper (optional, but recommended)
@@ -225,7 +219,6 @@ public partial class Character : CharacterBody3D
     
     private void SetupCameraSystem()
     {
-        Log($"Setting up camera system on {Multiplayer.GetUniqueId()} for node {Name} - {IsMultiplayerAuthority()}");
         // Get camera target from scene (created in editor)
         _cameraTarget = GetNodeOrNull<Node3D>("CameraTarget");
         if (_cameraTarget == null)
@@ -256,14 +249,11 @@ public partial class Character : CharacterBody3D
             _activeCamera = _firstPersonCamera;
             _activeCamera.SetCurrent(true);
             _thirdPersonCamera.Current = false;
-            Log("Camera system initialized successfully");
         }
         else
         {
             Error("ERROR: Camera system failed to initialize - missing camera nodes!");
         }
-
-        Log($"{_firstPersonCamera}");
         
         // Initialize camera angles
         _cameraPitch = 0.0f;
@@ -362,7 +352,7 @@ public partial class Character : CharacterBody3D
             // Remove old tool
             if (_currentTool != null)
             {
-                if (_currentTool.itemInstance.InstanceId != heldItem.InstanceId)
+                if (_currentTool.itemInstance.Id != heldItem.Id)
                 {
                     _currentTool.QueueFree();
                     _currentTool = null;

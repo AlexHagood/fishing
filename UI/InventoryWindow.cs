@@ -35,7 +35,7 @@ public partial class InventoryWindow : UIWindow
         }
         else
         {
-            // Now that signal is connected, refresh will work properly
+            SetUpGridContainer();
             RefreshItems();
         }
     }
@@ -45,19 +45,18 @@ public partial class InventoryWindow : UIWindow
         // Only refresh if this is our inventory
         if (updatedInventoryId == inventoryId)
         {
+            if (_gridContainer == null)
+            {
+                SetUpGridContainer();
+            }
+            
             Log($"Inventory {inventoryId} updated, refreshing");
             RefreshItems();
         }
     }
-    
-    public void RefreshItems()
-    {
-        // Safety check - don't try to refresh if inventory doesn't exist yet
-        if (!inventoryManager.InventoryExists(inventoryId))
-        {
-            throw new System.Exception($"Tried to refresh inventory {inventoryId} but it doesn't exist in InventoryManager");
-        }
 
+    public void SetUpGridContainer()
+    {
         if (_gridContainer == null)
         {
             // Get the content container from the base UIWindow
@@ -97,6 +96,22 @@ public partial class InventoryWindow : UIWindow
             base.ResizeAndCenter();
 
         }
+        else
+        {
+            GD.PrintErr("Tried to set up grid container for inventory window but it already exists");
+            throw new System.Exception("Tried to set up grid container for inventory window but it already exists");
+        }
+    }
+    
+    public void RefreshItems()
+    {
+        // Safety check - don't try to refresh if inventory doesn't exist yet
+        if (!inventoryManager.InventoryExists(inventoryId))
+        {
+            throw new System.Exception($"Tried to refresh inventory {inventoryId} but it doesn't exist in InventoryManager");
+        }
+
+
         // Clear all existing item tiles from the item layer
         foreach (Node child in _itemLayer.GetChildren())
         {

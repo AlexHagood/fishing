@@ -104,7 +104,7 @@ namespace InventorySystem
         // Register all items in the global item cache
         foreach (var item in inventory.Items)
         {
-            _itemInstances[item.InstanceId] = item;
+            _itemInstances[item.Id] = item;
         }
         
         // Store or update the inventory
@@ -149,81 +149,81 @@ namespace InventorySystem
         // Item exists, try to stack it there.
         if (existingItem != null && existingItem.ItemData == item.ItemData && item.ItemData.Stackable)
         {
-            if (existingItem.InstanceId == item.InstanceId)
+            if (existingItem.Id == item.Id)
             {
                 Log("Will not move item onto itself");
                 return;
             }
-            if (existingItem.CurrentStackSize + count > item.ItemData.StackSize)
+            if (existingItem.Count + count > item.ItemData.StackSize)
             {
-                Error($"Target stack full: {existingItem.CurrentStackSize} + {count} > {item.ItemData.StackSize}");
+                Error($"Target stack full: {existingItem.Count} + {count} > {item.ItemData.StackSize}");
                 throw new Exception("Target stack is already full");
             }
 
-            if (count > item.CurrentStackSize)
+            if (count > item.Count)
             {
-                Error($"Not enough items to transfer: requested {count}, available {item.CurrentStackSize}");
+                Error($"Not enough items to transfer: requested {count}, available {item.Count}");
                 throw new Exception("Not enough items to transfer");
             }
 
-            if (count == item.CurrentStackSize)
+            if (count == item.Count)
             {
-                Log($"Moving entire stack of {count} {item.Name} ({item.InstanceId}) to existing stack of {existingItem.CurrentStackSize} ({existingItem.InstanceId})");
+                Log($"Moving entire stack of {count} {item.Name} ({item.Id}) to existing stack of {existingItem.Count} ({existingItem.Id})");
                 // Remove from current inventory
                 if (!item.Infinite)
                 {
                     currentInventory.Items.Remove(item);
-                    _itemInstances.Remove(item.InstanceId);
+                    _itemInstances.Remove(item.Id);
                 }
-                existingItem.CurrentStackSize += count;
+                existingItem.Count += count;
             }
             else
             {
                 Log($"Moving {count} to existing stack");
                 if (!item.Infinite)
                 {
-                    item.CurrentStackSize -= count;
+                    item.Count -= count;
                 }
-                existingItem.CurrentStackSize += count;
+                existingItem.Count += count;
             }
 
         }
         // No existing item, check for space
         else
         {
-            if (spaceAvailable >= item.CurrentStackSize)
+            if (spaceAvailable >= item.Count)
             {
-                if (count == item.CurrentStackSize && !item.Infinite)
+                if (count == item.Count && !item.Infinite)
                 {
-                    Log($"Moving existing itemdef {item.Name} ({item.InstanceId}) to position {targetPosition} in inventory {targetInventoryId} {(targetInventory.Id != currentInventory.Id ? "from {currentInventory.Id}" : "")}");
+                    Log($"Moving existing itemdef {item.Name} ({item.Id}) to position {targetPosition} in inventory {targetInventoryId} {(targetInventory.Id != currentInventory.Id ? "from {currentInventory.Id}" : "")}");
                     currentInventory.Items.Remove(item);
                     item.InventoryId = targetInventoryId;
                     item.GridPosition = targetPosition;
                     item.IsRotated = rotated ^ item.IsRotated;
                     targetInventory.Items.Add(item);
                 }
-                else if (count < item.CurrentStackSize || item.Infinite)
+                else if (count < item.Count || item.Infinite)
                 {
                     ItemInstance newItem = new ItemInstance
                     {
-                        InstanceId = GenerateItemInstanceId(),
+                        Id = GenerateItemInstanceId(),
                         ItemData = item.ItemData,
                         InventoryId = targetInventoryId,
-                        CurrentStackSize = count,
+                        Count = count,
                         GridPosition = targetPosition,
                         IsRotated = rotated ^ item.IsRotated
                     };
-                    Log($"Moving new itemdef {item.Name} ({newItem.InstanceId} from {item.InstanceId})to position {targetPosition} in inventory {targetInventoryId} {(targetInventory.Id != currentInventory.Id ? "from {currentInventory.Id}" : "")}");
+                    Log($"Moving new itemdef {item.Name} ({newItem.Id} from {item.Id})to position {targetPosition} in inventory {targetInventoryId} {(targetInventory.Id != currentInventory.Id ? "from {currentInventory.Id}" : "")}");
                     if (!item.Infinite)
                     {
-                        item.CurrentStackSize -= count;
+                        item.Count -= count;
                     }
                     targetInventory.Items.Add(newItem);
-                    _itemInstances[newItem.InstanceId] = newItem;
+                    _itemInstances[newItem.Id] = newItem;
                 }
                 else
                 {
-                    Error($"Invalid move count {count} from stacksize {item.CurrentStackSize}");
+                    Error($"Invalid move count {count} from stacksize {item.Count}");
                     throw new Exception("Not enough items to transfer or invalid count? Infinite broken?");
                 }
             }
@@ -273,28 +273,28 @@ namespace InventorySystem
 
             targetInventory.Notify(peerId => {
                 {
-                    RpcId(peerId, nameof(MoveItem), item.InstanceId, targetInventoryId, targetPosition, rotated, count);
+                    RpcId(peerId, nameof(MoveItem), item.Id, targetInventoryId, targetPosition, rotated, count);
                 }
 
             });
         }
         else
         {
-            RpcId(1, nameof(RequestItemMove), item.InstanceId, targetInventoryId, targetPosition, rotated, count);
+            RpcId(1, nameof(RequestItemMove), item.Id, targetInventoryId, targetPosition, rotated, count);
         }
     }
 
 
     public void RequestItemRotate(ItemInstance item)
     {
-        RequestItemMove(item.InstanceId, item.InventoryId, item.GridPosition, true, item.CurrentStackSize);
+        RequestItemMove(item.Id, item.InventoryId, item.GridPosition, true, item.Count);
     }
 
     public bool CanRotateItem(ItemInstance item)
     {
         Inventory inv = GetInventory(item.InventoryId);
         int space = inv.GetSpaceAt(item, item.GridPosition, true);
-        return space >= item.CurrentStackSize;
+        return space >= item.Count;
     }
 
     public Vector2I? FindSpotToFitItem(ItemInstance item, int inventoryId)
@@ -306,7 +306,7 @@ namespace InventorySystem
             {
                 Vector2I pos = new Vector2I(x, y);
                 int space = inv.GetSpaceAt(item, pos, item.IsRotated);
-                if (space >= item.CurrentStackSize)
+                if (space >= item.Count)
                 {
                     return pos;
                 }
@@ -323,14 +323,14 @@ namespace InventorySystem
         var inventory = GetInventory(inventoryId);
         var newItem = new ItemInstance
         {
-            InstanceId = newInstanceId,
+            Id = newInstanceId,
             ItemData = itemDef,
             InventoryId = inventoryId,
-            CurrentStackSize = infinite ? itemDef.StackSize : 1,
+            Count = infinite ? itemDef.StackSize : 1,
             Infinite = infinite
         };
 
-        _itemInstances[newItem.InstanceId] = newItem;
+        _itemInstances[newItem.Id] = newItem;
         inventory.Items.Add(newItem);
         Vector2I? position = FindSpotToFitItem(newItem, inventoryId);
         
@@ -340,7 +340,7 @@ namespace InventorySystem
         // We find no valid position to spawn an item
         if (position == null)
         {
-            _itemInstances.Remove(newItem.InstanceId);
+            _itemInstances.Remove(newItem.Id);
             inventory.Items.Remove(newItem);
             Log($"No position found, cleaned up. Inventory now has {inventory.Items.Count} items");
 
@@ -362,12 +362,12 @@ namespace InventorySystem
 
             if (check)
             {
-                _itemInstances.Remove(newItem.InstanceId);
+                _itemInstances.Remove(newItem.Id);
                 inventory.Items.Remove(newItem);
                 return true;
             }
             // Set position directly instead of using MoveItem to avoid creating duplicates
-            Log($"Created item {newItem.Name} ({newItem.Name} in inventory {inventoryId} at {position.Value} {(infinite ? "infinite" : "")}");
+            Log($"Created item {newItem.Id} ({newItem.Name}) in inventory {inventoryId} at {position.Value} {(infinite ? "infinite" : "")}");
             newItem.GridPosition = position.Value;
             // Item already added to inventory.Items at line ~425, just set position here
             EmitSignal(nameof(InventoryUpdate), inventoryId);
@@ -437,7 +437,7 @@ namespace InventorySystem
         {
             return;
         }
-        Log($"{Multiplayer.GetUniqueId()} Creating {(isShop ? "shop" : "regular")} inventory" + size + " with specified ID " + id);
+        Log($"Creating {(isShop ? "shop" : "regular")} inventory" + size + " with specified ID " + id);
         _Inventories[id] = new Inventory(size, id, isShop);
     }
 
@@ -491,8 +491,8 @@ namespace InventorySystem
         }
         var inventory = GetInventory(item.InventoryId);
         inventory.Items.Remove(item);
-        inventory.HotbarItems = inventory.HotbarItems.Where(kvp => kvp.Value.InstanceId != instanceId).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
-        _itemInstances.Remove(item.InstanceId);
+        inventory.HotbarItems = inventory.HotbarItems.Where(kvp => kvp.Value.Id != instanceId).ToDictionary(kvp => kvp.Key, kvp => kvp.Value);
+        _itemInstances.Remove(item.Id);
         EmitSignal(nameof(InventoryUpdate), inventory.Id);
     }
 
@@ -546,7 +546,7 @@ namespace InventorySystem
         // If the item is already assigned to any hotbar slot, remove it from that slot first
         foreach (var kvp in inventory.HotbarItems.ToList())
         {
-            if (kvp.Value.InstanceId == item.InstanceId)
+            if (kvp.Value.Id == item.Id)
             {
                 inventory.HotbarItems.Remove(kvp.Key);
                 break;

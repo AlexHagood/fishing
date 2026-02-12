@@ -31,7 +31,7 @@ public partial class ContextMenu : Godot.PopupMenu
         {
             case 0: // Drop
                 Log($"Context menu: Drop item {item.ItemData.Name}");
-                _inventoryManager.RequestDeleteItem(item.InstanceId);
+                _inventoryManager.RequestDeleteItem(item.Id);
                 break;
 
             case 1: // Rotate

@@ -28,9 +28,9 @@ namespace InventorySystem
             return new ItemInstanceDTO
             {
                 InventoryId = item.InventoryId,
-                InstanceId = item.InstanceId,
+                InstanceId = item.Id,
                 ItemDataPath = item.ItemData.ResourcePath,
-                CurrentStackSize = item.CurrentStackSize,
+                CurrentStackSize = item.Count,
                 GridPositionX = item.GridPosition.X,
                 GridPositionY = item.GridPosition.Y,
                 IsRotated = item.IsRotated,
@@ -49,9 +49,9 @@ namespace InventorySystem
             return new ItemInstance
             {
                 InventoryId = InventoryId,
-                InstanceId = InstanceId,
+                Id = InstanceId,
                 ItemData = itemData,
-                CurrentStackSize = CurrentStackSize,
+                Count = CurrentStackSize,
                 GridPosition = new Vector2I(GridPositionX, GridPositionY),
                 IsRotated = IsRotated,
                 Infinite = Infinite

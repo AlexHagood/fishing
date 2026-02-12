@@ -5,9 +5,9 @@ namespace InventorySystem
     public class ItemInstance
     {
     public int InventoryId { get; set; }
-    public int InstanceId { get; set; }
+    public int Id { get; set; }
     public ItemDefinition ItemData { get; set; }
-    public int CurrentStackSize { get; set; }
+    public int Count { get; set; }
     public Vector2I GridPosition { get; set; }
     public bool IsRotated { get; set; } = false;
     public bool Infinite = false;
@@ -28,7 +28,7 @@ namespace InventorySystem
 
         public override string ToString()
         {
-            return $"{CurrentStackSize} {ItemData.Name}, Pos: {GridPosition}, Rotated: {IsRotated} InventoryId: {InventoryId} InstanceId: {InstanceId}";
+            return $"{Count} {ItemData.Name}, Pos: {GridPosition}, Rotated: {IsRotated} InventoryId: {InventoryId} InstanceId: {Id}";
         }
 }
 }

@@ -23,7 +23,7 @@ public partial class ItemGhost : TextureRect
     
     public void setup(ItemTile original)
     {
-        Count = original.ItemInstance.CurrentStackSize;
+        Count = original.ItemInstance.Count;
         Texture = original.Texture;
         Size = original.Size;
     }

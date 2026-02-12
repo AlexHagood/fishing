@@ -102,7 +102,6 @@ public partial class NetworkManager : Node
 
     public void SpawnPlayer(long peerId)
     {
-        Log($"SpawnPlayer called for {peerId}.");
         if (!Multiplayer.IsServer())
         {
             Error("SpawnPlayer called on client, ignoring.");

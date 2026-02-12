@@ -70,7 +70,7 @@ namespace InventorySystem
 
         foreach (var otherItem in Items)
         {
-            if (otherItem.InstanceId == item.InstanceId){
+            if (otherItem.Id == item.Id){
                 continue; // Skip self
             }
 
@@ -85,13 +85,13 @@ namespace InventorySystem
             {
                 if (otherItem.ItemData == item.ItemData && item.ItemData.Stackable)
                 {
-                    Log($"Item overlaps, but is stackable with space to fit" + (item.ItemData.StackSize - otherItem.CurrentStackSize));
+                    Log($"Item overlaps, but is stackable with space to fit" + (item.ItemData.StackSize - otherItem.Count));
                     // slot is occupied by another item of the same type
-                    return item.ItemData.StackSize - otherItem.CurrentStackSize;
+                    return item.ItemData.StackSize - otherItem.Count;
                 }
                 else
                 {
-                    Log($"Item {item.Name} ({item.InstanceId}) illegally overlaps with {otherItem.Name} ({otherItem.InstanceId})");
+                    Log($"Item {item.Name} ({item.Id}) illegally overlaps with {otherItem.Name} ({otherItem.Id})");
                     // slot is occupied by another item
                     return 0;
                 }

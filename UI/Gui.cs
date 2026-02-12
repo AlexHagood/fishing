@@ -154,7 +154,7 @@ public partial class Gui : CanvasLayer
             if (item != null)
             {
                 Log($"Hotbar key pressed over item at position: {item.ItemData.Name}");
-                _inventoryManager.BindItemToSlot(inv.Id, slotIndex, item.InstanceId);
+                _inventoryManager.BindItemToSlot(inv.Id, slotIndex, item.Id);
             }
         }
         }
@@ -396,10 +396,8 @@ public partial class Gui : CanvasLayer
         AddChild(inventoryWindow);
         windows.Add(inventoryWindow);
 
-        OpenWindow(inventoryWindow);
-
-
         Log($"Inventory opened. Total windows: {windows.Count}");
+        _inputHandler.CurrentContext = InputHandler.InputContext.UI;
 
 
     }
@@ -447,7 +445,7 @@ public partial class Gui : CanvasLayer
                 if (_inventoryManager.CanRotateItem(itemAtSlot))
                 {
                     _inventoryManager.RequestItemRotate(itemAtSlot);
-                    Log($"Requested rotated item {itemAtSlot.InstanceId} in place. IsRotated: {itemAtSlot.IsRotated}");
+                    Log($"Requested rotated item {itemAtSlot.Id} in place. IsRotated: {itemAtSlot.IsRotated}");
                 }
                 else
                 {
@@ -460,10 +458,10 @@ public partial class Gui : CanvasLayer
 
     private void OnStartDraggingItem(ItemTile itemTile)
     {
-        Log($"Item grabbed: {itemTile.ItemInstance.InstanceId}");
+        Log($"Item grabbed: {itemTile.ItemInstance.Id}");
         _dragGhost = new ItemGhost();
         _dragGhost.MouseDefaultCursorShape = Control.CursorShape.Move;
-        _dragGhost.Count = itemTile.ItemInstance.CurrentStackSize;
+        _dragGhost.Count = itemTile.ItemInstance.Count;
         _pickupAudio.Play();
         AddChild(_dragGhost);
         _dragGhost.setup(itemTile);
@@ -491,7 +489,7 @@ public partial class Gui : CanvasLayer
             ItemInstance itemInstance = _dragGhost.ItemInstance;
             if (targetSlot != null)
             {
-                if (targetInv.GetItemAtPosition(targetSlot.slotPosition)?.InstanceId == itemInstance.InstanceId && leftClick && !_rotateHeld && targetSlot.slotPosition == itemInstance.GridPosition)
+                if (targetInv.GetItemAtPosition(targetSlot.slotPosition)?.Id == itemInstance.Id && leftClick && !_rotateHeld && targetSlot.slotPosition == itemInstance.GridPosition)
                 {
                     Log("Placed item onto self, exitting dragging");
                     StopDragging();
@@ -509,7 +507,7 @@ public partial class Gui : CanvasLayer
                         Log($"Left click, drop all, rotating? {_rotateHeld}");
 
                         _inventoryManager.RequestItemMove(
-                            itemInstance.InstanceId,
+                            itemInstance.Id,
                             targetSlot.inventoryId,
                             targetPos,
                             _rotateHeld,
@@ -522,7 +520,7 @@ public partial class Gui : CanvasLayer
 
                         Log("Trying to place 1");
                         _inventoryManager.RequestItemMove(
-                            itemInstance.InstanceId,
+                            itemInstance.Id,
                             targetSlot.inventoryId,
                             targetPos,
                             _rotateHeld,
@@ -588,11 +586,11 @@ public partial class Gui : CanvasLayer
 
         if (_dragGhost != null)
         {
-            int itemid = _dragGhost.ItemInstance.InstanceId;
+            int itemid = _dragGhost.ItemInstance.Id;
             if (_inventoryManager.ItemExists(itemid))
             {
                 ItemInstance item = _inventoryManager.GetItem(itemid);
-                _dragGhost.Count = item.CurrentStackSize;
+                _dragGhost.Count = item.Count;
             }
             else
             {
