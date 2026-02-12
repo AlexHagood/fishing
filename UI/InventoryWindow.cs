@@ -25,19 +25,37 @@ public partial class InventoryWindow : UIWindow
     {
         base._Ready();
 
-        // Initial display of items
-        RefreshItems();
+        // Subscribe to the inventory from the server
+        GD.Print($"[InventoryWindow] Subscribing to inventory {inventoryId}");
+        inventoryManager.SubscribeToInventory(inventoryId);
+        
+        // Wait for this specific inventory to be available before displaying items
+        inventoryManager.InventoryUpdate += OnInventoryUpdate;
+    }
+
+    private void OnInventoryUpdate(int updatedInventoryId)
+    {
+        // Only refresh if this is our inventory
+        if (updatedInventoryId == inventoryId)
+        {
+            GD.Print($"[InventoryWindow] Inventory {inventoryId} updated, refreshing");
+            RefreshItems();
+        }
     }
     
     public void RefreshItems()
     {
+        // Safety check - don't try to refresh if inventory doesn't exist yet
+        if (!inventoryManager.InventoryExists(inventoryId))
+        {
+            throw new System.Exception($"Tried to refresh inventory {inventoryId} but it doesn't exist in InventoryManager");
+        }
 
         if (_gridContainer == null)
         {
                         // Get the content container from the base UIWindow
             var contentContainer = GetNode<PanelContainer>("Panel/VBoxContainer/Content");
             Vector2I inventorySize = inventoryManager.GetInventorySize(inventoryId);
-            inventoryManager.InventoryUpdate += RefreshItems;
             // Create and add the GridContainer to the content area
             _gridContainer = new GridContainer();
             _gridContainer.AddThemeConstantOverride("v_separation", 0);

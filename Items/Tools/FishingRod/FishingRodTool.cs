@@ -92,7 +92,7 @@ public partial class FishingRodTool : ToolScript
 
         if (hookedItem != null)
         {
-            _inventoryManager.RequestSpawnInstance(hookedItem.ResourcePath, character.inventoryId);
+            _inventoryManager.RequestSpawnInstance(hookedItem.ResourcePath, character.inventoryId, new NodePath(), false);
             hookedItem = null;
         }
         

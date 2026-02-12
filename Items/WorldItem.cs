@@ -40,13 +40,17 @@ public partial class WorldItem : RigidBody3D, IInteractable
 
     public override void _Ready()
     {
-        MultiplayerSynchronizer sync = new MultiplayerSynchronizer();
-        sync.SetMultiplayerAuthority(GetMultiplayerAuthority());
-        sync.Name = $"{Name}Synchronizer";
-        AddChild(sync);
-        SceneReplicationConfig config = new SceneReplicationConfig();
-        config.AddProperty(":position");
-        sync.ReplicationConfig = config;
+        // Only create synchronizer if one doesn't already exist (from scene)
+        if (GetNodeOrNull<MultiplayerSynchronizer>("Synchronizer") == null)
+        {
+            MultiplayerSynchronizer sync = new MultiplayerSynchronizer();
+            sync.SetMultiplayerAuthority(GetMultiplayerAuthority());
+            sync.Name = "Synchronizer";
+            AddChild(sync);
+            SceneReplicationConfig config = new SceneReplicationConfig();
+            config.AddProperty(":position");
+            sync.ReplicationConfig = config;
+        }
     }
 
 
@@ -96,11 +100,11 @@ public partial class WorldItem : RigidBody3D, IInteractable
         InventoryManager inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
         if (!spawnerManaged)
         {
-            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId, GetPath());
+            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId, GetPath(), false);
         }
         else
         {
-            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId);
+            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId, new NodePath(), false);
         }
     }
 
@@ -130,6 +134,12 @@ public partial class WorldItem : RigidBody3D, IInteractable
         }
         holdTarget = null;
         ApplyCentralImpulse(direction * ThrowForce);
+    }
+    [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
+    public void Destroy()
+    {
+        GD.Print($"Destroying worlditem on pickup on client {Multiplayer.GetUniqueId()}");
+        QueueFree();
     }
 
 }

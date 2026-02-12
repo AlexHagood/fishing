@@ -49,7 +49,6 @@ public partial class Character : CharacterBody3D
     private SpringArm3D _springArm;  // For third-person collision
     private MeshInstance3D _playerBodyMesh;  // Reference to player's body mesh (not the whole armature!)
     private AnimationPlayer _animationPlayer;  // Character animations
-    private BoneAttachment3D _rightHandAttachment;  // Attachment point for held tools
     private Node3D _toolPosition;  // Helper node for tool positioning
     private bool _isPlayingActionAnimation = false;  // Prevent movement animations from interrupting actions
 
@@ -89,8 +88,27 @@ public partial class Character : CharacterBody3D
             
             _hotbarSlot = value;
             
-            // Update tool equipment when hotbar slot changes
-            Rpc("UpdateEquippedTool", _hotbarSlot);
+            var hotbarItems = _inventoryManager.GetInventory(inventoryId).HotbarItems;
+            
+            // Check if the slot has an item before accessing it
+            if (hotbarItems.ContainsKey(_hotbarSlot) && hotbarItems[_hotbarSlot] != null)
+            {
+                ItemDefinition heldItem = hotbarItems[_hotbarSlot].ItemData;
+                if (heldItem != null && heldItem.ToolScriptScene != null)
+                {
+                    Rpc(nameof(UpdateEquippedTool), heldItem.ToolScriptScene.ResourcePath);
+                }
+                else
+                {
+                    Rpc(nameof(UpdateEquippedTool), "");
+                }
+            }
+            else
+            {
+                // Slot is empty, unequip tool
+                Rpc(nameof(UpdateEquippedTool), "");
+            }
+            
         }
     }
 
@@ -131,7 +149,7 @@ public partial class Character : CharacterBody3D
         footstepsAudioPlayer = GetNode<AudioStreamPlayer3D>("AudioStreamPlayer3D");
         
         // Get mesh for visibility control (ALL characters need this)
-        _playerBodyMesh = GetNodeOrNull<MeshInstance3D>("CharacterArmature/Skeleton3D/Body");
+        _playerBodyMesh = GetNode<MeshInstance3D>("CharacterArmature/Skeleton3D/Body");
         _playerBodyMesh.Visible = true;
         
         // Early return for non-authority characters (remote players on your screen)
@@ -139,27 +157,22 @@ public partial class Character : CharacterBody3D
         
         GD.Print($"[Character {Multiplayer.GetUniqueId()}] {Name} is local authority player, initializing...");
         
-        // Get hand attachment for tools
-        _rightHandAttachment = GetNodeOrNull<BoneAttachment3D>("CharacterArmature/Skeleton3D/RightHandAttachment");
-        if (_rightHandAttachment == null)
-        {
-            GD.PrintErr("[Character] ERROR: RightHandAttachment not found! Create a BoneAttachment3D at CharacterArmature/Skeleton3D/RightHandAttachment with bone_name='Fist.R'");
-        }
         
         // Get tool position helper (optional, but recommended)
-        _toolPosition = GetNodeOrNull<Node3D>("CharacterArmature/Skeleton3D/RightHandAttachment/ToolPosition");
-        if (_toolPosition == null)
-        {
-            GD.Print("[Character] ToolPosition helper not found, tools will attach directly to hand bone");
-            // Use the hand attachment itself as fallback
-            _toolPosition = _rightHandAttachment;
-        }
+        _toolPosition = GetNode<Node3D>("CharacterArmature/Skeleton3D/RightHandAttachment/ToolPosition");
 
         _inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
 
         inventoryId = GetMultiplayerAuthority();
 
         holdPosition = GetNode<Node3D>("Camera3D/HoldPosition");
+
+
+        if (Multiplayer.IsServer())
+        {
+            _inventoryManager.CreateInventory(new Vector2I(6, 4), inventoryId);
+        }
+
 
 
         if (IsMultiplayerAuthority())
@@ -177,16 +190,14 @@ public partial class Character : CharacterBody3D
             _inputHandler = GetNode<InputHandler>("/root/InputHandler");
             ConnectInputSignals();
 
-            _inventoryManager.CreateInventory(new Vector2I(5, 5), inventoryId);
-
+            
         }
-
-        _inventoryManager.InventoryUpdate += () => Rpc(nameof(UpdateEquippedTool), HotbarSlot);
 
 
         
         // Create hold position for physics items (attached to active camera)
     }
+
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false)]
     public void ApplyCharacterImpulse(Vector3 forceVelocity)
@@ -318,70 +329,76 @@ public partial class Character : CharacterBody3D
     /// Works for both local authority and remote players.
     /// </summary>
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void UpdateEquippedTool(int slot)
+    private void UpdateEquippedTool(string toolScenePath)
     {
-        // Safety check: ensure inventory manager is initialized
-        if (_inventoryManager == null)
-        {
-            GD.PushWarning("[Character] InventoryManager not initialized yet, deferring hotbar update");
-            return;
-        }
         
         // For remote players, we only show the visual mesh, not the full tool script
-        GD.Print($"{Name} Updating equipped tool. Rpc call? " + (Multiplayer.GetRemoteSenderId() != 0) + $"Hotbar Slot: {slot}");
+        GD.Print($"{Name} Updating equipped tool. Rpc call? " + (Multiplayer.GetRemoteSenderId() != 0));
         
-        if (IsMultiplayerAuthority() && _inputHandler?.CurrentContext == InputHandler.InputContext.UI && HotbarSlot != slot)
+        if (IsMultiplayerAuthority())
         {
-            GD.Print($"[Character] Currently in UI context, skipping hotbar update");
-            return;
-        }
+            var hotbarItems = _inventoryManager.GetInventory(inventoryId).HotbarItems;
+            
+            // Check if HotbarSlot has an item
+            if (!hotbarItems.ContainsKey(HotbarSlot))
+            {
+                // No item in this slot, remove tool if any
+                if (_currentTool != null)
+                {
+                    _currentTool.QueueFree();
+                    _currentTool = null;
+                }
+                GD.Print($"[Character] No item in hotbar slot {HotbarSlot}");
+                return;
+            }
 
-        if (_inventoryManager.GetInventory(inventoryId).HotbarItems.ContainsKey(slot))
-        {
-            ItemInstance item = _inventoryManager.GetInventory(inventoryId).HotbarItems[slot];
-            GD.Print($"[Character {Name}] Hotbar slot {slot} has item: {item.ItemData.Name}");
+            ItemInstance heldItem = hotbarItems[HotbarSlot];
+            GD.Print($"[Character] Equipping item: {heldItem.ItemData.Name}");
             
             // Remove old tool
             if (_currentTool != null)
             {
-                if (_currentTool.itemInstance.InstanceId != item.InstanceId)
+                if (_currentTool.itemInstance.InstanceId != heldItem.InstanceId)
                 {
                     _currentTool.QueueFree();
                     _currentTool = null;
                 }
                  else
                 {
-                    GD.Print($"[Character] Tool in slot {slot} is already equipped, no need to update");
+                    GD.Print($"[Character] Tool in slot {HotbarSlot} is already equipped, no need to update");
                     return;
                 }
             }
                 
-
-            _currentTool = item.ItemData.ToolScriptScene.Instantiate<ToolScript>();
-            _currentTool.SetMultiplayerAuthority(GetMultiplayerAuthority());
-            _currentTool.itemInstance = item;
-            _currentTool.holdingCharacter = this;
-            _toolPosition.AddChild(_currentTool);
-            GD.Print("[Character] Authority player equipped tool with full functionality");
-
-            // For remote players: just show the mesh
-        }
-        else
-        {
-            GD.Print($"[Character] Hotbar slot {slot} is empty");
-            if (_currentTool != null)
+            // Load and instantiate the tool scene
+            if (!string.IsNullOrEmpty(toolScenePath))
             {
-                _currentTool.QueueFree();
-                _currentTool = null;
+                PackedScene toolScene = GD.Load<PackedScene>(toolScenePath);
+                _currentTool = toolScene.Instantiate<ToolScript>();
+                _currentTool.SetMultiplayerAuthority(GetMultiplayerAuthority());
+                _currentTool.itemInstance = heldItem;
+                _currentTool.holdingCharacter = this;
+                _toolPosition.AddChild(_currentTool);
+                GD.Print("[Character] Authority player equipped tool with full functionality");
             }
-            
-            // Remove any mesh instances for remote players
-            if (_toolPosition != null)
+        }
+        else // Remote players only
+        {
+            if (string.IsNullOrEmpty(toolScenePath))
             {
-                foreach (var child in _toolPosition.GetChildren())
+                if (_currentTool != null)
                 {
-                    child.QueueFree();
+                    _currentTool.QueueFree();
+                    _currentTool = null;
                 }
+            }
+            else
+            {
+                PackedScene toolScene = GD.Load<PackedScene>(toolScenePath);
+                _currentTool = toolScene.Instantiate<ToolScript>();
+                _toolPosition.AddChild(_currentTool);
+                GD.Print("[Character] Remote player equipped tool with visual mesh only");
+                _currentTool.holdingCharacter = this;
             }
         }
     }
