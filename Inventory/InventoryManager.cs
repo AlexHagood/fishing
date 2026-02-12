@@ -24,9 +24,6 @@ public partial class InventoryManager : Node
     private Dictionary<int, ItemInstance> _itemInstances = new Dictionary<int, ItemInstance>();
 
     int inventoryCount = 1;
-    [Export]
-    private int _itemCount = 0;
-    private int ItemCount => _itemCount++;
 
     [Signal]
     public delegate void InventoryUpdateEventHandler(int inventoryId);
@@ -36,6 +33,19 @@ public partial class InventoryManager : Node
     public override void _Ready()
     {
         _networkManager = GetNode<NetworkManager>("/root/NetworkManager");
+    }
+
+    /// <summary>
+    /// Generates a new unique item instance ID by finding the first available ID not in use
+    /// </summary>
+    private int GenerateItemInstanceId()
+    {
+        int id = 0;
+        while (_itemInstances.ContainsKey(id))
+        {
+            id++;
+        }
+        return id;
     }
 
     public ItemInstance GetItem(int id)
@@ -189,7 +199,7 @@ public partial class InventoryManager : Node
                     GD.Print("[IM] Moving new itemdef to position");
                     ItemInstance newItem = new ItemInstance
                     {
-                        InstanceId = ItemCount,
+                        InstanceId = GenerateItemInstanceId(),
                         ItemData = item.ItemData,
                         InventoryId = targetInventoryId,
                         CurrentStackSize = count,
@@ -306,7 +316,8 @@ public partial class InventoryManager : Node
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
     public bool SpawnInstance(string itemResourcePath, int inventoryId, NodePath DeleteItemPath, bool check=false, bool infinite = false)
     {
-        GD.Print($"[IM] SpawnInstance called: check={check}, infinite={infinite}, InstanceId will be {ItemCount}");
+        int newInstanceId = GenerateItemInstanceId();
+        GD.Print($"[IM] SpawnInstance called: check={check}, infinite={infinite}, InstanceId will be {newInstanceId}");
         if (check)
         {
             GD.Print("[IM] Server checking spawn validity");
@@ -315,7 +326,7 @@ public partial class InventoryManager : Node
         var inventory = GetInventory(inventoryId);
         var newItem = new ItemInstance
         {
-            InstanceId = ItemCount,
+            InstanceId = newInstanceId,
             ItemData = itemDef,
             InventoryId = inventoryId,
             CurrentStackSize = 1,
@@ -332,10 +343,9 @@ public partial class InventoryManager : Node
         // We find no valid position to spawn an item
         if (position == null)
         {
-            _itemCount -= 1;
             _itemInstances.Remove(newItem.InstanceId);
             inventory.Items.Remove(newItem);
-            GD.Print($"[IM] No position found, cleaned up. ItemCount now {ItemCount}, inventory has {inventory.Items.Count} items");
+            GD.Print($"[IM] No position found, cleaned up. Inventory now has {inventory.Items.Count} items");
 
 
             if (!check)
@@ -355,10 +365,9 @@ public partial class InventoryManager : Node
 
             if (check)
             {
-                _itemCount -= 1;
                 _itemInstances.Remove(newItem.InstanceId);
                 inventory.Items.Remove(newItem);
-                GD.Print($"[IM] Check successful, cleaned up. ItemCount now {ItemCount}, inventory has {inventory.Items.Count} items");
+                GD.Print($"[IM] Check successful, cleaned up. Inventory now has {inventory.Items.Count} items");
                 return true;
             }
             // Set position directly instead of using MoveItem to avoid creating duplicates
