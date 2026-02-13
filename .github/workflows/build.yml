@@ -43,7 +43,7 @@ jobs:
           
           # Manually specify the debug build files
           WINDOWS_BUILD="$BUILD_DIR/Windows/glop3.exe"
-          LINUX_BUILD="$BUILD_DIR/Linux/Glop3.x86_64"
+          LINUX_BUILD="$BUILD_DIR/Linux/glop3.x86_64"
           
           # Check if files exist
           if [ ! -f "$WINDOWS_BUILD" ]; then
