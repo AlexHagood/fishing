@@ -16,17 +16,6 @@ jobs:
         with:
           lfs: true
       
-      - name: Setup .NET
-        uses: actions/setup-dotnet@v3
-        with:
-          dotnet-version: '8.0.x'
-      
-      - name: Restore NuGet packages
-        run: dotnet restore
-      
-      - name: Build .NET project
-        run: dotnet build --configuration ExportRelease --no-restore
-      
       - name: Export Game
         id: export
         uses: firebelley/godot-export@v5.2.1
@@ -40,8 +29,8 @@ jobs:
       - name: List export output
         run: |
           echo "Build directory: ${{ steps.export.outputs.build_directory }}"
-          echo "Contents of Releases directory:"
-          ls -laR ${{ steps.export.outputs.build_directory }}/Releases || true
+          echo "Contents of build directory:"
+          ls -laR ${{ steps.export.outputs.build_directory }} || true
 
       - name: Create Release
         env:
@@ -52,21 +41,29 @@ jobs:
           
           BUILD_DIR="${{ steps.export.outputs.build_directory }}"
           
-          # Collect all files from Releases directory
-          FILES=$(find "$BUILD_DIR/Releases" -type f)
+          # Manually specify the debug build files
+          WINDOWS_BUILD="$BUILD_DIR/Releases/Windows/glop3.exe"
+          LINUX_BUILD="$BUILD_DIR/Releases/Linux/Glop3.x86_64"
           
-          if [ -z "$FILES" ]; then
-            echo "No files found in $BUILD_DIR/Releases"
-            ls -laR "$BUILD_DIR" || true
+          # Check if files exist
+          if [ ! -f "$WINDOWS_BUILD" ]; then
+            echo "Windows build not found at: $WINDOWS_BUILD"
             exit 1
           fi
           
-          echo "Files to upload:"
-          echo "$FILES"
+          if [ ! -f "$LINUX_BUILD" ]; then
+            echo "Linux build not found at: $LINUX_BUILD"
+            exit 1
+          fi
           
-          # Create release with files
+          echo "Found builds:"
+          echo "  Windows: $WINDOWS_BUILD"
+          echo "  Linux: $LINUX_BUILD"
+          
+          # Create release with the debug builds
           gh release create "$TAG" \
             --repo="$GITHUB_REPOSITORY" \
             --title="Build ${SHORT_SHA}" \
-            --notes="Automated build from commit ${GITHUB_SHA}" \
-            $FILES
+            --notes="Automated debug build from commit ${GITHUB_SHA}" \
+            "$WINDOWS_BUILD" \
+            "$LINUX_BUILD"
