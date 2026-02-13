@@ -22,7 +22,7 @@ public partial class Merchant : Npc
             {
                 foreach (ItemDefinition itemdef in ShopInventory)
                 {
-                    _inventoryManager.RequestSpawnInstance(itemdef.ResourcePath, ShopId, new NodePath(), infinite: true);
+                    _inventoryManager.RequestSpawnInstance(itemdef.ResourcePath, ShopId, new NodePath(), 1, infinite: true);
                 }
             }
 		}

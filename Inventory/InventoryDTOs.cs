@@ -65,6 +65,7 @@ namespace InventorySystem
         public int SizeY { get; set; }
         public List<ItemInstanceDTO> Items { get; set; } = new();
         public int Id { get; set; }
+        public bool IsShop { get; set; }
 
         public static InventoryDTO FromInventory(Inventory inventory)
         {
@@ -73,13 +74,14 @@ namespace InventorySystem
                 SizeX = inventory.Size.X,
                 SizeY = inventory.Size.Y,
                 Items = inventory.Items.Select(ItemInstanceDTO.FromItemInstance).ToList(),
-                Id = inventory.Id
+                Id = inventory.Id,
+                IsShop = inventory.IsShop
             };
         }
 
         public Inventory ToInventory()
         {
-            var inventory = new Inventory(new Vector2I(SizeX, SizeY), Id);
+            var inventory = new Inventory(new Vector2I(SizeX, SizeY), Id, IsShop);
             inventory.Items = Items.Select(dto => dto.ToItemInstance()).ToList();
             
             // Hotbar will be managed separately

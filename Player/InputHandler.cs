@@ -91,6 +91,14 @@ public partial class InputHandler : Node
             return;
         }
 
+        if (Input.IsActionJustPressed("debuginv"))
+        {
+            GD.Print($"=== Inventory State {Multiplayer.GetUniqueId()} ===");
+            InventoryManager inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
+            inventoryManager.PrintState();
+            return;
+        }
+
         // Route input based on current context
         switch (_currentContext)
         {

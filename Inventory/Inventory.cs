@@ -85,7 +85,7 @@ namespace InventorySystem
             {
                 if (otherItem.ItemData == item.ItemData && item.ItemData.Stackable)
                 {
-                    Log($"Item overlaps, but is stackable with space to fit" + (item.ItemData.StackSize - otherItem.Count));
+                    Log($"Item {item.Name} ({item.Id}) overlaps {otherItem.Id}, but is stackable with space to fit" + (item.ItemData.StackSize - otherItem.Count));
                     // slot is occupied by another item of the same type
                     return item.ItemData.StackSize - otherItem.Count;
                 }
@@ -124,7 +124,7 @@ namespace InventorySystem
             int count = 0;
             foreach (var item in Items)
             {
-                if (item.ItemData.Name == "Coin")
+                if (item.IsCoin)
                 {
                     count += item.Count;
                 }

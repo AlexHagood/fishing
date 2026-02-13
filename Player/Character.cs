@@ -373,6 +373,7 @@ public partial class Character : CharacterBody3D
                 _currentTool.itemInstance = heldItem;
                 _currentTool.holdingCharacter = this;
                 _toolPosition.AddChild(_currentTool);
+                _currentTool.SetMultiplayerAuthority(GetMultiplayerAuthority());
                 Log("Authority player equipped tool with full functionality");
             }
         }
@@ -391,6 +392,7 @@ public partial class Character : CharacterBody3D
                 PackedScene toolScene = GD.Load<PackedScene>(toolScenePath);
                 _currentTool = toolScene.Instantiate<ToolScript>();
                 _toolPosition.AddChild(_currentTool);
+                _currentTool.SetMultiplayerAuthority(GetMultiplayerAuthority());
                 Log("Remote player equipped tool with visual mesh only");
                 _currentTool.holdingCharacter = this;
             }
@@ -444,10 +446,10 @@ public partial class Character : CharacterBody3D
         Log($"{Name} - Opening inventory with Id " + id);
         EmitSignal(SignalName.InventoryRequested, id);
     }
-
-    public override void _Process(double delta)
+    public void SendDialogMessage(string message)
     {
-    }
+        EmitSignal(SignalName.DialogMessage, message);
+    } 
 
     public override void _PhysicsProcess(double delta)
     {
@@ -508,7 +510,6 @@ public partial class Character : CharacterBody3D
         // Handle jump using InputHandler
         if (isOnFloor && _inputHandler.IsJumpJustPressed())
         {
-            EmitSignal(SignalName.DialogMessage, "Jump!");
             Velocity = new Vector3(Velocity.X, JumpVelocity, Velocity.Z);
             if (animTree != null)
             {

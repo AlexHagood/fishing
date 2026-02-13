@@ -100,11 +100,11 @@ public partial class WorldItem : RigidBody3D, IInteractable
         InventoryManager inventoryManager = GetNode<InventoryManager>("/root/InventoryManager");
         if (!spawnerManaged)
         {
-            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId, GetPath(), false);
+            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId, GetPath(), 1, false);
         }
         else
         {
-            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId, new NodePath(), false);
+            inventoryManager.RequestSpawnInstance(InvItemData.ResourcePath, character.inventoryId, new NodePath(), 1, false);
         }
     }
 

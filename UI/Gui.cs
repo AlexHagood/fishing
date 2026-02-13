@@ -273,8 +273,8 @@ public partial class Gui : CanvasLayer
 
     private InventorySlot? GetSlotAtPosition(Vector2 globalPosition)
     {
-        // Check all open inventory windows
-        foreach (var window in windows.OfType<InventoryWindow>())
+        // Check only visible inventory windows
+        foreach (var window in windows.OfType<InventoryWindow>().Where(w => w.Visible))
         {
             // Access the grid container directly (it's a public field)
             var contentContainer = window.GetNode<PanelContainer>("Panel/VBoxContainer/Content");
@@ -349,9 +349,8 @@ public partial class Gui : CanvasLayer
         if (openWindows == 0)
         {
             _inputHandler.CurrentContext = InputHandler.InputContext.Gameplay;
-
+            StopDragging();
         }
-
         Log($"Window closed. Windows open: {openWindows}");
     }
 

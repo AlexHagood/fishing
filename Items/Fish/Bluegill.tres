@@ -7,4 +7,5 @@ script = ExtResource("1_ekope")
 Name = "Bluegill"
 Icon = "uid://24hiptuipe8q"
 Size = Vector2i(1, 1)
+Value = 2
 metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

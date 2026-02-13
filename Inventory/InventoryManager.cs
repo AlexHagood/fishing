@@ -40,7 +40,7 @@ namespace InventorySystem
     /// </summary>
     private int GenerateItemInstanceId()
     {
-        int id = 0;
+        int id = 1;
         while (_itemInstances.ContainsKey(id))
         {
             id++;
@@ -120,33 +120,116 @@ namespace InventorySystem
         return inventory.Size;
     }
 
+    public void PrintState()
+    {
+        foreach(var inventory in _Inventories.Values)
+        {
+            GD.Print($"{(inventory.IsShop ? "Shop" : "Inventory")} {inventory.Id} - Size: {inventory.Size} - Coins: {inventory.CoinCount} - Items:");
+            foreach (var item in inventory.Items)
+            {
+                GD.Print($"  - {item.Name} (ID: {item.Id}, Count: {item.Count}, Pos: {item.GridPosition}, Infinite: {item.Infinite})");
+            }
+        }
+    }
+
+    public void TakeCoins(int count, int inventoryId)
+    {
+        var inventory = GetInventory(inventoryId);
+        if (inventory.CoinCount < count)
+        {
+            Log($"Not enough coins in inventory {inventoryId} to take {count} coins. Current coin count: {inventory.CoinCount}");
+            throw new Exception("Not enough coins in inventory");
+        }
+        int taken = 0;
+        List<ItemInstance> coins = inventory.Items.Where(i => i.IsCoin).ToList();
+        foreach(ItemInstance coin in coins)
+        {
+            if (taken == count)
+            {
+                break;
+            }
+            if (taken > count)
+            {
+                throw new Exception("Taken more coins than requested, this should never happen");
+            }
+            if (coin.Count + taken <= count)
+            {
+                Log($"Taking a whole stack of coins {coin.Id}");
+                taken += coin.Count;
+                DeleteItem(coin.Id);
+            }
+            else
+            {
+                int toTake = count - taken;
+                Log($"Taking {toTake} coins from stack {coin.Id}");
+                coin.Count -= toTake;
+                taken += toTake;
+            }
+        }
+        EmitSignal(nameof(InventoryUpdate), inventoryId);
+    }
+
 
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    private void MoveItem(int instanceId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count)
+    private void MoveItem(int instanceId, int targetInventoryId, Vector2I targetPosition, bool rotated, int count, int freeInstanceId)
     {
 
         ItemInstance item = GetItem(instanceId);
         Inventory currentInventory = GetInventory(item.InventoryId);
         Inventory targetInventory = GetInventory(targetInventoryId);
 
-        if (currentInventory.IsShop)
-        {
-            Log($"Purchasing {item.Name} from shop");
-        }
-        else if (targetInventory.IsShop)
-        {
-            Log($"Selling {item.Name} to shop");
-            DeleteItem(instanceId);
-            RequestSpawnInstance("res://Items/Coin.tres", currentInventory.Id, new NodePath(), infinite: false);
-            return;
-        }
 
         if (currentInventory.IsShop && targetInventory.IsShop)
         {
             Log($"Illegal move: cannot move items directly between shops");
             return;
         }
+
+        
+
+        if (currentInventory.IsShop & !item.IsCoin)
+        {
+            Log($"Purchasing {item.Name} from shop");
+            if (targetInventory.CoinCount < count)
+            {
+                Log("No money!");
+                return;
+            }
+            else
+            {
+                TakeCoins(count * item.ItemData.Value, targetInventoryId);
+            }
+        }
+        else if (targetInventory.IsShop & !item.IsCoin)
+        {
+            Log($"Selling {item.Name} to shop");
+            
+            // Generate the coin ID BEFORE deleting the item to avoid ID reuse race condition
+            int coinInstanceId = freeInstanceId;
+            
+            if (count == item.Count)
+            {
+                DeleteItem(instanceId);
+            }
+            else
+            {
+                item.Count -= count;
+            }
+            if (Multiplayer.IsServer())
+            {
+                Log($"Serving giving out {count * item.ItemData.Value} money for selling with ID {coinInstanceId}");
+                // Directly call SpawnInstance instead of RequestSpawnInstance to use the pre-generated ID
+                Inventory inventory = GetInventory(currentInventory.Id);
+                inventory.Notify(peerId =>
+                {
+                    RpcId(peerId, nameof(SpawnInstance), "res://Items/Coin.tres", currentInventory.Id, new NodePath(), coinInstanceId, count * item.ItemData.Value, false);
+                });
+            }
+            return;
+        }
+
+
 
         int spaceAvailable = targetInventory.GetSpaceAt(item, targetPosition, rotated);
         ItemInstance? existingItem = targetInventory.GetItemAtPosition(targetPosition);
@@ -214,7 +297,7 @@ namespace InventorySystem
                 {
                     ItemInstance newItem = new ItemInstance
                     {
-                        Id = GenerateItemInstanceId(),
+                        Id = freeInstanceId,
                         ItemData = item.ItemData,
                         InventoryId = targetInventoryId,
                         Count = count,
@@ -278,10 +361,10 @@ namespace InventorySystem
                     RpcId(peerId, nameof(InventorySubscribeCallback), targetInventoryJson);
                 }
             });
-
+            int freshInstanceId = GenerateItemInstanceId();
             targetInventory.Notify(peerId => {
                 {
-                    RpcId(peerId, nameof(MoveItem), item.Id, targetInventoryId, targetPosition, rotated, count);
+                    RpcId(peerId, nameof(MoveItem), item.Id, targetInventoryId, targetPosition, rotated, count, freshInstanceId);
                 }
 
             });
@@ -309,10 +392,10 @@ namespace InventorySystem
     {
         Inventory inv = GetInventory(inventoryId);
 
-        ItemInstance? stackCandidate = inv.Items.FirstOrDefault(i => i.Name == item.Name && i.Count + item.Count <= i.ItemData.StackSize);
+        ItemInstance? stackCandidate = inv.Items.FirstOrDefault(i => i.ItemData.ScenePath == item.ItemData.ScenePath && i.Count + item.Count <= i.ItemData.StackSize);
         if (stackCandidate != null)
         {
-            Log("Found existing stack to drop this item on.");
+            Log($"Found existing stack of {stackCandidate.Count} {stackCandidate.Name} ({stackCandidate.Id}) to drop this item on at {stackCandidate.GridPosition}.");
             return stackCandidate.GridPosition;
         }
 
@@ -332,22 +415,19 @@ namespace InventorySystem
     }
 
     [Rpc(MultiplayerApi.RpcMode.Authority, CallLocal = true, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public bool SpawnInstance(string itemResourcePath, int inventoryId, NodePath DeleteItemPath, bool check=false, bool infinite = false)
+    public void SpawnInstance(string itemResourcePath, int inventoryId, NodePath DeleteItemPath, int freshInstanceId, int count = 1, bool infinite = false)
     {
-        int newInstanceId = GenerateItemInstanceId();
         ItemDefinition itemDef = GD.Load<ItemDefinition>(itemResourcePath);
         var inventory = GetInventory(inventoryId);
         var newItem = new ItemInstance
         {
-            Id = newInstanceId,
+            Id = freshInstanceId,
             ItemData = itemDef,
-            InventoryId = inventoryId,
-            Count = infinite ? itemDef.StackSize : 1,
+            Count = infinite ? itemDef.StackSize : count,
             Infinite = infinite
         };
 
-        _itemInstances[newItem.Id] = newItem;
-        inventory.Items.Add(newItem);
+
         Vector2I? position = FindSpotToFitItem(newItem, inventoryId);
         
 
@@ -358,90 +438,70 @@ namespace InventorySystem
         {
             _itemInstances.Remove(newItem.Id);
             inventory.Items.Remove(newItem);
-            Log($"No position found, cleaned up. Inventory now has {inventory.Items.Count} items");
-
-
-            if (!check)
-            {
-                Log("Spawning failed on non-check!");
-                throw new Exception("Illegal spawn attempt");
-            }
-            else
-            {
-                return false;
-            }
-            
+            Error($"No position found to spawn item {newItem.Name}, cleaned up. Inventory now has {inventory.Items.Count} items");
+            throw new Exception("No valid position found to spawn item in inventory");
         } 
-        else 
-        {
+         
         // valid spawn position found
+        ItemInstance? existingItem = inventory.GetItemAtPosition(position.Value);
+        if (existingItem != null)
+        {
+            Log($"Stacking onto existing stack of {existingItem.Name} ({existingItem.Id}) with count {existingItem.Count}");
+            existingItem.Count += newItem.Count;
+            
+        }
+        else
+        {
+            _itemInstances[newItem.Id] = newItem;
+            inventory.Items.Add(newItem);
+            // Set position directly instead of using MoveItem to avoid creating duplicates
+            Log($"Created item {newItem.Id} ({newItem.Name}) in inventory {inventoryId} at {position.Value} {(infinite ? "infinite" : "")}");
+            newItem.GridPosition = position.Value;
+            newItem.InventoryId = inventoryId;
+            // Item already added to inventory.Items at line ~425, just set position here
+            EmitSignal(nameof(InventoryUpdate), inventoryId);
 
-            if (check)
+            if (!DeleteItemPath.IsEmpty)
             {
-                _itemInstances.Remove(newItem.Id);
-                inventory.Items.Remove(newItem);
-                return true;
-            }
-
-            ItemInstance? existingItem = inventory.GetItemAtPosition(position.Value);
-            if (existingItem != null)
-            {
-                Log($"Stacking onto existing stack of {existingItem.Name} ({existingItem.Id}) with count {existingItem.Count}");
-                existingItem.Count += newItem.Count;
-                _itemInstances.Remove(newItem.Id);
-                inventory.Items.Remove(newItem);
-                return true;
-                
-            }
-            else
-            {
-                // Set position directly instead of using MoveItem to avoid creating duplicates
-                Log($"Created item {newItem.Id} ({newItem.Name}) in inventory {inventoryId} at {position.Value} {(infinite ? "infinite" : "")}");
-                newItem.GridPosition = position.Value;
-                // Item already added to inventory.Items at line ~425, just set position here
-                EmitSignal(nameof(InventoryUpdate), inventoryId);
-                if (!DeleteItemPath.IsEmpty)
+                Log($"Deleting spawned item from world {DeleteItemPath}");
+                Node? node = GetNodeOrNull(DeleteItemPath);
+                if (node != null)
                 {
-                    Log($"Deleting spawned item from world {DeleteItemPath}");
-                    Node? node = GetNodeOrNull(DeleteItemPath);
-                    if (node != null)
+                    // Call RPC on the WorldItem to delete it on all clients
+                    if (node is WorldItem worldItem)
                     {
-                        // Call RPC on the WorldItem to delete it on all clients
-                        if (node is WorldItem worldItem)
+                        if (Multiplayer.IsServer())
                         {
-                            if (Multiplayer.IsServer())
-                            {
-                                Log("Calling Destroy RPC on WorldItem");
-                                worldItem.Rpc(nameof(worldItem.Destroy));
-                            }
+                            Log("Calling Destroy RPC on WorldItem");
+                            worldItem.Rpc(nameof(worldItem.Destroy));
                         }
-                    }
-                    else
-                    {
-                        Log("Warning: Could not find node to delete at path " + DeleteItemPath);
                     }
                 }
                 else
                 {
-                    Log("No delete path provided, not deleting any world item");
+                    Log("Warning: Could not find node to delete at path " + DeleteItemPath);
                 }
-                return true;
+            }
+            else
+            {
+                Log("No delete path provided, not deleting any world item");
             }
         }
     }
 
     [Rpc(MultiplayerApi.RpcMode.AnyPeer, CallLocal = false, TransferMode = MultiplayerPeer.TransferModeEnum.Reliable)]
-    public void RequestSpawnInstance(string itemResourcePath, int inventoryId, NodePath deleteNodePath, bool infinite)
+    public void RequestSpawnInstance(string itemResourcePath, int inventoryId, NodePath deleteNodePath, int count, bool infinite)
     {
         if (Multiplayer.IsServer())
         {
-            if (SpawnInstance(itemResourcePath, inventoryId, deleteNodePath, check: true, infinite: infinite))
+            if (CanSpawnInstance(itemResourcePath, inventoryId, count: count))
             {
                 Inventory inventory = GetInventory(inventoryId);
-                Log($"Server accepts spawn instance of {itemResourcePath} in inventory {inventoryId}, sending to clients");
+                Log($"Server accepts spawn instance of {count} {itemResourcePath} in inventory {inventoryId}, sending to clients");
+                int freshInstanceId = GenerateItemInstanceId();
                 inventory.Notify(peerId =>
                 {
-                    RpcId(peerId, nameof(SpawnInstance), itemResourcePath, inventoryId, deleteNodePath, false, infinite);
+                    RpcId(peerId, nameof(SpawnInstance), itemResourcePath, inventoryId, deleteNodePath, freshInstanceId, count, infinite);
                 });
             }
             else
@@ -457,8 +517,24 @@ namespace InventorySystem
                 throw new Exception("Clients cannot spawn infinite items!");
             }
             Log("Client requesting item spawn");
-            RpcId(1, nameof(RequestSpawnInstance), itemResourcePath, inventoryId, deleteNodePath, false);
+            RpcId(1, nameof(RequestSpawnInstance), itemResourcePath, inventoryId, deleteNodePath, count, false);
         }
+    }
+
+    public bool CanSpawnInstance(string itemResourcePath, int inventoryId, int count)
+    {
+        ItemDefinition itemDef = GD.Load<ItemDefinition>(itemResourcePath);
+        var newItem = new ItemInstance
+        {
+            Id = -1,
+            ItemData = itemDef,
+            InventoryId = inventoryId,
+            Count = count
+        };
+
+        Vector2I? position = FindSpotToFitItem(newItem, inventoryId);
+        Log("Can spawn instance? " + (position.HasValue ? "Yes, found position at " + position.Value : "No, no valid position found"));
+        return position.HasValue;
     }
 
     public void CreateInventory(Vector2I size, int id, bool isShop = false)

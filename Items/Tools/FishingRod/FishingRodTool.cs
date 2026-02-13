@@ -87,7 +87,7 @@ public partial class FishingRodTool : ToolScript
         // Position and rotation are now controlled by the hand bone and tool scene positioning
         // No need to set them here anymore
 
-        _reelStrength = GetNode<ReelStrength>("ReelStrength");
+        _reelStrength = GetNode<ReelStrength>("Control");
     }
     
     public override void PrimaryFire(Character character)
@@ -96,8 +96,11 @@ public partial class FishingRodTool : ToolScript
 
         if (hookedItem != null)
         {
-            _inventoryManager.RequestSpawnInstance(hookedItem.ResourcePath, character.inventoryId, new NodePath(), false);
+            _inventoryManager.RequestSpawnInstance(hookedItem.ResourcePath, character.inventoryId, new NodePath(), 1, false);
+            character.SendDialogMessage($"You caught a {hookedItem.Name}!");
             hookedItem = null;
+            _fishMesh.Visible = false;
+            return;
         }
         
         if (_state == FishingState.Idle)
@@ -119,10 +122,7 @@ public partial class FishingRodTool : ToolScript
     public override void SecondaryFire(Character character)
     {
         holdingCharacter = character;
-        if (hookedItem != null)
-        {
-            hookedItem = null;
-        }
+
         if (_state == FishingState.Cast)
         {
             // Mark that right button is held for continuous letting out
@@ -383,23 +383,19 @@ public partial class FishingRodTool : ToolScript
             Texture2D originalTexture = GD.Load<Texture2D>(hookedItem.Icon);
             Image fishImage = originalTexture.GetImage();
                     // Rotate the image
-                fishImage.Rotate90(ClockDirection.Clockwise);
-                    // Create a new texture from the rotated image
-                Texture2D fishTexture = ImageTexture.CreateFromImage(fishImage);
-                    
-                _fishMesh.Visible = true;
-                    
-                var mat = _fishMesh.GetActiveMaterial(0) as StandardMaterial3D;
-                if (mat == null)
-                {
-                    mat = new StandardMaterial3D();
-                    _fishMesh.SetMaterialOverride(mat);
-                }
-                mat.AlbedoTexture = fishTexture;
-        }
-        else
-        {
+            fishImage.Rotate90(ClockDirection.Clockwise);
+                // Create a new texture from the rotated image
+            Texture2D fishTexture = ImageTexture.CreateFromImage(fishImage);
+                
             _fishMesh.Visible = true;
+                
+            var mat = _fishMesh.GetActiveMaterial(0) as StandardMaterial3D;
+            if (mat == null)
+            {
+                mat = new StandardMaterial3D();
+                _fishMesh.SetMaterialOverride(mat);
+            }
+            mat.AlbedoTexture = fishTexture;
         }
 
         

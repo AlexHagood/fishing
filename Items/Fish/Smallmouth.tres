@@ -7,4 +7,5 @@ script = ExtResource("1_hj6oq")
 Name = "Smallmouth Bass"
 Icon = "uid://d2jobbr65ff64"
 Size = Vector2i(2, 1)
+Value = 5
 metadata/_custom_type_script = "uid://dtbrmxc8w0vpf"

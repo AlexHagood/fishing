@@ -12,6 +12,8 @@ namespace InventorySystem
     public bool IsRotated { get; set; } = false;
     public bool Infinite = false;
 
+    public bool IsCoin => ItemData.ResourcePath == "res://Items/Coin.tres";
+
     public string Name => ItemData.Name;
 
     public Vector2I Size

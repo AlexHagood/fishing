@@ -37,6 +37,8 @@ public partial class ItemDefinition : Resource
     public bool Stackable => StackSize > 1;
 
     [Export] public PackedScene ToolScriptScene { get; set; }
+
+    [Export] public int Value { get; set; } = 1;
     
 
 }
