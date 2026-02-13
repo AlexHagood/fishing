@@ -25,7 +25,7 @@ jobs:
         run: dotnet restore
       
       - name: Build .NET project
-        run: dotnet build --configuration Release --no-restore
+        run: dotnet build --configuration ExportRelease --no-restore
       
       - name: Export Game
         id: export
