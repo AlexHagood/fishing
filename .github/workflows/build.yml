@@ -42,8 +42,8 @@ jobs:
           BUILD_DIR="${{ steps.export.outputs.build_directory }}"
           
           # Manually specify the debug build files
-          WINDOWS_BUILD="$BUILD_DIR/Releases/Windows/glop3.exe"
-          LINUX_BUILD="$BUILD_DIR/Releases/Linux/Glop3.x86_64"
+          WINDOWS_BUILD="$BUILD_DIR/Windows/glop3.exe"
+          LINUX_BUILD="$BUILD_DIR/Linux/Glop3.x86_64"
           
           # Check if files exist
           if [ ! -f "$WINDOWS_BUILD" ]; then
