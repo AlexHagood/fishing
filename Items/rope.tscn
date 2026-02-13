@@ -1,6 +1,6 @@
 [gd_scene format=3 uid="uid://bmqjs3528icoe"]
 
-[ext_resource type="Script" uid="uid://frwk5ql2n4by" path="res://Rope.cs" id="1_0756u"]
+[ext_resource type="Script" uid="uid://frwk5ql2n4by" path="res://Items/Rope.cs" id="1_0756u"]
 
 [sub_resource type="CylinderMesh" id="CylinderMesh_2cfd8"]
 top_radius = 0.01

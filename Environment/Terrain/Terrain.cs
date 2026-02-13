@@ -334,17 +334,6 @@ public partial class Terrain : Node3D
 		return generatedPositions;
 	}
 	
-	/// <summary>
-	/// Creates a debug line as a pink cylinder between two 3D points. If addToScene is false, does not add to scene tree (for dynamic lines).
-	/// </summary>
-	/// <param name="pointA">Start point</param>
-	/// <param name="pointB">End point</param>
-	/// <param name="addToScene">If true, adds to scene tree. If false, caller manages it.</param>
-
-	public void CreateDebugLine(Vector3 pointA, Vector3 pointB, bool addToScene = true)
-	{
-		DebugDraw3D.DrawArrow(pointA, pointB);
-	}
 
 	private static StandardMaterial3D CreateGrassMaterial()
     {

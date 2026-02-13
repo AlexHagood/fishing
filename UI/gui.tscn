@@ -10,7 +10,7 @@
 [ext_resource type="AudioStream" uid="uid://cny6s3cb8lk68" path="res://Sounds/drop.ogg" id="7_67jta"]
 [ext_resource type="Script" uid="uid://cji0cvrryc564" path="res://UI/ContextMenu.cs" id="9_p8208"]
 [ext_resource type="Script" uid="uid://cafdx3hab30sx" path="res://UI/Chat.cs" id="10_axmix"]
-[ext_resource type="Script" uid="uid://cakrr7tqxvh2d" path="res://Dialog.cs" id="11_7u6ry"]
+[ext_resource type="Script" uid="uid://cakrr7tqxvh2d" path="res://UI/Dialog.cs" id="11_7u6ry"]
 
 [sub_resource type="Animation" id="Animation_wfnr8"]
 resource_name = "BadWiggle"

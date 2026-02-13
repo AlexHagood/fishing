@@ -3,7 +3,7 @@
 importer="texture"
 type="CompressedTexture2D"
 uid="uid://djovt644owkex"
-path.s3tc="res://.godot/imported/heightmap.png-6f48792f8e9cde7ab5c63b4efb0fc57b.s3tc.ctex"
+path.s3tc="res://.godot/imported/heightmap.png-79ef86099550866caf428654eb568457.s3tc.ctex"
 metadata={
 "imported_formats": ["s3tc_bptc"],
 "vram_texture": true
@@ -11,8 +11,8 @@ metadata={
 
 [deps]
 
-source_file="res://heightmap.png"
-dest_files=["res://.godot/imported/heightmap.png-6f48792f8e9cde7ab5c63b4efb0fc57b.s3tc.ctex"]
+source_file="res://Environment/Terrain/heightmap.png"
+dest_files=["res://.godot/imported/heightmap.png-79ef86099550866caf428654eb568457.s3tc.ctex"]
 
 [params]
 

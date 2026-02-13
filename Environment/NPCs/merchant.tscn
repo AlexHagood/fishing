@@ -1,7 +1,7 @@
 [gd_scene format=3 uid="uid://dyfthathb27j0"]
 
-[ext_resource type="PackedScene" uid="uid://d0rj7djsnos6a" path="res://npc.tscn" id="1_vi8yi"]
-[ext_resource type="Script" uid="uid://1ycl3ektelvx" path="res://Merchant.cs" id="2_pm7pw"]
+[ext_resource type="PackedScene" uid="uid://d0rj7djsnos6a" path="res://Environment/NPCs/npc.tscn" id="1_vi8yi"]
+[ext_resource type="Script" uid="uid://1ycl3ektelvx" path="res://Environment/NPCs/Merchant.cs" id="2_pm7pw"]
 [ext_resource type="Resource" uid="uid://bw44vg40p452c" path="res://Items/Hook.tres" id="3_4467b"]
 [ext_resource type="Resource" uid="uid://d1omxjw12mqo3" path="res://Items/Tools/Pickaxe/Pickaxe.tres" id="4_k1q5i"]
 [ext_resource type="Resource" uid="uid://cdx2u0a1rvmah" path="res://Items/Tools/FishingRod/RodDef.tres" id="5_jjmm1"]
