@@ -34,41 +34,15 @@ jobs:
           godot_executable_download_url: https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_mono_linux_x86_64.zip
           godot_export_templates_download_url: https://github.com/godotengine/godot/releases/download/4.5.1-stable/Godot_v4.5.1-stable_mono_export_templates.tpz
           relative_project_path: ./
-          archive_output: true
-          export_debug: false
+          archive_output: false
+          export_debug: true
       
       - name: List export output
         run: |
-          echo "Archive directory: ${{ steps.export.outputs.archive_directory }}"
           echo "Build directory: ${{ steps.export.outputs.build_directory }}"
-          ls -la ${{ steps.export.outputs.build_directory }} || true
-          find ${{ steps.export.outputs.build_directory }} -type f || true
-      
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: game-builds
-          path: ${{ steps.export.outputs.build_directory }}/**/*
-          if-no-files-found: error
+          echo "Contents of Releases directory:"
+          ls -laR ${{ steps.export.outputs.build_directory }}/Releases || true
 
-  release:
-    needs: build
-    runs-on: ubuntu-latest
-    if: github.event_name == 'push'
-    steps:
-      - name: Checkout (for gh CLI)
-        uses: actions/checkout@v2
-      
-      - name: Download all artifacts
-        uses: actions/download-artifact@v4
-        with:
-          path: ./artifacts
-      
-      - name: List artifacts
-        run: |
-          echo "Artifacts downloaded:"
-          ls -R ./artifacts
-      
       - name: Create Release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -76,13 +50,19 @@ jobs:
           SHORT_SHA="${GITHUB_SHA:0:7}"
           TAG="build-${SHORT_SHA}"
           
-          # Collect all files to upload
-          FILES=$(find ./artifacts -type f)
+          BUILD_DIR="${{ steps.export.outputs.build_directory }}"
+          
+          # Collect all files from Releases directory
+          FILES=$(find "$BUILD_DIR/Releases" -type f)
           
           if [ -z "$FILES" ]; then
-            echo "No files found to upload"
+            echo "No files found in $BUILD_DIR/Releases"
+            ls -laR "$BUILD_DIR" || true
             exit 1
           fi
+          
+          echo "Files to upload:"
+          echo "$FILES"
           
           # Create release with files
           gh release create "$TAG" \
