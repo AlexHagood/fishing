@@ -23,9 +23,17 @@ public partial class NetworkManager : Node
         
         // Server listens for new connections and spawns players
         Multiplayer.PeerConnected += OnPeerConnected;
+        Multiplayer.PeerDisconnected += OnPeerDisconnected;
+        Multiplayer.ConnectionFailed += OnConnectionFailed;
         
     }
 
+    private void OnConnectionFailed()
+    {
+        Log("Failed to connect to server. Exiting...");
+        GetTree().Quit();
+    }
+    
     private void OnPeerDisconnected(long peerId)
     {
         Log($"Peer {peerId} disconnected");
