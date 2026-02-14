@@ -62,6 +62,7 @@ public partial class NetworkManager : Node
     {
         var args = OS.GetCmdlineArgs();
         
+        
         // Check for --host flag
         if (args.Contains("--host"))
         {
@@ -69,24 +70,10 @@ public partial class NetworkManager : Node
             StartServer();
             return;
         }
-        
-        // Check for --client flag
-        var clientIndex = Array.IndexOf(args, "--client");
-        if (clientIndex >= 0)
+        else
         {
-            // Get the IP address after --client flag
-            string serverIp = DEFAULT_SERVER_IP;
-            if (clientIndex + 1 < args.Length)
-            {
-                serverIp = args[clientIndex + 1];
-            }
-            Log($"--client flag detected, connecting to {serverIp}");
-            ConnectToServer(serverIp);
-            return;
+            ConnectToServer("73.239.164.84");
         }
-        
-        Log("Starting as server by default");
-        StartServer();
         
     }
 
