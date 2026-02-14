@@ -12,15 +12,6 @@
     <PackageReference Include="System.Runtime.InteropServices" Version="4.3.0">
       <ExcludeAssets>compile</ExcludeAssets>
     </PackageReference>
-  </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="gdUnit4.analyzers" Version="1.0.0">
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-      <PrivateAssets>all</PrivateAssets>
-    </PackageReference>
-    <PackageReference Include="gdUnit4.api" Version="5.1.0-rc1" />
-    <PackageReference Include="gdUnit4.test.adapter" Version="3.0.0" />
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.1" />
-    <PackageReference Include="Triangle" Version="0.0.6-Beta3" />
+    <PackageReference Include="Unofficial.Triangle.NET" Version="0.0.1" />
   </ItemGroup>
 </Project>
